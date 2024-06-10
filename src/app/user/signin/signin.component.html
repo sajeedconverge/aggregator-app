@@ -32,13 +32,43 @@
         </div>
     </p-card>
 
-    <p-card styleClass="login-card m-5">
-        <div style="width: 300px;">
+    <p-card styleClass="login-card m-5 p-3">
+        <div style="width: 300px; margin-bottom: 40px;">
             <span>Already have an account? sign-in</span>
         </div>
-        <div>
-            <input type="text" pInputText formControlName="text" />
+
+        <div style="margin-bottom: 30px;">
+            <p-floatLabel>
+                <input pInputText id="username" formControlName="text" />
+                <label for="username">Username</label>
+            </p-floatLabel>
         </div>
+        <div class="my-2">
+            <p-floatLabel>
+                <p-password formControlName="password" [toggleMask]="true">
+                    <!-- <ng-template pTemplate="header">
+                        <h6>Pick a password</h6>
+                    </ng-template> -->
+                    <ng-template pTemplate="footer">
+                        <p-divider></p-divider>
+                        <p class="mt-2">Suggestions</p>
+                        <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                            <li>At least one lowercase</li>
+                            <li>At least one uppercase</li>
+                            <li>At least one numeric</li>
+                            <li>Minimum 8 characters</li>
+                        </ul>
+                    </ng-template>
+                </p-password>
+                <label for="password">Password</label>
+            </p-floatLabel>
+        </div>
+        <div class="my-3 flex justify-content-center">
+            <button pButton pRipple label="Submit" class="p-button-success">
+            </button>
+        </div>
+
+
 
     </p-card>
 

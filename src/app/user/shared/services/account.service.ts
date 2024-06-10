@@ -9,11 +9,11 @@ import { Constants } from '../../../shared/Constants';
 })
 export class AccountService {
   headers = new HttpHeaders().set('Content-Type', 'application/json');
-  
+
   constructor(private http: HttpClient) { }
 
-  externalLogin(request:SocialUser):Observable<any> {
-return this.http.post<any>(`${Constants.baseServerUrl}/`, request, { headers: this.headers } )
+  externalLogin(request: SocialUser): Observable<any> {
+    return this.http.post<any>(`${Constants.baseServerUrl}/Account/external-login`, request, { headers: this.headers })
   }
 
 

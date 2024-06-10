@@ -3,6 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
+import { AccountService } from '../shared/services/account.service';
+import { Router } from '@angular/router';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { PasswordModule } from 'primeng/password';
+import { DividerModule } from 'primeng/divider';
 
 @Component({
   selector: 'app-signin',
@@ -13,6 +18,9 @@ import { InputTextModule } from 'primeng/inputtext';
     ButtonModule,
     InputTextModule,
     CardModule,
+    FloatLabelModule,
+    PasswordModule,
+    DividerModule
   ],
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.css'
@@ -24,7 +32,9 @@ export class SigninComponent implements OnInit {
 
 
   constructor(
-    private authService: SocialAuthService
+    private authService: SocialAuthService,
+    private accountService: AccountService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -32,6 +42,10 @@ export class SigninComponent implements OnInit {
       this.user = user;
       this.loggedIn = (user != null);
       console.log(user);
+      this.accountService.externalLogin(this.user).subscribe((res) => {
+        console.log(res);
+this.router.navigate(['/home'])
+      })
     });
   }
 
@@ -40,7 +54,7 @@ export class SigninComponent implements OnInit {
   }
 
   externalLogin() {
-    
+
   }
 
 

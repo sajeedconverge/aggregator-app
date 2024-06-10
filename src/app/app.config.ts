@@ -9,8 +9,8 @@ import { authConfigInterceptor } from './user/shared/security/interceptors/auth-
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }), 
-    provideRouter(routes), 
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
     provideClientHydration(),
     provideHttpClient(withInterceptors([authConfigInterceptor])),
     provideAnimationsAsync()
