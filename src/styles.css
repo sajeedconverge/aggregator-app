@@ -1,1 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
+body{
+    background: rgb(245, 245, 245) !important;
+    margin: 0;
+}
+
+.p-card .p-card-body {
+    padding: 0 !important;
+}
+
+.p-card .p-card-content {
+    padding: 0 !important;
+}
+
+.facebook-button{
+    width: 250px;
+}
+
+.login-card{
+    margin-left: 20px;
+}
