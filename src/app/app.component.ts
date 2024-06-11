@@ -6,6 +6,7 @@ import { ToastModule } from 'primeng/toast';
 import { Subject } from 'rxjs';
 import { Constants } from './shared/Constants';
 import { CommonModule } from '@angular/common';
+import { Tooltip, TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +16,8 @@ import { CommonModule } from '@angular/common';
     ButtonModule,
     SidebarModule,
     ToastModule,
-    CommonModule
+    CommonModule,
+    TooltipModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
