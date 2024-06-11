@@ -18,3 +18,7 @@ body{
 .login-card{
     margin-left: 20px;
 }
+
+.custom-password .p-input-icon-right > .p-inputtext{
+    width: 350px;
+}

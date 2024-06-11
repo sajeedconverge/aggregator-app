@@ -33,19 +33,19 @@
     </p-card>
 
     <p-card styleClass="login-card m-5 p-3">
-        <div style="width: 300px; margin-bottom: 40px;">
+        <div style="width: 400px; margin-bottom: 40px;">
             <span>Already have an account? sign-in</span>
         </div>
 
         <div style="margin-bottom: 30px;">
             <p-floatLabel>
-                <input pInputText id="username" formControlName="text" />
+                <input pInputText id="username" formControlName="text" style="width: 350px;" />
                 <label for="username">Username</label>
             </p-floatLabel>
         </div>
-        <div class="my-2">
+        <div class="my-2 custom-password">
             <p-floatLabel>
-                <p-password formControlName="password" [toggleMask]="true">
+                <p-password formControlName="password" [toggleMask]="true" >
                     <!-- <ng-template pTemplate="header">
                         <h6>Pick a password</h6>
                     </ng-template> -->
