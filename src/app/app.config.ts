@@ -6,14 +6,16 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authConfigInterceptor } from './user/shared/security/interceptors/auth-config.interceptor';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }), 
-    provideRouter(routes), 
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
     provideClientHydration(),
     provideHttpClient(withInterceptors([authConfigInterceptor])),
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    MessageService
   ]
 };
 

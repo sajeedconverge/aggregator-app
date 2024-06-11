@@ -15,8 +15,8 @@ export class AuthService {
     const token = sessionStorage.getItem('access-token') || '';
     const decodedToken: any = this.jwtHelperService.decodeToken(token);
     let claims: TokenCustomClaims = {
-      userId: decodedToken?.userId,
-      PersonName: decodedToken?.PersonName,
+      userId: decodedToken?.sub,
+      PersonName: decodedToken?.FullName,
       Email: decodedToken?.Email,
       UserType: decodedToken?.UserType,
       exp: decodedToken?.exp
@@ -45,5 +45,7 @@ export class AuthService {
   isLoggedIn(): boolean {
     return sessionStorage.getItem("access-token") ? true : false
   }
+
   
+
 }
