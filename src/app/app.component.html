@@ -13,7 +13,7 @@
         }
     </div>
     <div></div>
-    <div class="mr-2">      
+    <div class="mr-2">
     </div>
 </div>
 
@@ -79,6 +79,17 @@
                             <span class="font-medium">Sign Out</span>
                         </a>
                     </li>
+
+                    <li (click)="sidebarVisible = false">
+                        <a pRipple
+                            class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                            <i class="pi pi-sun mr-2" *ngIf="!dark"></i>
+                            <i class="pi pi-moon mr-2" *ngIf="dark"></i>
+                            <p-inputSwitch [(ngModel)]="dark" />
+                        </a>
+                            
+                    </li>
+
 
                 </ul>
             </div>

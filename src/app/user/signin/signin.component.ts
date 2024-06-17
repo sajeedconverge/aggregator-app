@@ -11,6 +11,7 @@ import { DividerModule } from 'primeng/divider';
 import { Constants } from '../../shared/Constants';
 import { AuthService } from '../shared/services/auth.service';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-signin',
@@ -24,7 +25,7 @@ import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.com
     FloatLabelModule,
     PasswordModule,
     DividerModule,
-    ProgressBarComponent
+    ProgressBarComponent,
   ],
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.css'

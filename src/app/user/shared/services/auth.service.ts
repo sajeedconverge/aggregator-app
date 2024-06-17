@@ -46,6 +46,10 @@ export class AuthService {
     return sessionStorage.getItem("access-token") ? true : false
   }
 
+  //tempMethod
+  isUserLoggedIn(): boolean {
+    return sessionStorage.getItem("social-user") ? true : false
+  }
   
 
 }
