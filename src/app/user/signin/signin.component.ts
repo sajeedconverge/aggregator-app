@@ -12,6 +12,7 @@ import { Constants } from '../../shared/Constants';
 import { AuthService } from '../shared/services/auth.service';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { FormsModule } from '@angular/forms';
+import { log } from 'node:console';
 
 @Component({
   selector: 'app-signin',
@@ -53,7 +54,7 @@ export class SigninComponent implements OnInit {
         sessionStorage.setItem("social-user", JSON.stringify(this.user));
         console.log(res);
 
-        
+
         setTimeout(() => {
           this.isLoading = false;
           this.router.navigate(['/home']);
@@ -62,6 +63,20 @@ export class SigninComponent implements OnInit {
 
       });
     });
+
+    //temp code 
+    // const request = {
+    //   "email": "admin@local.com",
+    //   "password": "P@ssword@1"
+    // }
+
+    // this.accountService.login(request).subscribe((res) => {
+    //   if (res.status) {
+    //     console.log(res);
+
+    //   }
+    // });
+
   }
 
   signInWithFB(): void { //Facebook Login

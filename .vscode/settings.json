@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/73565ca8-f384-48bd-87c2-6771aeb6c0e2/resourceGroups/AggregatorResourceGroup/providers/Microsoft.Web/sites/AggregatorApp",
+    "appService.deploySubpath": "dist\\aggregator-app\\browser"
+}
