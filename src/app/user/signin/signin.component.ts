@@ -49,18 +49,17 @@ export class SigninComponent implements OnInit {
       this.user = user;
       this.loggedIn = (user != null);
 
-      console.log("google", user);
+      console.log(user.provider, user);
       this.accountService.externalLogin(this.user).subscribe((res) => {
         sessionStorage.setItem("social-user", JSON.stringify(this.user));
         console.log(res);
-
 
         setTimeout(() => {
           this.isLoading = false;
           this.router.navigate(['/home']);
           Constants.isLoggedInFlag = this.loggedIn;
         }, 1500);
-
+ 
       });
     });
 
