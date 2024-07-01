@@ -6,7 +6,11 @@ import { ToastModule } from 'primeng/toast';
 import { Subject } from 'rxjs';
 import { Constants } from './shared/Constants';
 import { CommonModule } from '@angular/common';
-import { Tooltip, TooltipModule } from 'primeng/tooltip';
+import { TooltipModule } from 'primeng/tooltip';
+import { ThemeService } from './shared/services/theme.service';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AuthService } from './user/shared/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +21,10 @@ import { Tooltip, TooltipModule } from 'primeng/tooltip';
     SidebarModule,
     ToastModule,
     CommonModule,
-    TooltipModule
+    TooltipModule,
+    InputSwitchModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -30,7 +37,8 @@ export class AppComponent implements OnInit {
   userName: string = "";
 
   constructor(
-
+    private themeService: ThemeService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -44,11 +52,17 @@ export class AppComponent implements OnInit {
 
   ngDoCheck() {
     // console.log("ngDoCheck");
-    this.isUserLoggedIn = Constants.isLoggedInFlag;
+     
+    this.isUserLoggedIn = Constants.isLoggedInFlag || this.authService.isUserLoggedIn();
   }
 
+  get dark() {
+    return this.themeService.theme === 'dark';
+  }
 
-
+  set dark(enabled: boolean) {
+    this.themeService.theme = enabled ? 'dark' : '';
+  }
 
 
   login() {

@@ -10,6 +10,9 @@ import { PasswordModule } from 'primeng/password';
 import { DividerModule } from 'primeng/divider';
 import { Constants } from '../../shared/Constants';
 import { AuthService } from '../shared/services/auth.service';
+import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
+import { FormsModule } from '@angular/forms';
+import { log } from 'node:console';
 
 @Component({
   selector: 'app-signin',
@@ -22,7 +25,8 @@ import { AuthService } from '../shared/services/auth.service';
     CardModule,
     FloatLabelModule,
     PasswordModule,
-    DividerModule
+    DividerModule,
+    ProgressBarComponent,
   ],
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.css'
@@ -30,46 +34,53 @@ import { AuthService } from '../shared/services/auth.service';
 export class SigninComponent implements OnInit {
   user!: SocialUser;
   loggedIn: boolean = false;
-
+  isLoading: boolean = false;
 
 
   constructor(
     private socialAuthService: SocialAuthService,
     private accountService: AccountService,
     private router: Router,
-    private authService: AuthService,
   ) { }
 
   ngOnInit(): void {
     this.socialAuthService.authState.subscribe((user) => {
+      this.isLoading = true;
       this.user = user;
       this.loggedIn = (user != null);
 
-      console.log("google", user);
+      console.log(user.provider, user);
       this.accountService.externalLogin(this.user).subscribe((res) => {
         sessionStorage.setItem("social-user", JSON.stringify(this.user));
         console.log(res);
-        this.router.navigate(['/home']);
-        Constants.isLoggedInFlag = this.loggedIn;
+
+        setTimeout(() => {
+          this.isLoading = false;
+          this.router.navigate(['/home']);
+          Constants.isLoggedInFlag = this.loggedIn;
+        }, 1500);
+ 
       });
     });
+
+    //temp code 
+    // const request = {
+    //   "email": "admin@local.com",
+    //   "password": "P@ssword@1"
+    // }
+
+    // this.accountService.login(request).subscribe((res) => {
+    //   if (res.status) {
+    //     console.log(res);
+
+    //   }
+    // });
+
   }
 
   signInWithFB(): void { //Facebook Login
+    this.isLoading = true;
     this.socialAuthService.signIn(FacebookLoginProvider.PROVIDER_ID);
-    // .then((user) => {
-    //   debugger;
-    //   this.user = user;
-    //   console.log("facebook", this.user); // For debugging purposes
-    //   this.accountService.externalLogin(this.user).subscribe((res) => {
-    //     console.log(res);
-    //     this.router.navigate(['/home']);
-    //     this.loggedIn = (user != null);
-    //     Constants.isLoggedInFlag = this.loggedIn;
-    //   });
-    // }).catch((err) => {
-    //   console.error(err);
-    // });
   }
 
   externalLogin() {

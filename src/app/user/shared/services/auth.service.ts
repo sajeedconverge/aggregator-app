@@ -12,7 +12,11 @@ export class AuthService {
   constructor() { }
 
   getLoggedInUserDetails(): TokenCustomClaims {
-    const token = sessionStorage.getItem('access-token') || '';
+    var token = '';
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      token = sessionStorage.getItem('access-token') || '';
+    } 
+
     const decodedToken: any = this.jwtHelperService.decodeToken(token);
     let claims: TokenCustomClaims = {
       userId: decodedToken?.sub,
@@ -43,9 +47,22 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return sessionStorage.getItem("access-token") ? true : false
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      return sessionStorage.getItem("access-token") ? true : false
+    } else {
+      return false;
+    }
+
   }
 
-  
+  //tempMethod
+  isUserLoggedIn(): boolean {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      return sessionStorage.getItem("social-user") ? true : false
+    } else {
+      return false;
+    }
+  }
+
 
 }

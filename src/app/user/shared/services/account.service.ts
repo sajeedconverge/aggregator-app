@@ -16,5 +16,8 @@ export class AccountService {
     return this.http.post<any>(`${Constants.baseServerUrl}/Account/external-login`, request, { headers: this.headers })
   }
 
+  login(request:any): Observable<any> {
+    return this.http.post<any>(`${Constants.baseServerUrl}/Account/login`, request, { headers: this.headers })
+  }
 
 }
