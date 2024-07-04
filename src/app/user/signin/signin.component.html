@@ -2,7 +2,7 @@
 <app-progress-bar></app-progress-bar>
 }
 
-<div class="flex flex-row flex-wrap m-5 p-3">
+<div class="flex flex-row flex-wrap m-5 p-3" *ngIf="!isUserLoggedIn">
 
     <p-card styleClass="social-continue-card">
         <div class=" m-5" style="width: 300px;">
