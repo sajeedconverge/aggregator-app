@@ -13,11 +13,13 @@ import { AuthService } from '../shared/services/auth.service';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { FormsModule } from '@angular/forms';
 import { log } from 'node:console';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-signin',
   standalone: true,
   imports: [
+    CommonModule,
     SocialLoginModule,
     GoogleSigninButtonModule,
     ButtonModule,
@@ -35,13 +37,16 @@ export class SigninComponent implements OnInit {
   user!: SocialUser;
   loggedIn: boolean = false;
   isLoading: boolean = false;
-
+  isUserLoggedIn = false;
 
   constructor(
     private socialAuthService: SocialAuthService,
     private accountService: AccountService,
     private router: Router,
-  ) { }
+    private authService: AuthService
+  ) {
+    //sessionStorage.clear();
+   }
 
   ngOnInit(): void {
     this.socialAuthService.authState.subscribe((user) => {
@@ -76,6 +81,11 @@ export class SigninComponent implements OnInit {
     //   }
     // });
 
+  }
+  ngDoCheck() {
+    // console.log("ngDoCheck");
+     
+    this.isUserLoggedIn = Constants.isLoggedInFlag || this.authService.isUserLoggedIn();
   }
 
   signInWithFB(): void { //Facebook Login

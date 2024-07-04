@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { SigninComponent } from './signin/signin.component';
 import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
+import { commonGuard } from './shared/security/guards/common.guard';
 
 const routes: Routes = [
   {
@@ -13,7 +14,8 @@ const routes: Routes = [
     component: RegisterComponent
   }, {
     path: 'home',
-    component: HomeComponent
+    component: HomeComponent,
+    canActivate:[commonGuard]
   }
 ];
 
