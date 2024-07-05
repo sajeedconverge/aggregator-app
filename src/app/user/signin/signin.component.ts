@@ -57,6 +57,7 @@ export class SigninComponent implements OnInit {
       console.log(user.provider, user);
       this.accountService.externalLogin(this.user).subscribe((res) => {
         sessionStorage.setItem("social-user", JSON.stringify(this.user));
+        this.authService.setAccessToken(res.payload.token);
         console.log(res);
 
         setTimeout(() => {
