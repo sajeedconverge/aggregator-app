@@ -69,19 +69,6 @@ export class SigninComponent implements OnInit {
       });
     });
 
-    //temp code 
-    // const request = {
-    //   "email": "admin@local.com",
-    //   "password": "P@ssword@1"
-    // }
-
-    // this.accountService.login(request).subscribe((res) => {
-    //   if (res.status) {
-    //     console.log(res);
-
-    //   }
-    // });
-
   }
   ngDoCheck() {
     // console.log("ngDoCheck");

@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Constants } from '../Constants';
+import { ResponseModel } from '../shared-models';
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +13,9 @@ export class SpotifyService {
 
   constructor(private http: HttpClient) { }
 
-  getSpotifyAccessToken(body: any): Observable<any> {
-    return this.http.post<any>(Constants.spotifyTokenUrl, body, { headers: Constants.spotifyHeader });
-  }
+  // getSpotifyAccessTokenOld(body: any): Observable<any> {
+  //   return this.http.post<any>(Constants.spotifyTokenUrl, body, { headers: Constants.spotifyHeader });
+  // }
 
   getArtists(token: string): Observable<any> {
     return this.http.get<any>(Constants.spotifyArtistsUrl, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
@@ -24,10 +25,25 @@ export class SpotifyService {
     return this.http.get<any>(Constants.spotifyPlaylistsUrl, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
   }
 
-
-  getSpotifyAuthUrl(): Observable<any> {
+  //.net api calls
+  getSpotifyAuthUrl(): Observable<ResponseModel> {
     return this.http.get<any>(Constants.baseServerUrl + '/Spotify/GetSpotifyAuthUrl', { headers: this.headers })
   }
 
+  getSpotifyAccessTokenUrl(): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + '/Spotify/GetSpotifyAccessTokenUrl', { headers: this.headers });
+  }
 
+  getSpotifyRecentlyPlayedUrl(): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + '/Spotify/GetSpotifyRecentlyPlayedUrl', { headers: this.headers });
+  }
+
+  //third party api calls
+  getSpotifyAccessToken(url: string, body: any): Observable<any> {
+    return this.http.post<any>(url, body, { headers: Constants.spotifyHeader });
+  }
+
+  GetSpotifyRecentlyPlayedUrl(url: string, body: any): Observable<any> {
+    return this.http.post<any>(url, body, { headers: Constants.spotifyHeader });
+  }
 }
