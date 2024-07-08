@@ -43,40 +43,72 @@ export class HomeComponent implements OnInit {
 
 
   loginToSpotify() {
-    const url = new URL('https://accounts.spotify.com/authorize');
-    const scopes = 'user-read-private user-read-email playlist-modify-private';
-    //harsh
-    //url.searchParams.set('client_id', "221899f30e1b45f39b4ae86c9a9ecdc0");
-    //sajeed sir
-    url.searchParams.set('client_id', "a3470aef0a5e4ca5bcb06600c262f026");
-    url.searchParams.set('redirect_uri', "http://localhost:4200/home");
-    url.searchParams.set('scope', scopes);
-    url.searchParams.set('response_type', 'code');
-    url.searchParams.set('show_dialog', 'true');
+    //var url = new URL('https://accounts.spotify.com/authorize');
+    // const scopes = 'user-read-private user-read-email playlist-modify-private';
+    // //harsh
+    // url.searchParams.set('client_id', "221899f30e1b45f39b4ae86c9a9ecdc0");
+    // //sajeed sir
+    // //  url.searchParams.set('client_id', "a3470aef0a5e4ca5bcb06600c262f026");
+    // url.searchParams.set('redirect_uri', "http://localhost:4200/home");
+    // url.searchParams.set('scope', scopes);
+    // url.searchParams.set('response_type', 'code');
+    // url.searchParams.set('show_dialog', 'true');
+    // // Open the URL in a new window that looks like a dialog
+    // const width = 500;
+    // const height = 600;
+    // const left = (screen.width / 2) - (width / 2);
+    // const top = (screen.height / 2) - (height / 2);
+    // const loginWindow = window.open(url.toString(), 'Spotify Login', `width=${width},height=${height},top=${top},left=${left}`);
+    // // Check the window URL periodically
+    // const intervalId = setInterval(() => {
+    //   try {
+    //     if (loginWindow && loginWindow.closed) {
+    //       clearInterval(intervalId);
+    //     } else if (loginWindow && loginWindow.location.href !== url.toString()) {
+    //       // Send the new URL back to the main window
+    //       window.postMessage(loginWindow.location.href, 'http://localhost:4200');
+    //       loginWindow.close();
+    //       clearInterval(intervalId);
+    //     }
+    //   } catch (e) {
+    //     // Cross-origin error, wait for the same-origin response
+    //   }
+    // }, 500);
 
-    // Open the URL in a new window that looks like a dialog
-    const width = 500;
-    const height = 600;
-    const left = (screen.width / 2) - (width / 2);
-    const top = (screen.height / 2) - (height / 2);
+    var url: any;
+    this.spotifyService.getSpotifyAuthUrl().subscribe((res) => {
+      if (res) {
+        //console.log(res);
+        url = new URL(res.payload);
 
-    const loginWindow = window.open(url.toString(), 'Spotify Login', `width=${width},height=${height},top=${top},left=${left}`);
+        // Open the URL in a new window that looks like a dialog
+        const width = 500;
+        const height = 600;
+        const left = (screen.width / 2) - (width / 2);
+        const top = (screen.height / 2) - (height / 2);
 
-    // Check the window URL periodically
-    const intervalId = setInterval(() => {
-      try {
-        if (loginWindow && loginWindow.closed) {
-          clearInterval(intervalId);
-        } else if (loginWindow && loginWindow.location.href !== url.toString()) {
-          // Send the new URL back to the main window
-          window.postMessage(loginWindow.location.href, 'http://localhost:4200');
-          loginWindow.close();
-          clearInterval(intervalId);
-        }
-      } catch (e) {
-        // Cross-origin error, wait for the same-origin response
-      }
-    }, 500);
+        const loginWindow = window.open(url.toString(), 'Spotify Login', `width=${width},height=${height},top=${top},left=${left}`);
+
+        // Check the window URL periodically
+        const intervalId = setInterval(() => {
+          try {
+            if (loginWindow && loginWindow.closed) {
+              clearInterval(intervalId);
+            } else if (loginWindow && loginWindow.location.href !== url.toString()) {
+              // Send the new URL back to the main window
+              window.postMessage(loginWindow.location.href, 'http://localhost:4200');
+              loginWindow.close();
+              clearInterval(intervalId);
+            }
+          } catch (e) {
+            // Cross-origin error, wait for the same-origin response
+          }
+        }, 500);
+      };
+    });
+
+
+
 
 
   }
@@ -88,7 +120,6 @@ export class HomeComponent implements OnInit {
     if (event.origin !== 'http://localhost:4200') {
       return;
     }
-
     try {
       // Handle the received message (new URL)
       const newUrl = event.data;
@@ -115,6 +146,7 @@ export class HomeComponent implements OnInit {
 
     this.spotifyService.getSpotifyAccessToken(body).subscribe(res => {
       if (res) {
+        debugger;
         console.log(res);
         Constants.spotifyBearerToken = res.access_token;
         sessionStorage.setItem('spotifyBearerToken', res.access_token);
@@ -130,6 +162,16 @@ export class HomeComponent implements OnInit {
         this.artistsResponse = res;
         this.artistsResponseString = JSON.stringify(this.artistsResponse);
         console.log("artists response", this.artistsResponse);
+      };
+    });
+  }
+
+  getPlaylists() {
+    this.spotifyService.getPlaylists(Constants.spotifyBearerToken).subscribe((res) => {
+      if (res) {
+        this.artistsResponse = res;
+        this.artistsResponseString = JSON.stringify(this.artistsResponse);
+        console.log("playlists response", this.artistsResponse);
       };
     });
   }

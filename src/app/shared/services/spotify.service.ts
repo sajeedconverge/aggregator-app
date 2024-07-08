@@ -7,9 +7,8 @@ import { Constants } from '../Constants';
   providedIn: 'root'
 })
 export class SpotifyService {
-  headers = new HttpHeaders()
-  .set('Content-Type', 'application/json')
-  ;
+  // headers = new HttpHeaders().set('Content-Type', 'application/json');
+  headers = new HttpHeaders().set('Content-Type', 'application/json');
 
   constructor(private http: HttpClient) { }
 
@@ -17,8 +16,18 @@ export class SpotifyService {
     return this.http.post<any>(Constants.spotifyTokenUrl, body, { headers: Constants.spotifyHeader });
   }
 
-  getArtists(token:string): Observable<any>{
-    return this.http.get<any>(Constants.spotifyArtistsUrl, { headers: this.headers.set('Authorization',`Bearer ${token}`) });
+  getArtists(token: string): Observable<any> {
+    return this.http.get<any>(Constants.spotifyArtistsUrl, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
   }
+
+  getPlaylists(token: string): Observable<any> {
+    return this.http.get<any>(Constants.spotifyPlaylistsUrl, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
+  }
+
+
+  getSpotifyAuthUrl(): Observable<any> {
+    return this.http.get<any>(Constants.baseServerUrl + '/Spotify/GetSpotifyAuthUrl', { headers: this.headers })
+  }
+
 
 }

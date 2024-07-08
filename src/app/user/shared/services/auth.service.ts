@@ -11,22 +11,22 @@ export class AuthService {
 
   constructor() { }
 
-  getLoggedInUserDetails(): TokenCustomClaims {
-    var token = '';
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      token = sessionStorage.getItem('access-token') || '';
-    } 
+  // getLoggedInUserDetails(): TokenCustomClaims {
+  //   var token = '';
+  //   if (typeof window !== 'undefined' && window.sessionStorage) {
+  //     token = sessionStorage.getItem('access-token') || '';
+  //   } 
 
-    const decodedToken: any = this.jwtHelperService.decodeToken(token);
-    let claims: TokenCustomClaims = {
-      userId: decodedToken?.sub,
-      PersonName: decodedToken?.FullName,
-      Email: decodedToken?.Email,
-      UserType: decodedToken?.UserType,
-      exp: decodedToken?.exp
-    }
-    return claims;
-  }
+  //   const decodedToken: any = this.jwtHelperService.decodeToken(token);
+  //   let claims: TokenCustomClaims = {
+  //     userId: decodedToken?.sub,
+  //     PersonName: decodedToken?.FullName,
+  //     Email: decodedToken?.Email,
+  //     UserType: decodedToken?.UserType,
+  //     exp: decodedToken?.exp
+  //   }
+  //   return claims;
+  // }
 
   isUserAuthorized() {
     const accessToken = sessionStorage.getItem('access-token') || '';
@@ -36,7 +36,21 @@ export class AuthService {
     return expirationDate > currentDate;
   }
 
-  getUserToken(): string {
+  setAccessToken(token: string) {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.setItem('access-token', token);
+    }
+  }
+
+  getAccessToken(): string | null {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      return sessionStorage.getItem('access-token') || '';
+    } else {
+      return null;
+    }
+  }
+
+  getdecodedUserToken(): string {
     const token = sessionStorage.getItem('access-token') || '';
     const decodedToken: string = this.jwtHelperService.decodeToken(token) || '';
     return decodedToken;
