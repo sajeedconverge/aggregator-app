@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Constants } from '../Constants';
+import { Constants } from '../../../shared/Constants';
 import { SpotifyService } from './spotify.service';
 
 @Injectable({

@@ -3,7 +3,7 @@ import { throwError } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { SpotifyAuthorizationService } from '../../../../shared/services/spotify-authorization.service';
+import { SpotifyAuthorizationService } from '../../../../spotify/shared/services/spotify-authorization.service';
 
 export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
   const spotifyAuthService = inject(SpotifyAuthorizationService);

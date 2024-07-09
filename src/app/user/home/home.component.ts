@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { catchError, map } from 'rxjs';
-import { SpotifyService } from '../../shared/services/spotify.service';
+import { SpotifyService } from '../../spotify/shared/services/spotify.service';
 import { Constants } from '../../shared/Constants';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { FormsModule } from '@angular/forms';
-import { SpotifyAuthorizationService } from '../../shared/services/spotify-authorization.service';
+import { SpotifyAuthorizationService } from '../../spotify/shared/services/spotify-authorization.service';
+import { StravaAuthorizationService } from '../../strava/shared/services/strava-authorization.service';
 
 @Component({
   selector: 'app-home',
@@ -28,7 +29,8 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private spotifyService: SpotifyService,
-    public spotifyAuthService: SpotifyAuthorizationService
+    public spotifyAuthService: SpotifyAuthorizationService,
+    public stravaAuthService: StravaAuthorizationService
   ) { }
 
   ngOnInit(): void {
@@ -62,7 +64,6 @@ export class HomeComponent implements OnInit {
     }
   }
 
-
   getArtists() {
     const spotifyBearerToken: string = sessionStorage.getItem('spotify-bearer-token') || '';
     this.spotifyService.getArtists(spotifyBearerToken).subscribe((res) => {
@@ -88,6 +89,9 @@ export class HomeComponent implements OnInit {
 
   //# Strava
 
+  callStravaAuth() {
+    this.stravaAuthService.loginToStrava();
+  }
 
 
 

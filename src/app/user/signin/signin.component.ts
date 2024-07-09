@@ -14,7 +14,7 @@ import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.com
 import { FormsModule } from '@angular/forms';
 import { log } from 'node:console';
 import { CommonModule } from '@angular/common';
-import { SpotifyService } from '../../shared/services/spotify.service';
+import { SpotifyService } from '../../spotify/shared/services/spotify.service';
 
 @Component({
   selector: 'app-signin',

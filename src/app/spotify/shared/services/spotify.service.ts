@@ -1,8 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Constants } from '../Constants';
-import { ResponseModel } from '../shared-models';
+import { Constants } from '../../../shared/Constants';
+import { ResponseModel } from '../../../shared/shared-models';
 
 @Injectable({
   providedIn: 'root'

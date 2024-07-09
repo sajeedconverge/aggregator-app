@@ -1,4 +1,4 @@
-<div class="topnav flex flex-row justify-content-between p-2" *ngIf="isUserLoggedIn" >
+<div class="topnav flex flex-row justify-content-between p-2" *ngIf="isUserLoggedIn">
 
     <div class="ml-2">
         @if (isUserLoggedIn) {
@@ -32,8 +32,8 @@
             </div>
             <div class="overflow-y-auto">
                 <ul class="list-none p-3 m-0">
-                    <li (click)="sidebarVisible = false">
-                        <a pRipple routerLink="['/home']"
+                    <li (click)="navigateToPath('/home')" >
+                        <a pRipple 
                             class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                             <i class="pi pi-home mr-2"></i>
                             <span class="font-medium">Home</span>
@@ -61,6 +61,22 @@
                             class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple text-decoration-none">
                             <i class="pi pi-credit-card mr-2"></i>
                             <span class="font-medium">Manage Subscription</span>
+                        </a>
+                    </li>
+
+                    <li (click)="navigateToPath('/spotify/consent')">
+                        <a pRipple 
+                            class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                            <i class="pi pi-cog mr-2"></i>
+                            <span class="font-medium">Spotify</span>
+                        </a>
+                    </li>
+
+                    <li (click)="navigateToPath('/strava/consent')">
+                        <a pRipple 
+                            class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                            <i class="pi pi-cog mr-2"></i>
+                            <span class="font-medium">Strava</span>
                         </a>
                     </li>
 

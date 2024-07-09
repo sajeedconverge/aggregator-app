@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { SidebarModule } from 'primeng/sidebar';
 import { ToastModule } from 'primeng/toast';
@@ -11,17 +11,17 @@ import { ThemeService } from './shared/services/theme.service';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from './user/shared/services/auth.service';
-import { SpotifyService } from './shared/services/spotify.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
+    CommonModule,
     RouterOutlet,
     ButtonModule,
     SidebarModule,
     ToastModule,
-    CommonModule,
+
     TooltipModule,
     InputSwitchModule,
     FormsModule,
@@ -39,7 +39,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     private themeService: ThemeService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -64,9 +65,10 @@ export class AppComponent implements OnInit {
     this.themeService.theme = enabled ? 'dark' : '';
   }
 
-
-  login() {
-
+  navigateToPath(path: string) {
+    this.sidebarVisible = false;
+    this.router.navigate([`${path}`]);
+    
   }
 
   logout() {
