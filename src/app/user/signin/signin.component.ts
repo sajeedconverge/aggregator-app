@@ -14,6 +14,7 @@ import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.com
 import { FormsModule } from '@angular/forms';
 import { log } from 'node:console';
 import { CommonModule } from '@angular/common';
+import { SpotifyService } from '../../shared/services/spotify.service';
 
 @Component({
   selector: 'app-signin',
@@ -43,9 +44,10 @@ export class SigninComponent implements OnInit {
     private socialAuthService: SocialAuthService,
     private accountService: AccountService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private spotifyService: SpotifyService
   ) {
-    //sessionStorage.clear();
+    sessionStorage.clear();
    }
 
   ngOnInit(): void {
@@ -56,7 +58,7 @@ export class SigninComponent implements OnInit {
 
       console.log(user.provider, user);
       this.accountService.externalLogin(this.user).subscribe((res) => {
-        sessionStorage.setItem("social-user", JSON.stringify(this.user));
+        //sessionStorage.setItem("social-user", JSON.stringify(this.user));
         this.authService.setAccessToken(res.payload.token);
         console.log(res);
 
@@ -64,6 +66,12 @@ export class SigninComponent implements OnInit {
           this.isLoading = false;
           this.router.navigate(['/home']);
           Constants.isLoggedInFlag = this.loggedIn;
+          //to set the spotify settings from api to client app
+          this.spotifyService.getSpotifyData().subscribe((res) => {
+            if (res.statusCode === 200) {
+              Constants.spotifySettings = res.payload;
+            }
+          });
         }, 1500);
  
       });
@@ -73,7 +81,7 @@ export class SigninComponent implements OnInit {
   ngDoCheck() {
     // console.log("ngDoCheck");
      
-    this.isUserLoggedIn = Constants.isLoggedInFlag || this.authService.isUserLoggedIn();
+    this.isUserLoggedIn = Constants.isLoggedInFlag || this.authService.isLoggedIn();
   }
 
   signInWithFB(): void { //Facebook Login
@@ -81,9 +89,7 @@ export class SigninComponent implements OnInit {
     this.socialAuthService.signIn(FacebookLoginProvider.PROVIDER_ID);
   }
 
-  externalLogin() {
-
-  }
+  
 
 
   signOut(): any { //for logging out

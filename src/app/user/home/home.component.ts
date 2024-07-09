@@ -83,31 +83,100 @@ export class HomeComponent implements OnInit {
       const urlObj = new URL(newUrl);
       // Use the new URL to extract the authorization code and get the token
       const authCode = urlObj.searchParams.get('code');
-      this.getTokenFromCode(authCode);
-      console.log('authCode  ', authCode)
+      this.getSpotifyAccessToken(authCode);
+      //console.log('authCode  ', authCode)
     } catch (error) {
       //console.error('Invalid URL received:', event.data);
     }
   }
   //#To get access token
-  getTokenFromCode(authCode: any) {
+  getSpotifyAccessToken(authCode: any) {
     var body = new URLSearchParams();
     body.set('grant_type', 'authorization_code');
     body.set('code', authCode);
-    body.set('redirect_uri', Constants.clientAppRedirectUrl);
+    body.set('redirect_uri', Constants.spotifySettings.redirectClientUrl);
 
     this.spotifyService.getSpotifyAccessTokenUrl().subscribe((res) => {
       if (res.statusCode === 200) {
         const tokenUrl: string = res.payload;
-        this.spotifyService.getSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
+        this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
           if (res) {
-            console.log(res);
+            console.log("new access token", res);
             sessionStorage.setItem('spotify-bearer-token', res.access_token);
+            sessionStorage.setItem('spotify-refresh-token', res.refresh_token);
+
+            const currentDateTime = new Date();
+            const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
+            console.log(currentDateTime,tokenExpiryTime);
+            sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
           };
         })
       }
     });
   }
+//To refresh access token
+  refreshSpotifyAccessToken() {
+    const refreshToken: string = sessionStorage.getItem('spotify-refresh-token') || '';
+
+    var body = new URLSearchParams();
+    body.set('grant_type', 'refresh_token');
+    body.set('refresh_token', refreshToken);
+    body.set('client_id', Constants.spotifySettings.clientId);
+
+    this.spotifyService.getSpotifyAccessTokenUrl().subscribe((res) => {
+      if (res.statusCode === 200) {
+        const tokenUrl: string = res.payload;
+        this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
+          if (res) {
+            console.log("refresh access token", res);
+            sessionStorage.setItem('spotify-bearer-token', res.access_token);
+            
+            const currentDateTime = new Date();
+            const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
+            console.log(currentDateTime,tokenExpiryTime);
+            sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
+          };
+        })
+      };
+    });
+  }
+
+  checkExpiryAndRefreshToken() {
+    const sbtExpiryTime = sessionStorage.getItem('sbt-expiry-time');
+    if (sbtExpiryTime) {
+      const futureDateTime = new Date(sbtExpiryTime);
+      const currentTime = new Date();
+
+      // Calculate the difference in milliseconds
+      const timeDifference = futureDateTime.getTime() - currentTime.getTime();
+
+      // Convert the difference to minutes
+      const timeDifferenceInMinutes = timeDifference / (1000 * 60);
+
+      // If the difference is 10 minutes or less, call refreshSpotifyAccessToken
+      if (timeDifferenceInMinutes <= 10) {
+        this.refreshSpotifyAccessToken();
+      }
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   getArtists() {

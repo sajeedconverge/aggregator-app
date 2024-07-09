@@ -1,4 +1,5 @@
 import { HttpHeaders } from "@angular/common/http";
+import { SpotifySettings } from "./shared-models";
 
 export class Constants {
 
@@ -7,8 +8,13 @@ export class Constants {
 
     public static isLoggedInFlag: boolean = false;
 
-    public static clientAppRedirectUrl: string = "http://localhost:4200/home";
-    // public static clientAppRedirectUrl:string=""
+    
+    public static spotifySettings: SpotifySettings = {
+        clientId: "",
+        clientSecret: "",
+        scopes: "",
+        redirectClientUrl: ""
+    }
 
     public static spotifyHeader = new HttpHeaders({
         'Authorization': 'Basic ' + btoa('a3470aef0a5e4ca5bcb06600c262f026' + ':' + '25e7aab330324d8ba368c08e7b4a5800'),

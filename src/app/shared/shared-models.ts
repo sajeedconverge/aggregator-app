@@ -4,3 +4,10 @@ export interface ResponseModel{
     message: string
     status: boolean
 }
+
+export interface SpotifySettings {
+    clientId: string;
+    clientSecret: string;
+    scopes: string;
+    redirectClientUrl: string;
+}
