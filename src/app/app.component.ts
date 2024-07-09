@@ -68,11 +68,12 @@ export class AppComponent implements OnInit {
   navigateToPath(path: string) {
     this.sidebarVisible = false;
     this.router.navigate([`${path}`]);
-    
+
   }
 
   logout() {
-
+    sessionStorage.clear();
+    this.router.navigate([`/`]);
   }
 
 

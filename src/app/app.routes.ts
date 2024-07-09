@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { commonGuard } from './user/shared/security/guards/common.guard';
 
 export const routes: Routes = [
     {
@@ -7,10 +8,12 @@ export const routes: Routes = [
     },
     {
         path:'spotify',
-        loadChildren: ()=> import('./spotify/spotify.module').then(m=> m.SpotifyModule)
+        loadChildren: ()=> import('./spotify/spotify.module').then(m=> m.SpotifyModule),
+        canActivate:[commonGuard]
     },
     {
         path:'strava',
-        loadChildren: ()=> import('./strava/strava.module').then(m=> m.StravaModule)
+        loadChildren: ()=> import('./strava/strava.module').then(m=> m.StravaModule),
+        canActivate:[commonGuard]
     },
 ];

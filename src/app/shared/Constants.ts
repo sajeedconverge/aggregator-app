@@ -1,5 +1,6 @@
 import { HttpHeaders } from "@angular/common/http";
-import { SpotifySettings } from "./shared-models";
+import { SpotifySettings } from "../spotify/shared/models/spotify-models";
+import { StravaSettings } from "../strava/shared/models/strava-models";
 
 export class Constants {
 
@@ -14,6 +15,13 @@ export class Constants {
         clientSecret: "",
         scopes: "",
         redirectClientUrl: ""
+    }
+
+    public static stravaSettings: StravaSettings = {
+        clientId: 0,
+        clientSecret: "",
+        redirectClientUrl: "",
+        scope: ""
     }
 
     public static spotifyHeader = new HttpHeaders({

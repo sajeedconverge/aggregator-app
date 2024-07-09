@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { log } from 'node:console';
 import { CommonModule } from '@angular/common';
 import { SpotifyService } from '../../spotify/shared/services/spotify.service';
+import { StravaService } from '../../strava/shared/services/strava.service';
 
 @Component({
   selector: 'app-signin',
@@ -45,7 +46,8 @@ export class SigninComponent implements OnInit {
     private accountService: AccountService,
     private router: Router,
     private authService: AuthService,
-    private spotifyService: SpotifyService
+    private spotifyService: SpotifyService,
+    private stravaService: StravaService
   ) {
     if (typeof window !== 'undefined' && window.sessionStorage) {
       sessionStorage.clear();
@@ -73,6 +75,11 @@ export class SigninComponent implements OnInit {
           this.spotifyService.getSpotifyData().subscribe((res) => {
             if (res.statusCode === 200) {
               Constants.spotifySettings = res.payload;
+            }
+          });
+          this.stravaService.getStravaData().subscribe((res) => {
+            if (res.statusCode === 200) {
+              Constants.stravaSettings = res.payload;
             }
           });
         }, 1500);
