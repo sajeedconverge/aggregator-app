@@ -43,7 +43,7 @@ export class HomeComponent implements OnInit {
     this.spotifyAuthService.loginToSpotify();
   }
 
-  //#To extract the authcode
+  //#To extract the authcode (Spotify)
   receiveMessage(event: MessageEvent) {
     // Ensure the message is from the expected origin
     if (event.origin !== 'http://localhost:4200') {
@@ -61,9 +61,6 @@ export class HomeComponent implements OnInit {
       //console.error('Invalid URL received:', event.data);
     }
   }
-
-
-
 
 
   getArtists() {
@@ -87,5 +84,22 @@ export class HomeComponent implements OnInit {
       };
     });
   }
+
+
+  //# Strava
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
