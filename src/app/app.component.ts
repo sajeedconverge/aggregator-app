@@ -11,6 +11,7 @@ import { ThemeService } from './shared/services/theme.service';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from './user/shared/services/auth.service';
+import { SpotifyService } from './shared/services/spotify.service';
 
 @Component({
   selector: 'app-root',
@@ -42,7 +43,6 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-
   }
 
   ngOnDestroy(): void {
@@ -52,8 +52,8 @@ export class AppComponent implements OnInit {
 
   ngDoCheck() {
     // console.log("ngDoCheck");
-     
-    this.isUserLoggedIn = Constants.isLoggedInFlag || this.authService.isUserLoggedIn();
+
+    this.isUserLoggedIn = Constants.isLoggedInFlag || this.authService.isLoggedIn();
   }
 
   get dark() {

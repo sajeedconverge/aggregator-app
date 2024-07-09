@@ -69,14 +69,14 @@ export class AuthService {
 
   }
 
-  //tempMethod
-  isUserLoggedIn(): boolean {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      return sessionStorage.getItem("social-user") ? true : false
-    } else {
-      return false;
-    }
-  }
+  // //tempMethod
+  // isUserLoggedIn(): boolean {
+  //   if (typeof window !== 'undefined' && window.sessionStorage) {
+  //     return sessionStorage.getItem("social-user") ? true : false
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
 
 }
