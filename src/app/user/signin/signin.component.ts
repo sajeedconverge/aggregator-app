@@ -47,8 +47,11 @@ export class SigninComponent implements OnInit {
     private authService: AuthService,
     private spotifyService: SpotifyService
   ) {
-    sessionStorage.clear();
-   }
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.clear();
+    };
+
+  }
 
   ngOnInit(): void {
     this.socialAuthService.authState.subscribe((user) => {
@@ -73,14 +76,14 @@ export class SigninComponent implements OnInit {
             }
           });
         }, 1500);
- 
+
       });
     });
 
   }
   ngDoCheck() {
     // console.log("ngDoCheck");
-     
+
     this.isUserLoggedIn = Constants.isLoggedInFlag || this.authService.isLoggedIn();
   }
 
@@ -89,7 +92,7 @@ export class SigninComponent implements OnInit {
     this.socialAuthService.signIn(FacebookLoginProvider.PROVIDER_ID);
   }
 
-  
+
 
 
   signOut(): any { //for logging out

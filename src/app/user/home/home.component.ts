@@ -107,14 +107,14 @@ export class HomeComponent implements OnInit {
 
             const currentDateTime = new Date();
             const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
-            console.log(currentDateTime,tokenExpiryTime);
+            console.log(currentDateTime, tokenExpiryTime);
             sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
           };
         })
       }
     });
   }
-//To refresh access token
+  //To refresh access token
   refreshSpotifyAccessToken() {
     const refreshToken: string = sessionStorage.getItem('spotify-refresh-token') || '';
 
@@ -130,17 +130,17 @@ export class HomeComponent implements OnInit {
           if (res) {
             console.log("refresh access token", res);
             sessionStorage.setItem('spotify-bearer-token', res.access_token);
-            
+
             const currentDateTime = new Date();
             const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
-            console.log(currentDateTime,tokenExpiryTime);
+            console.log(currentDateTime, tokenExpiryTime);
             sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
           };
         })
       };
     });
   }
-
+  //To check sbt expiry and refresh the access token
   checkExpiryAndRefreshToken() {
     const sbtExpiryTime = sessionStorage.getItem('sbt-expiry-time');
     if (sbtExpiryTime) {
