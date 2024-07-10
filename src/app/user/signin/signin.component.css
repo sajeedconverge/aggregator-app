@@ -1,0 +1,85 @@
+.signin_mainpage{
+    height: 100vh;
+    width: 100%;
+    align-items: center;
+    background-color: #4070f4;
+    column-gap: 30px;
+    justify-content: center;
+}
+
+
+::ng-deep .signin_mainpage form input{
+    outline: none;
+    padding: 0 12px;
+    border: 1px solid #CACACA;
+    height: 38px;
+    width: 100%;
+    color: #000;
+    font-size: 14px;
+}
+::ng-deep .signin_title{
+    text-align: center;
+    margin-bottom: 25px;
+}
+::ng-deep .signin_title span{
+    font-size: 28px;
+    font-weight: 600;
+    color: #232836;
+    text-align: center;
+}
+::ng-deep .signin_btn button{
+    height: 100%;
+    width: 100%;
+    border: none;
+    font-size: 16px;
+    font-weight: 400;
+    border-radius: 6px;
+}
+::ng-deep .orline{
+    position: relative;
+    height: 1px;
+    width: 100%;
+    margin: 36px 0 10px;
+    background-color: #d4d4d4;
+}
+::ng-deep .orline::before{
+    content: 'Or';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #FFF;
+    color: #8b8b8b;
+    padding: 0 15px;
+    font-size: 14px;
+    line-height: 1.2;
+}
+::ng-deep .input_top{
+    margin-top:20px;
+}
+::ng-deep .login_google{
+    margin-top: 15px;
+    text-align: center;
+}
+::ng-deep .login_google iframe{
+    margin: -2px auto !important;
+}
+::ng-deep .login_fb{
+    margin-top: 15px;
+    text-align: center;
+}
+
+::ng-deep .form-link{
+    text-align: center;
+    margin-top: 10px;
+}
+::ng-deep .form-link span,
+::ng-deep .form-link a{
+    font-size: 14px;
+    font-weight: 400;
+    color: #232836;
+}
+::ng-deep .form a{
+    color: #0171d3;
+    text-decoration: none;
+}

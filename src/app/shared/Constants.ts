@@ -1,12 +1,13 @@
 import { HttpHeaders } from "@angular/common/http";
-import { SpotifySettings } from "./shared-models";
+import { SpotifySettings } from "../spotify/shared/models/spotify-models";
+import { StravaSettings } from "../strava/shared/models/strava-models";
 
 export class Constants {
 
     public static baseServerUrl: string = 'https://localhost:44354/api/v1';
     // public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1';
 
-    public static isLoggedInFlag: boolean = false;
+    //public static isLoggedInFlag: boolean = false;
 
     
     public static spotifySettings: SpotifySettings = {
@@ -14,6 +15,13 @@ export class Constants {
         clientSecret: "",
         scopes: "",
         redirectClientUrl: ""
+    }
+
+    public static stravaSettings: StravaSettings = {
+        clientId: 0,
+        clientSecret: "",
+        redirectClientUrl: "",
+        scope: ""
     }
 
     public static spotifyHeader = new HttpHeaders({

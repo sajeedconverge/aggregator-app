@@ -19,10 +19,42 @@ body{
     width: 250px;
 }
 
-.login-card{
-    margin-left: 20px;
-}
-
 .custom-password .p-input-icon-right > .p-inputtext{
     width: 350px;
+}
+
+.signin_mainpage.show-signup .login-card {
+    opacity: 0;
+    pointer-events: none;
+}
+.signin_mainpage .login-card{
+    position: absolute;
+    background: #FFF;
+    background: #fff;
+    border-radius: 6px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+}
+.signin_mainpage .login-card .p-card{
+    box-shadow: none;
+}
+.signin_mainpage p-card.register-card {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    background: #fff;
+    border-radius: 6px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+}
+.signin_mainpage.show-signup p-card.register-card {
+    opacity: 1;
+    pointer-events: auto;
+}
+.signin_mainpage p-card.register-card .p-card{
+    box-shadow: none;
 }

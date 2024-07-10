@@ -6,16 +6,19 @@ import { HomeComponent } from './home/home.component';
 import { commonGuard } from './shared/security/guards/common.guard';
 
 const routes: Routes = [
+  //  {
+  //   path: '',
+  //   component: HomeComponent,
+  //   canActivate: [commonGuard]
+  // },
   {
     path: '',
     component: SigninComponent
-  }, {
-    path: 'create-account',
-    component: RegisterComponent
-  }, {
+  }, 
+  {
     path: 'home',
     component: HomeComponent,
-    canActivate:[commonGuard]
+    canActivate: [commonGuard]
   }
 ];
 

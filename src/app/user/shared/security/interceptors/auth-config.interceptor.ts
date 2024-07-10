@@ -3,7 +3,7 @@ import { throwError } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { SpotifyAuthorizationService } from '../../../../shared/services/spotify-authorization.service';
+import { SpotifyAuthorizationService } from '../../../../spotify/shared/services/spotify-authorization.service';
 
 export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
   const spotifyAuthService = inject(SpotifyAuthorizationService);
@@ -11,7 +11,7 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
   const url: string = req.url;
 
   //for not spotify api calls
-  if (!(url.includes('accounts.spotify.com') || url.includes('api.spotify.com'))) {
+  if (!(url.includes('accounts.spotify.com') || url.includes('api.spotify.com') || url.includes('www.strava.com/api'))) {
     const authService = inject(AuthService);
     const router = inject(Router);
 
