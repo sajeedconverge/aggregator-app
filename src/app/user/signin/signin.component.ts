@@ -1,4 +1,4 @@
-import { FacebookLoginProvider, GoogleSigninButtonModule, SocialAuthService, SocialLoginModule, SocialUser } from '@abacritt/angularx-social-login';
+import { FacebookLoginProvider, GoogleLoginProvider, GoogleSigninButtonModule, SocialAuthService, SocialAuthServiceConfig, SocialLoginModule, SocialUser } from '@abacritt/angularx-social-login';
 import { Component, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -11,11 +11,12 @@ import { DividerModule } from 'primeng/divider';
 import { Constants } from '../../shared/Constants';
 import { AuthService } from '../shared/services/auth.service';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
-import { FormsModule } from '@angular/forms';
-import { log } from 'node:console';
 import { CommonModule } from '@angular/common';
 import { SpotifyService } from '../../spotify/shared/services/spotify.service';
 import { StravaService } from '../../strava/shared/services/strava.service';
+import { RegisterComponent } from "../register/register.component";
+import { UserModule } from '../user.module';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-signin',
@@ -31,15 +32,23 @@ import { StravaService } from '../../strava/shared/services/strava.service';
     PasswordModule,
     DividerModule,
     ProgressBarComponent,
+    RegisterComponent,
+    ReactiveFormsModule
   ],
   templateUrl: './signin.component.html',
-  styleUrl: './signin.component.css'
+  styleUrl: './signin.component.css',
+
 })
 export class SigninComponent implements OnInit {
   user!: SocialUser;
   loggedIn: boolean = false;
   isLoading: boolean = false;
   isUserLoggedIn = false;
+  signinForm!: FormGroup;
+  showSignUp: boolean = false;
+ 
+  
+
 
   constructor(
     private socialAuthService: SocialAuthService,
@@ -47,15 +56,36 @@ export class SigninComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private spotifyService: SpotifyService,
-    private stravaService: StravaService
+    private stravaService: StravaService,
+    private fb: FormBuilder
   ) {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      sessionStorage.clear();
-    };
+    // if (typeof window !== 'undefined' && window.sessionStorage) {
+    //   sessionStorage.clear();
+    // };
 
   }
 
+
+  ngAfterViewInit(): void {
+    const links: NodeListOf<HTMLAnchorElement> = document.querySelectorAll<HTMLAnchorElement>('a');
+    const forms: HTMLElement | null = document.querySelector<HTMLElement>('.signin_mainpage');
+    if (forms) {
+      links.forEach(link => {
+        link.addEventListener("click", (e: MouseEvent) => {
+          e.preventDefault(); // Preventing form submit
+          forms.classList.toggle("show-signup");
+        });
+      });
+    }
+  }
+
   ngOnInit(): void {
+
+    this.signinForm = this.fb.group({
+      email: new FormControl(),
+      password: new FormControl()
+    })
+
     this.socialAuthService.authState.subscribe((user) => {
       this.isLoading = true;
       this.user = user;
@@ -70,7 +100,7 @@ export class SigninComponent implements OnInit {
         setTimeout(() => {
           this.isLoading = false;
           this.router.navigate(['/home']);
-          Constants.isLoggedInFlag = this.loggedIn;
+          //Constants.isLoggedInFlag = this.loggedIn;
           //to set the spotify settings from api to client app
           this.spotifyService.getSpotifyData().subscribe((res) => {
             if (res.statusCode === 200) {
@@ -91,7 +121,7 @@ export class SigninComponent implements OnInit {
   ngDoCheck() {
     // console.log("ngDoCheck");
 
-    this.isUserLoggedIn = Constants.isLoggedInFlag || this.authService.isLoggedIn();
+    this.isUserLoggedIn = this.authService.isLoggedIn();
   }
 
   signInWithFB(): void { //Facebook Login
@@ -107,5 +137,8 @@ export class SigninComponent implements OnInit {
     console.log('logged out');
   }
 
+  onSubmit() {
+
+  }
 
 }

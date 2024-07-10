@@ -60,14 +60,14 @@ export class SpotifyAuthorizationService {
         const tokenUrl: string = res.payload;
         this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
           if (res) {
-            console.log("new access token", res);
+            //console.log("new access token", res);
             sessionStorage.setItem('spotify-bearer-token', res.access_token);
             sessionStorage.setItem('spotify-refresh-token', res.refresh_token);
 
             const currentDateTime = new Date();
             const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
-            console.log(currentDateTime, tokenExpiryTime);
-            sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
+            //console.log(currentDateTime, tokenExpiryTime);
+            sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toString());
           };
         })
       }
@@ -87,12 +87,12 @@ export class SpotifyAuthorizationService {
         const tokenUrl: string = res.payload;
         this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
           if (res) {
-            console.log("refresh access token", res);
+            //console.log("refresh access token", res);
             sessionStorage.setItem('spotify-bearer-token', res.access_token);
 
             const currentDateTime = new Date();
             const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
-            console.log(currentDateTime, tokenExpiryTime);
+            //console.log(currentDateTime, tokenExpiryTime);
             sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
           };
         })

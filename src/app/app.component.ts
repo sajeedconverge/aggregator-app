@@ -11,6 +11,7 @@ import { ThemeService } from './shared/services/theme.service';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from './user/shared/services/auth.service';
+import { SigninComponent } from './user/signin/signin.component';
 
 @Component({
   selector: 'app-root',
@@ -21,11 +22,11 @@ import { AuthService } from './user/shared/services/auth.service';
     ButtonModule,
     SidebarModule,
     ToastModule,
-
     TooltipModule,
     InputSwitchModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SigninComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -44,6 +45,7 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    
   }
 
   ngOnDestroy(): void {
@@ -54,7 +56,8 @@ export class AppComponent implements OnInit {
   ngDoCheck() {
     // console.log("ngDoCheck");
 
-    this.isUserLoggedIn = Constants.isLoggedInFlag || this.authService.isLoggedIn();
+    this.isUserLoggedIn = this.authService.isLoggedIn();
+    
   }
 
   get dark() {

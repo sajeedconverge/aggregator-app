@@ -2,54 +2,22 @@
 <app-progress-bar></app-progress-bar>
 }
 
-<div class="flex flex-row flex-wrap m-5 p-3" *ngIf="!isUserLoggedIn">
+<!-- <div class="flex flex-row flex-wrap m-5 p-3" *ngIf="!isUserLoggedIn"> -->
+<div class="flex flex-row flex-wrap signin_mainpage">
 
-    <p-card styleClass="social-continue-card">
-        <div class=" m-5" style="width: 300px;">
-            <div class=" p-2">
-                <div class=" m-2">
-                    <asl-google-signin-button type='standard' text="continue_with" size='large' [width]="250">
-                    </asl-google-signin-button>
-                </div>
-                <div class="m-2">
-                    <p-button size="small" label="Continue with Facebook" styleClass="facebook-button"
-                        icon="pi pi-facebook" (click)="signInWithFB()" />
-                </div>
-                <!-- <div class="m-2">
-                    <p-button label="Continue with Apple" severity="secondary" size="small" icon="pi pi-apple"
-                        styleClass="facebook-button" />
-                </div> -->
-                <div class="m-2 flex flex-row flex-wrap">
-                    <div class="flex align-items-center justify-content-center w-6rem h-2rem"></div>
-                    <div class="flex align-items-center justify-content-center w-4rem h-2rem">
-                        <span>or</span>
-                    </div>
-                    <div class="flex align-items-center justify-content-center w-4rem h-2rem"></div>
-                </div>
-                <div class="m-2">
-                    <p-button label="Create Account" size="small" severity="info" styleClass="facebook-button" />
-                </div>
-                <div class="m-2"></div>
-                <div class="m-2"></div>
 
+    <p-card  class=" login-card p-3" >
+        <form [formGroup]="signinForm" (ngSubmit)="onSubmit()">
+
+            <div class="signin_title">
+                <span>Sign In</span>
             </div>
-        </div>
-    </p-card>
+            <div class="input_top">
+                <input pInputText id="username" formControlName="email" placeholder="Email" />
+            </div>
+            <div class="custom-password input_top">
 
-    <p-card styleClass="login-card m-5 p-3">
-        <div style="width: 400px; margin-bottom: 40px;">
-            <span>Already have an account? sign-in</span>
-        </div>
-
-        <div style="margin-bottom: 30px;">
-            <p-floatLabel>
-                <input pInputText id="username" formControlName="text" style="width: 350px;" />
-                <label for="username">Username</label>
-            </p-floatLabel>
-        </div>
-        <div class="my-2 custom-password">
-            <p-floatLabel>
-                <p-password formControlName="password" [toggleMask]="true">
+                <p-password formControlName="password" [toggleMask]="true" placeholder="Password">
                     <!-- <ng-template pTemplate="header">
                         <h6>Pick a password</h6>
                     </ng-template> -->
@@ -64,16 +32,31 @@
                         </ul>
                     </ng-template>
                 </p-password>
-                <label for="password">Password</label>
-            </p-floatLabel>
-        </div>
-        <div class="my-3 flex justify-content-center">
-            <button pButton pRipple label="Submit" class="p-button-success">
-            </button>
-        </div>
+            </div>
 
+            <div class="flex justify-content-center signin_btn input_top">
+                <button pButton pRipple label="Sign In" class="p-button-primary">
+                </button>
+            </div>
 
+            <div class="form-link">
+                <span>Don't have an account? <a href="" class="link signup-link" (click)="showSignUp=true">Signup</a></span>
+              </div>
 
+            <div class="orline"></div>
+            <div class="p-2">
+                <div class="login_google">
+                    <asl-google-signin-button type='standard' text="continue_with" size='large' [width]="250">
+                    </asl-google-signin-button>
+                </div>
+                <div class="login_fb">
+                    <p-button size="small" label="Continue with Facebook" styleClass="facebook-button"
+                        icon="pi pi-facebook" (click)="signInWithFB()" />
+                </div>
+            </div>
+        </form>
     </p-card>
+
+    <app-register ></app-register>
 
 </div>

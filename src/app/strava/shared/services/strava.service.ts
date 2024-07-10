@@ -8,8 +8,12 @@ import { Constants } from '../../../shared/Constants';
   providedIn: 'root'
 })
 export class StravaService {
+  stravaAccessToken: string = sessionStorage.getItem('strava-bearer-token') || '';
+
   headers = new HttpHeaders().set('Content-Type', 'application/json');
-  //formHeaders = new HttpHeaders().set('Content-Type', 'multipart/form-data');
+  stravaHeaders = new HttpHeaders()
+    .set('Content-Type', 'application/json')
+    .set('authorization', `Bearer ${this.stravaAccessToken}`);
 
   constructor(private http: HttpClient) { }
 
@@ -26,11 +30,18 @@ export class StravaService {
     return this.http.get<any>(Constants.baseServerUrl + '/Strava/GetStravaAccessTokenUrl', { headers: this.headers });
   }
 
+  getStravaAthleteActivitiesUrl(): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + '/Strava/GetAthleteActivitiesUrl', { headers: this.headers });
+  }
+
   // third party api calls
   generateStravaAccessToken(url: string, body: any): Observable<any> {
     return this.http.post<any>(url, body, { headers: this.headers });
   }
 
+  getStravaAthleteActivities(url: string): Observable<any> {
+    return this.http.get<any>(url, { headers: this.stravaHeaders })
+  }
 
 
 }

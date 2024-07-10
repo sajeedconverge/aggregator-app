@@ -1,1 +1,64 @@
-<p>register works!</p>
+<p-card  class="register-card p-3" >
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+        <div class="signin_title">
+            <span>Register</span>
+        </div>
+
+        <div class="input_top">
+            <input pInputText id="username" formControlName="firstName" 
+                placeholder="First Name" />
+        </div>
+
+        <div class="input_top">
+            <input pInputText id="username" formControlName="lastName"  placeholder="Last Name" />
+
+        </div>
+
+        <div class="input_top">
+            <input pInputText id="username" formControlName="email"  placeholder="Email" />
+        </div>
+
+        <div class="custom-password input_top">
+            <p-floatLabel>
+                <p-password formControlName="password" [toggleMask]="true">
+                    <!-- <ng-template pTemplate="header">
+                    <h6>Pick a password</h6>
+                </ng-template> -->
+                    <ng-template pTemplate="footer">
+                        <p-divider></p-divider>
+                        <p class="mt-2">Suggestions</p>
+                        <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                            <li>At least one lowercase</li>
+                            <li>At least one uppercase</li>
+                            <li>At least one numeric</li>
+                            <li>Minimum 8 characters</li>
+                        </ul>
+                    </ng-template>
+                </p-password>
+                <label for="password">Password</label>
+            </p-floatLabel>
+        </div>
+        <div class="my-3 flex justify-content-center signin_btn input_top">
+            <button pButton pRipple label="Register" class="p-button-primary">
+            </button>
+        </div>
+
+        <div class="form-link">
+            <span>Already have an account? <a href="" class="link login-link">Login</a></span>
+          </div>
+
+        <div class="orline"></div>
+            <div class="p-2">
+                <div class="login_google">
+                    <asl-google-signin-button type='standard' text="signup_with" size='large' [width]="250">
+                    </asl-google-signin-button>
+                </div>
+                <div class="login_fb">
+                    <p-button size="small" label="Sign up with Facebook" styleClass="facebook-button"
+                        icon="pi pi-facebook" (click)="signInWithFB()" />
+                </div>
+            </div>
+    </form>
+</p-card>

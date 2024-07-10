@@ -11,7 +11,7 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
   const url: string = req.url;
 
   //for not spotify api calls
-  if (!(url.includes('accounts.spotify.com') || url.includes('api.spotify.com'))) {
+  if (!(url.includes('accounts.spotify.com') || url.includes('api.spotify.com') || url.includes('www.strava.com/api'))) {
     const authService = inject(AuthService);
     const router = inject(Router);
 
