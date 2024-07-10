@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Constants } from '../../../shared/Constants';
+import { UserLoginRequest, UserRegisterRequest } from '../models/user-models';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +17,12 @@ export class AccountService {
     return this.http.post<any>(`${Constants.baseServerUrl}/Account/external-login`, request, { headers: this.headers })
   }
 
-  login(request:any): Observable<any> {
+  login(request:UserLoginRequest): Observable<any> {
     return this.http.post<any>(`${Constants.baseServerUrl}/Account/login`, request, { headers: this.headers })
+  }
+
+  register(request:UserRegisterRequest): Observable<any> {
+    return this.http.post<any>(`${Constants.baseServerUrl}/Account/Register`, request, { headers: this.headers })
   }
 
 }

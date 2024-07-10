@@ -65,6 +65,8 @@ export class StravaAuthorizationService {
             sessionStorage.setItem('strava-refresh-token', res.refresh_token);
             const tokenExpiryTime = new Date(res.expires_at * 1000);
             sessionStorage.setItem('strava-token-expiry-time', tokenExpiryTime.toString());
+
+            Constants.stravaHeader.set('Authorization',res.access_token);
           };
         })
       }

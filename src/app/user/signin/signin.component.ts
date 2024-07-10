@@ -17,6 +17,7 @@ import { StravaService } from '../../strava/shared/services/strava.service';
 import { RegisterComponent } from "../register/register.component";
 import { UserModule } from '../user.module';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { UserLoginRequest } from '../shared/models/user-models';
 
 @Component({
   selector: 'app-signin',
@@ -46,8 +47,8 @@ export class SigninComponent implements OnInit {
   isUserLoggedIn = false;
   signinForm!: FormGroup;
   showSignUp: boolean = false;
- 
-  
+  UserRequest!: UserLoginRequest;
+
 
 
   constructor(
@@ -65,17 +66,18 @@ export class SigninComponent implements OnInit {
 
   }
 
-
   ngAfterViewInit(): void {
-    const links: NodeListOf<HTMLAnchorElement> = document.querySelectorAll<HTMLAnchorElement>('a');
-    const forms: HTMLElement | null = document.querySelector<HTMLElement>('.signin_mainpage');
-    if (forms) {
-      links.forEach(link => {
-        link.addEventListener("click", (e: MouseEvent) => {
-          e.preventDefault(); // Preventing form submit
-          forms.classList.toggle("show-signup");
+    if (typeof document !== 'undefined') {
+      const links: NodeListOf<HTMLAnchorElement> = document.querySelectorAll<HTMLAnchorElement>('a');
+      const forms: HTMLElement | null = document.querySelector<HTMLElement>('.signin_mainpage');
+      if (forms) {
+        links.forEach(link => {
+          link.addEventListener("click", (e: MouseEvent) => {
+            e.preventDefault(); // Preventing form submit
+            forms.classList.toggle("show-signup");
+          });
         });
-      });
+      }
     }
   }
 
@@ -93,7 +95,7 @@ export class SigninComponent implements OnInit {
 
       console.log(user.provider, user);
       this.accountService.externalLogin(this.user).subscribe((res) => {
-        //sessionStorage.setItem("social-user", JSON.stringify(this.user));
+        //initial login process to store user data
         this.authService.setAccessToken(res.payload.token);
         console.log(res);
 
@@ -138,6 +140,37 @@ export class SigninComponent implements OnInit {
   }
 
   onSubmit() {
+    if (this.signinForm.valid) {
+      this.UserRequest = this.signinForm.value;
+      this.accountService.login(this.UserRequest).subscribe((res) => {
+        if (res.statusCode === 200) {
+
+          console.log('login success', res);
+
+          //initial login process to store user data
+          this.authService.setAccessToken(res.payload.token);
+          console.log(res);
+
+          setTimeout(() => {
+            this.isLoading = false;
+            this.router.navigate(['/home']);
+            //Constants.isLoggedInFlag = this.loggedIn;
+            //to set the spotify settings from api to client app
+            this.spotifyService.getSpotifyData().subscribe((res) => {
+              if (res.statusCode === 200) {
+                Constants.spotifySettings = res.payload;
+              }
+            });
+            this.stravaService.getStravaData().subscribe((res) => {
+              if (res.statusCode === 200) {
+                Constants.stravaSettings = res.payload;
+              }
+            });
+          }, 1500);
+
+        };
+      });
+    };
 
   }
 

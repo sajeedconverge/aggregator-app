@@ -14,7 +14,8 @@ import { StravaService } from '../../strava/shared/services/strava.service';
 import { AccountService } from '../shared/services/account.service';
 import { AuthService } from '../shared/services/auth.service';
 import { Router } from '@angular/router';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { UserRegisterRequest } from '../shared/models/user-models';
 
 @Component({
   selector: 'app-register',
@@ -41,7 +42,9 @@ export class RegisterComponent {
   loggedIn: boolean = false;
   isLoading: boolean = false;
   isUserLoggedIn = false;
-  registerForm!:FormGroup;
+  registerForm!: FormGroup;
+  UserRequest!: UserRegisterRequest;
+
   constructor(
     private socialAuthService: SocialAuthService,
     private accountService: AccountService,
@@ -49,7 +52,7 @@ export class RegisterComponent {
     private authService: AuthService,
     private spotifyService: SpotifyService,
     private stravaService: StravaService,
-    private fb : FormBuilder
+    private fb: FormBuilder
   ) {
     // if (typeof window !== 'undefined' && window.sessionStorage) {
     //   sessionStorage.clear();
@@ -59,11 +62,11 @@ export class RegisterComponent {
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
-      firstName:new FormControl(),
-      lastName:new FormControl(),
-      email: new FormControl(),
-      password: new FormControl()
-    })
+      firstName: new FormControl('', [Validators.required]),
+      lastName: new FormControl('', [Validators.required]),
+      email: new FormControl('', [Validators.required]),
+      password: new FormControl('', [Validators.required])
+    });
     this.socialAuthService.authState.subscribe((user) => {
       this.isLoading = true;
       this.user = user;
@@ -98,8 +101,9 @@ export class RegisterComponent {
   ngDoCheck() {
     // console.log("ngDoCheck");
 
-    this.isUserLoggedIn =  this.authService.isLoggedIn();
+    this.isUserLoggedIn = this.authService.isLoggedIn();
   }
+
 
   signInWithFB(): void { //Facebook Login
     this.isLoading = true;
@@ -107,7 +111,19 @@ export class RegisterComponent {
   }
 
   onSubmit() {
-
+    if(this.registerForm.valid) {
+      this.UserRequest = this.registerForm.value;
+      this.accountService.register(this.UserRequest).subscribe((res) => {
+        //debugger;
+        //if (res) {
+          
+          console.log('register success', res);
+          
+          this.router.navigate(['/home']);
+        //};
+      });
+    };
+    
   }
 
 

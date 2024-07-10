@@ -2,8 +2,8 @@
 <app-progress-bar></app-progress-bar>
 }
 
-<!-- <div class="flex flex-row flex-wrap m-5 p-3" *ngIf="!isUserLoggedIn"> -->
-<div class="flex flex-row flex-wrap signin_mainpage">
+<div class="flex flex-row flex-wrap signin_mainpage" *ngIf="!isUserLoggedIn">
+<!-- <div class="flex flex-row flex-wrap signin_mainpage"> -->
 
 
     <p-card  class=" login-card p-3" >
@@ -35,7 +35,7 @@
             </div>
 
             <div class="flex justify-content-center signin_btn input_top">
-                <button pButton pRipple label="Sign In" class="p-button-primary">
+                <button type="submit" pButton pRipple label="Sign In" class="p-button-primary">
                 </button>
             </div>
 
