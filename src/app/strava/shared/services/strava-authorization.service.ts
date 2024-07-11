@@ -38,7 +38,7 @@ export class StravaAuthorizationService {
     });
   }
 
-
+  //# To get strava unique code from url
   extractStravaCode(url: string) {
     const urlObj = new URL(url);
     // Use the new URL to extract the authorization code and get the token
@@ -61,12 +61,12 @@ export class StravaAuthorizationService {
         this.stravaService.generateStravaAccessToken(tokenUrl, body).subscribe((res) => {
           if (res) {
             console.log("new access token strava", res);
-            sessionStorage.setItem('strava-bearer-token', res.access_token);
-            sessionStorage.setItem('strava-refresh-token', res.refresh_token);
+            localStorage.setItem('strava-bearer-token', res.access_token);
+            localStorage.setItem('strava-refresh-token', res.refresh_token);
             const tokenExpiryTime = new Date(res.expires_at * 1000);
-            sessionStorage.setItem('strava-token-expiry-time', tokenExpiryTime.toString());
+            localStorage.setItem('strava-token-expiry-time', tokenExpiryTime.toString());
 
-            Constants.stravaHeader.set('Authorization',res.access_token);
+            Constants.stravaHeader.set('Authorization', res.access_token);
           };
         })
       }

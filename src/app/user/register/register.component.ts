@@ -54,9 +54,6 @@ export class RegisterComponent {
     private stravaService: StravaService,
     private fb: FormBuilder
   ) {
-    // if (typeof window !== 'undefined' && window.sessionStorage) {
-    //   sessionStorage.clear();
-    // };
 
   }
 
@@ -74,7 +71,7 @@ export class RegisterComponent {
 
       console.log(user.provider, user);
       this.accountService.externalLogin(this.user).subscribe((res) => {
-        //sessionStorage.setItem("social-user", JSON.stringify(this.user));
+        //localStorage.setItem("social-user", JSON.stringify(this.user));
         this.authService.setAccessToken(res.payload.token);
         console.log(res);
 
@@ -119,7 +116,7 @@ export class RegisterComponent {
           
           console.log('register success', res);
           
-          this.router.navigate(['/home']);
+          this.router.navigate(['/']);
         //};
       });
     };

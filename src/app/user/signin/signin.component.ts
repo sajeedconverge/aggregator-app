@@ -42,7 +42,7 @@ import { UserLoginRequest } from '../shared/models/user-models';
 })
 export class SigninComponent implements OnInit {
   user!: SocialUser;
-  loggedIn: boolean = false;
+  //loggedIn: boolean = false;
   isLoading: boolean = false;
   isUserLoggedIn = false;
   signinForm!: FormGroup;
@@ -60,9 +60,6 @@ export class SigninComponent implements OnInit {
     private stravaService: StravaService,
     private fb: FormBuilder
   ) {
-    // if (typeof window !== 'undefined' && window.sessionStorage) {
-    //   sessionStorage.clear();
-    // };
 
   }
 
@@ -89,34 +86,37 @@ export class SigninComponent implements OnInit {
     })
 
     this.socialAuthService.authState.subscribe((user) => {
-      this.isLoading = true;
-      this.user = user;
-      this.loggedIn = (user != null);
+     // debugger;
+      if (user) {
+        this.isLoading = true;
+        this.user = user;
+        //this.loggedIn = (user != null);
 
-      console.log(user.provider, user);
-      this.accountService.externalLogin(this.user).subscribe((res) => {
-        //initial login process to store user data
-        this.authService.setAccessToken(res.payload.token);
-        console.log(res);
+        console.log(user.provider, user);
+        this.accountService.externalLogin(this.user).subscribe((res) => {
+          //initial login process to store user data
+          this.authService.setAccessToken(res.payload.token);
+          console.log(res);
 
-        setTimeout(() => {
-          this.isLoading = false;
-          this.router.navigate(['/home']);
-          //Constants.isLoggedInFlag = this.loggedIn;
-          //to set the spotify settings from api to client app
-          this.spotifyService.getSpotifyData().subscribe((res) => {
-            if (res.statusCode === 200) {
-              Constants.spotifySettings = res.payload;
-            }
-          });
-          this.stravaService.getStravaData().subscribe((res) => {
-            if (res.statusCode === 200) {
-              Constants.stravaSettings = res.payload;
-            }
-          });
-        }, 1500);
-
-      });
+          setTimeout(() => {
+            this.isLoading = false;
+            this.router.navigate(['/home']);
+            //Constants.isLoggedInFlag = this.loggedIn;
+            //to set the spotify settings from api to client app
+            this.spotifyService.getSpotifyData().subscribe((res) => {
+              if (res.statusCode === 200) {
+                Constants.spotifySettings = res.payload;
+              }
+            });
+            this.stravaService.getStravaData().subscribe((res) => {
+              if (res.statusCode === 200) {
+                Constants.stravaSettings = res.payload;
+              }
+            });
+          }, 1500);
+          this.signOut();
+        });
+      };
     });
 
   }
