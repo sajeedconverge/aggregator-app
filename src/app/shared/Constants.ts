@@ -29,11 +29,13 @@ export class Constants {
         'Content-Type': 'application/x-www-form-urlencoded',
     });
 
+    public static stravaHeader = new HttpHeaders({
+        'Content-Type': 'application/json',
+    });
+
 
     public static spotifyArtistsUrl: string = "https://api.spotify.com/v1/artists/4Z8W4fKeB5YxbusRsdQVPb";
 
     public static spotifyPlaylistsUrl: string = 'https://api.spotify.com/v1/playlists/3Hvv07VydednTzQIBnSumd'
-
-
 
 }

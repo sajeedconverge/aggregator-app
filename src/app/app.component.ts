@@ -12,6 +12,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from './user/shared/services/auth.service';
 import { SigninComponent } from './user/signin/signin.component';
+import { SocialAuthService } from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'app-root',
@@ -42,10 +43,11 @@ export class AppComponent implements OnInit {
     private themeService: ThemeService,
     private authService: AuthService,
     private router: Router,
+    private socialAuthService: SocialAuthService,
   ) { }
 
   ngOnInit(): void {
-    
+    this.isUserLoggedIn = this.authService.isLoggedIn();
   }
 
   ngOnDestroy(): void {
@@ -55,9 +57,8 @@ export class AppComponent implements OnInit {
 
   ngDoCheck() {
     // console.log("ngDoCheck");
-
     this.isUserLoggedIn = this.authService.isLoggedIn();
-    
+
   }
 
   get dark() {
@@ -75,8 +76,13 @@ export class AppComponent implements OnInit {
   }
 
   logout() {
-    sessionStorage.clear();
-    this.router.navigate([`/`]);
+    this.isUserLoggedIn = false;
+    this.socialAuthService.signOut(true);
+    localStorage.clear();
+    setTimeout(() => {
+      this.router.navigate(['/']);
+    }, 500);
+    
   }
 
 

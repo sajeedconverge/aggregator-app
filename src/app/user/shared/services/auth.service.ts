@@ -11,25 +11,10 @@ export class AuthService {
 
   constructor() { }
 
-  // getLoggedInUserDetails(): TokenCustomClaims {
-  //   var token = '';
-  //   if (typeof window !== 'undefined' && window.sessionStorage) {
-  //     token = sessionStorage.getItem('access-token') || '';
-  //   } 
-
-  //   const decodedToken: any = this.jwtHelperService.decodeToken(token);
-  //   let claims: TokenCustomClaims = {
-  //     userId: decodedToken?.sub,
-  //     PersonName: decodedToken?.FullName,
-  //     Email: decodedToken?.Email,
-  //     UserType: decodedToken?.UserType,
-  //     exp: decodedToken?.exp
-  //   }
-  //   return claims;
-  // }
+  
 
   isUserAuthorized() {
-    const accessToken = sessionStorage.getItem('access-token') || '';
+    const accessToken = localStorage.getItem('access-token') || '';
     const payload = JSON.parse(atob(accessToken.split('.')[1]));
     const expirationDate = new Date(payload.exp * 1000);
     const currentDate = new Date();
@@ -37,46 +22,34 @@ export class AuthService {
   }
 
   setAccessToken(token: string) {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      sessionStorage.setItem('access-token', token);
-    }
+    localStorage.setItem('access-token', token);
+
   }
 
   getAccessToken(): string | null {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      return sessionStorage.getItem('access-token') || '';
-    } else {
-      return null;
-    }
+    return localStorage.getItem('access-token') || '';
+
   }
 
   getdecodedUserToken(): string {
-    const token = sessionStorage.getItem('access-token') || '';
+    const token = localStorage.getItem('access-token') || '';
     const decodedToken: string = this.jwtHelperService.decodeToken(token) || '';
     return decodedToken;
   }
 
   removeToken() {
-    sessionStorage.clear();
+    localStorage.clear();
   }
 
-  isLoggedIn(): boolean {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      return sessionStorage.getItem("access-token") ? true : false
-    } else {
+  isLoggedIn() {
+    if (window.localStorage) {
+      return localStorage.getItem("access-token") ? true : false
+    }
+    else {
       return false;
     }
 
   }
-
-  // //tempMethod
-  // isUserLoggedIn(): boolean {
-  //   if (typeof window !== 'undefined' && window.sessionStorage) {
-  //     return sessionStorage.getItem("social-user") ? true : false
-  //   } else {
-  //     return false;
-  //   }
-  // }
 
 
 }

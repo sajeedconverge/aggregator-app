@@ -13,7 +13,7 @@ export class SpotifyAuthorizationService {
 
 
   //#to open spotify login modal
-  loginToSpotify() {
+  loginToSpotify1() {
     var url: any;
     this.spotifyService.getSpotifyAuthUrl().subscribe((res) => {
       if (res) {
@@ -48,6 +48,45 @@ export class SpotifyAuthorizationService {
     
   }
 
+  loginToSpotify() {
+    var url: any;
+    this.spotifyService.getSpotifyAuthUrl().subscribe((res) => {
+      if (res) {
+        //console.log(res);
+        url = new URL(res.payload);
+
+        const spotifyWindow = window.open(url, '_blank', 'width=600,height=600');
+        if (!spotifyWindow) {
+          console.error('Failed to open the window');
+          return;
+        }
+
+        const interval = setInterval(() => {
+          try {
+            if (spotifyWindow.location.href.includes(Constants.stravaSettings.redirectClientUrl)) {
+              clearInterval(interval);
+              const redirectedUrl = spotifyWindow.location.href;
+              spotifyWindow.close();
+              this.extractSpotifyCode(redirectedUrl);
+            }
+          } catch (error) {
+            // Error is expected due to cross-origin policies when accessing the window.location.href
+          }
+        }, 1000);
+        
+      };
+    });
+    
+  }
+
+  //# To get spotify auth code from url
+  extractSpotifyCode(url: string) {
+    const urlObj = new URL(url);
+    // Use the new URL to extract the authorization code and get the token
+    const authCode = urlObj.searchParams.get('code');
+    this.getSpotifyAccessToken(authCode);
+  }
+
   //#To get access token
   getSpotifyAccessToken(authCode: any) {
     var body = new URLSearchParams();
@@ -61,13 +100,13 @@ export class SpotifyAuthorizationService {
         this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
           if (res) {
             //console.log("new access token", res);
-            sessionStorage.setItem('spotify-bearer-token', res.access_token);
-            sessionStorage.setItem('spotify-refresh-token', res.refresh_token);
+            localStorage.setItem('spotify-bearer-token', res.access_token);
+            localStorage.setItem('spotify-refresh-token', res.refresh_token);
 
             const currentDateTime = new Date();
             const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
             //console.log(currentDateTime, tokenExpiryTime);
-            sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toString());
+            localStorage.setItem('sbt-expiry-time', tokenExpiryTime.toString());
           };
         })
       }
@@ -75,7 +114,7 @@ export class SpotifyAuthorizationService {
   }
   //To refresh access token
   refreshSpotifyAccessToken() {
-    const refreshToken: string = sessionStorage.getItem('spotify-refresh-token') || '';
+    const refreshToken: string = localStorage.getItem('spotify-refresh-token') || '';
 
     var body = new URLSearchParams();
     body.set('grant_type', 'refresh_token');
@@ -88,12 +127,12 @@ export class SpotifyAuthorizationService {
         this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
           if (res) {
             //console.log("refresh access token", res);
-            sessionStorage.setItem('spotify-bearer-token', res.access_token);
+            localStorage.setItem('spotify-bearer-token', res.access_token);
 
             const currentDateTime = new Date();
             const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
             //console.log(currentDateTime, tokenExpiryTime);
-            sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
+            localStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
           };
         })
       };
@@ -101,7 +140,7 @@ export class SpotifyAuthorizationService {
   }
   //To check sbt expiry and refresh the access token
   checkExpiryAndRefreshToken() {
-    const sbtExpiryTime = sessionStorage.getItem('sbt-expiry-time');
+    const sbtExpiryTime = localStorage.getItem('sbt-expiry-time');
     if (sbtExpiryTime) {
       const futureDateTime = new Date(sbtExpiryTime);
       const currentTime = new Date();
