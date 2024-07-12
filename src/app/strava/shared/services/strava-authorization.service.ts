@@ -9,13 +9,14 @@ export class StravaAuthorizationService {
 
   constructor(private stravaService: StravaService) { }
 
+  //#to open spotify login modal
   loginToStrava() {
     var url: any;
     this.stravaService.getStravaAuthUrl().subscribe((res) => {
       if (res) {
         url = new URL(res.payload);
 
-        const stravaWindow = window.open(url, '_blank', 'width=600,height=600');
+        const stravaWindow = window.open(url, '_blank', 'width=500,height=600');
         if (!stravaWindow) {
           console.error('Failed to open the window');
           return;
@@ -37,7 +38,6 @@ export class StravaAuthorizationService {
       };
     });
   }
-
   //# To get strava unique code from url
   extractStravaCode(url: string) {
     const urlObj = new URL(url);
@@ -45,7 +45,6 @@ export class StravaAuthorizationService {
     const authCode = urlObj.searchParams.get('code');
     this.getStravaAccessToken(authCode);
   }
-
   //#To get Strava accessToken
   getStravaAccessToken(authCode: any) {
     const body: any = {
@@ -67,14 +66,15 @@ export class StravaAuthorizationService {
             localStorage.setItem('strava-token-expiry-time', tokenExpiryTime.toString());
 
             Constants.stravaHeader.set('Authorization', res.access_token);
+
+            
           };
         })
       }
     });
   }
 
-
-
+  
 
 
 

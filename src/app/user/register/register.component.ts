@@ -39,7 +39,7 @@ import { UserRegisterRequest } from '../shared/models/user-models';
 })
 export class RegisterComponent {
   user!: SocialUser;
-  loggedIn: boolean = false;
+  //loggedIn: boolean = false;
   isLoading: boolean = false;
   isUserLoggedIn = false;
   registerForm!: FormGroup;
@@ -65,33 +65,35 @@ export class RegisterComponent {
       password: new FormControl('', [Validators.required])
     });
     this.socialAuthService.authState.subscribe((user) => {
-      this.isLoading = true;
-      this.user = user;
-      this.loggedIn = (user != null);
+      if (user) {
+        this.isLoading = true;
+        this.user = user;
+        //this.loggedIn = (user != null);
 
-      console.log(user.provider, user);
-      this.accountService.externalLogin(this.user).subscribe((res) => {
-        //localStorage.setItem("social-user", JSON.stringify(this.user));
-        this.authService.setAccessToken(res.payload.token);
-        console.log(res);
+       // console.log(user.provider, user);
+        this.accountService.externalLogin(this.user).subscribe((res) => {
+          //localStorage.setItem("social-user", JSON.stringify(this.user));
+          this.authService.setAccessToken(res.payload.token);
+          //console.log(res);
 
-        setTimeout(() => {
-          this.isLoading = false;
-          this.router.navigate(['/home']);
-          //to set the spotify settings from api to client app
-          this.spotifyService.getSpotifyData().subscribe((res) => {
-            if (res.statusCode === 200) {
-              Constants.spotifySettings = res.payload;
-            }
-          });
-          this.stravaService.getStravaData().subscribe((res) => {
-            if (res.statusCode === 200) {
-              Constants.stravaSettings = res.payload;
-            }
-          });
-        }, 1500);
+          setTimeout(() => {
+            this.isLoading = false;
+            this.router.navigate(['/home']);
+            //to set the spotify settings from api to client app
+            this.spotifyService.getSpotifyData().subscribe((res) => {
+              if (res.statusCode === 200) {
+                Constants.spotifySettings = res.payload;
+              }
+            });
+            this.stravaService.getStravaData().subscribe((res) => {
+              if (res.statusCode === 200) {
+                Constants.stravaSettings = res.payload;
+              }
+            });
+          }, 1500);
 
-      });
+        });
+      };
     });
 
   }
@@ -108,19 +110,19 @@ export class RegisterComponent {
   }
 
   onSubmit() {
-    if(this.registerForm.valid) {
+    if (this.registerForm.valid) {
       this.UserRequest = this.registerForm.value;
       this.accountService.register(this.UserRequest).subscribe((res) => {
         //debugger;
         //if (res) {
-          
-          console.log('register success', res);
-          
-          this.router.navigate(['/']);
+
+        console.log('register success', res);
+
+        this.router.navigate(['/']);
         //};
       });
     };
-    
+
   }
 
 

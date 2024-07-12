@@ -18,31 +18,31 @@ import { StravaService } from '../shared/services/strava.service';
   templateUrl: './strava-consent.component.html',
   styleUrl: './strava-consent.component.css'
 })
-export class StravaConsentComponent implements OnInit {
+export class StravaConsentComponent {
 
 
-  constructor(
-    public stravaAuthService: StravaAuthorizationService,
-    private stravaService: StravaService
-  ) { }
+  // constructor(
+  //   public stravaAuthService: StravaAuthorizationService,
+  //   private stravaService: StravaService
+  // ) { }
 
 
-  ngOnInit(): void {
-    this.getAthleteActivities();
-  }
+  // ngOnInit(): void {
+  //   this.getAthleteActivities();
+  // }
 
-  callStravaAuth() {
-    this.stravaAuthService.loginToStrava();
-  }
+  // callStravaAuth() {
+  //   this.stravaAuthService.loginToStrava();
+  // }
 
-  getAthleteActivities() {
-    this.stravaService.getStravaAthleteActivitiesUrl().subscribe((res) => {
-      if (res.statusCode === 200) {
-        this.stravaService.getStravaAthleteActivities(res.payload).subscribe((res) => {
-          console.log('athlete activities', res);
-        })
-      }
-    })
-  }
+  // getAthleteActivities() {
+  //   this.stravaService.getStravaAthleteActivitiesUrl().subscribe((res) => {
+  //     if (res.statusCode === 200) {
+  //       this.stravaService.getStravaAthleteActivities(res.payload).subscribe((res) => {
+  //         console.log('athlete activities', res);
+  //       })
+  //     }
+  //   })
+  // }
 
 }

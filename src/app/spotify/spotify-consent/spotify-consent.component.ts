@@ -27,17 +27,17 @@ export class SpotifyConsentComponent {
     public spotifyAuthService: SpotifyAuthorizationService,
   ) { }
 
-  ngOnInit(): void {
-    // window.addEventListener('message', this.receiveMessage.bind(this), false);
-    //window.addEventListener('message', this.receiveMessage.bind(this), false);
-  }
-  // ngOnDestroy() {
-  //   window.removeEventListener('message', this.receiveMessage.bind(this), false);
+  // ngOnInit(): void {
+  //   // window.addEventListener('message', this.receiveMessage.bind(this), false);
+  //   //window.addEventListener('message', this.receiveMessage.bind(this), false);
   // }
+  // // ngOnDestroy() {
+  // //   window.removeEventListener('message', this.receiveMessage.bind(this), false);
+  // // }
 
-  callSpotifyAuth() {
-    this.spotifyAuthService.loginToSpotify();
-  }
+  // callSpotifyAuth() {
+  //   this.spotifyAuthService.loginToSpotify();
+  // }
 
   // //#To extract the authcode (Spotify)
   // receiveMessage(event: MessageEvent) {
