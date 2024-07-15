@@ -1,6 +1,6 @@
 @if(isLoading) {
-    <app-progress-bar></app-progress-bar>
-    }
+<app-progress-bar></app-progress-bar>
+}
 
 <div class="" style="display: flex;justify-content: center;margin-top: 20px;margin-bottom: 10px;">
 
@@ -36,7 +36,8 @@
         <ng-template pTemplate="body" let-activity>
             <tr>
                 <td>
-                    <p-button (click)="getActivityDetails(activity.id,activity.start_date)" [label]="activity.name" [link]="true" />
+                    <p-button class="anchor_btn" (click)="getActivityDetails(activity.id,activity.start_date)" [label]="activity.name"
+                        [link]="true" />
                 </td>
                 <td>{{ activity.start_date | date:'MMM d, y, h:mm:ss a' }}</td>
                 <td>{{ activity.sport_type }}</td>
@@ -79,8 +80,8 @@
             <tr>
                 <td>{{ activity.name }}</td>
                 <td>
-                    <p-button [disabled]="pairedTrack.track.id===0" (click)="getAudioFeatures(pairedTrack.track.id)" [label]="pairedTrack.track.name"
-                        [link]="true" />
+                    <p-button class="anchor_btn" [disabled]="pairedTrack.track.id===0" (click)="getAudioFeatures(pairedTrack.track.id)"
+                        [label]="pairedTrack.track.name" [link]="true" />
                 </td>
                 <td>{{ activity.start_date | date:'MMM d, y, h:mm:ss a' }}</td>
                 <td>{{ activity.sport_type }}</td>

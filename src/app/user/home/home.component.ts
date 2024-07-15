@@ -42,19 +42,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   pairedTrack: any;
   showAudioFeatures: boolean = false;
   audioFeatures: any[] = [];
-  isLoading: boolean = true;
+  isLoading: boolean = false;
 
 
 
   constructor(
     private stravaAuthService: StravaAuthorizationService,
-    private spotifyAuthService: SpotifyAuthorizationService,
     private stravaService: StravaService,
+    private spotifyAuthService: SpotifyAuthorizationService,
     private spotifyService: SpotifyService
   ) { }
 
   ngOnInit(): void {
-    this.isLoading = false;
     this.startCheckingToken();
     this.fetchThirdPartyDetails();
 
@@ -64,17 +63,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Ensure to clear the interval if the component is destroyed
     if (this.checkInterval) {
       clearInterval(this.checkInterval);
-    }
-
+    };
   }
 
   startCheckingToken(): void {
     this.checkInterval = setInterval(() => {
       const stravaAccessToken = localStorage.getItem('strava-bearer-token') || '';
-      const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
       if (stravaAccessToken.length > 0 && Constants.stravaSettings.clientId !== 0) {
         this.getAthleteActivities(stravaAccessToken);
-
         clearInterval(this.checkInterval); // Stop the interval
       };
     }, 2000); // Check every 2 seconds, adjust as needed
@@ -97,7 +93,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         Constants.stravaSettings = res.payload;
       }
     });
-
   }
 
   callSpotifyAuth() {
@@ -154,7 +149,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (res.statusCode === 200) {
         const url = res.payload;
 
-        this.spotifyService.getSpotifyRecentlyPlayed(url, spotifyAccessToken).subscribe((res) => {
+        this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((res) => {
           this.recentAudio = res.items;
           console.log("this.recentAudio", this.recentAudio);
 
@@ -208,7 +203,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (res.statusCode === 200) {
         var featuresUrl = res.payload;
         const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
-        this.spotifyService.getSpotifyAudioFeatures(featuresUrl, spotifyAccessToken).subscribe((res) => {
+        this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
           this.audioFeatures.push(res);
           this.showAudioFeatures = true;
         })

@@ -46,6 +46,10 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `/Spotify/GetAudioFeaturesUrl?trackId=${trackId}`, { headers: this.headers });
   }
 
+  getCurrentUserPlaylistsUrl(): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `/Spotify/GetCurrentUserPlaylistsUrl`, { headers: this.headers });
+  }
+
 
   //third party api calls
   //token api
@@ -55,13 +59,10 @@ export class SpotifyService {
     });
   }
   //fetch api
-  getSpotifyRecentlyPlayed(url: string, token: string): Observable<any> {
+  SpotifyCommonGetApi(url: string, token: string): Observable<any> {
     return this.http.get<any>(url, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
   }
 
-  getSpotifyAudioFeatures(url: string, token: string): Observable<any> {
-    return this.http.get<any>(url, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
-  }
 
 
 }
