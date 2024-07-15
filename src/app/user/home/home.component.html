@@ -1,7 +1,6 @@
-<!-- <div class="" style="display: flex;justify-content: center;margin-top: 20px;margin-bottom: 10px;">
-    <app-spotify-consent></app-spotify-consent>
-    <app-strava-consent></app-strava-consent>
-</div> -->
+@if(isLoading) {
+    <app-progress-bar></app-progress-bar>
+    }
 
 <div class="" style="display: flex;justify-content: center;margin-top: 20px;margin-bottom: 10px;">
 
@@ -37,7 +36,7 @@
         <ng-template pTemplate="body" let-activity>
             <tr>
                 <td>
-                    <p-button (click)="getActivityDetails(activity.id)" [label]="activity.name" [link]="true" />
+                    <p-button (click)="getActivityDetails(activity.id,activity.start_date)" [label]="activity.name" [link]="true" />
                 </td>
                 <td>{{ activity.start_date | date:'MMM d, y, h:mm:ss a' }}</td>
                 <td>{{ activity.sport_type }}</td>

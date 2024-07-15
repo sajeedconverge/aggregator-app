@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SpotifyConsentComponent } from './spotify-consent/spotify-consent.component';
+import { PlaylistComponent } from './playlist/playlist.component';
 
 const routes: Routes = [
   {
-    path:'consent',
-    component:SpotifyConsentComponent
+    path:'playlists',
+    component:PlaylistComponent
   }
 ];
 

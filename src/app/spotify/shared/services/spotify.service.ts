@@ -34,8 +34,8 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + '/Spotify/GetSpotifyAccessTokenUrl', { headers: this.headers });
   }
 
-  getSpotifyRecentlyPlayedUrl(): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + '/Spotify/GetSpotifyRecentlyPlayedUrl', { headers: this.headers });
+  getSpotifyRecentlyPlayedUrl(activityTime:any): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `/Spotify/GetSpotifyRecentlyPlayedUrl?activityTime=${activityTime}`, { headers: this.headers });
   }
 
   getSpotifyData(): Observable<ResponseModel> {
