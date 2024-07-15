@@ -92,11 +92,11 @@ export class SigninComponent implements OnInit {
         this.user = user;
         //this.loggedIn = (user != null);
 
-        console.log(user.provider, user);
+        //console.log(user.provider, user);
         this.accountService.externalLogin(this.user).subscribe((res) => {
           //initial login process to store user data
           this.authService.setAccessToken(res.payload.token);
-          console.log(res);
+          //console.log(res);
 
           setTimeout(() => {
             this.isLoading = false;
@@ -136,7 +136,7 @@ export class SigninComponent implements OnInit {
 
   signOut(): any { //for logging out
     this.socialAuthService.signOut();
-    console.log('logged out');
+    //console.log('logged out');
   }
 
   onSubmit() {

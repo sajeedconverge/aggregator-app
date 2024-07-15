@@ -24,10 +24,9 @@ export class Constants {
         scope: ""
     }
 
-    public static spotifyHeader = new HttpHeaders({
-        'Authorization': 'Basic ' + btoa('a3470aef0a5e4ca5bcb06600c262f026' + ':' + '25e7aab330324d8ba368c08e7b4a5800'),
-        'Content-Type': 'application/x-www-form-urlencoded',
-    });
+
+
+    public static spotifyHeader = new HttpHeaders({});
 
     public static stravaHeader = new HttpHeaders({
         'Content-Type': 'application/json',
