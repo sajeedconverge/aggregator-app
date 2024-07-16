@@ -86,7 +86,7 @@
 
                     @for(track of pairedTracks; track track.track.name) {
                     <p-button class="anchor_btn" [disabled]="track.track.id===0"
-                        (click)="getAudioFeatures(pairedTrack.track.id)" [label]="track.track.name" [link]="true" />
+                        (click)="getAudioFeatures(track.track.id)" [label]="track.track.name" [link]="true" />
                     <br />
                     }
 
