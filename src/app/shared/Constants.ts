@@ -9,7 +9,7 @@ export class Constants {
 
     //public static isLoggedInFlag: boolean = false;
 
-    
+
     public static spotifySettings: SpotifySettings = {
         clientId: "",
         clientSecret: "",
@@ -32,9 +32,26 @@ export class Constants {
         'Content-Type': 'application/json',
     });
 
+    //To calculate the starting time of played track
+    public static getTrackStartTime(endTime: string, duration_ms: number): string {
+        // Convert endTime to a Date object
+        const endDate = new Date(endTime);
+        // Subtract the duration from the endDate
+        const startDate = new Date(endDate.getTime() - duration_ms);
+        // Convert the resulting Date object back to an ISO string
+        return startDate.toISOString();
+    }
 
-    public static spotifyArtistsUrl: string = "https://api.spotify.com/v1/artists/4Z8W4fKeB5YxbusRsdQVPb";
+    //To calculate the end time of the activity
+    public static getActivityEndTime(startDate: string, elapsed_time: number): string {
+        // Convert startDate to a Date object
+        const startDateObj = new Date(startDate);
+        // Add the elapsed time (in seconds) to the startDate
+        const endDateObj = new Date(startDateObj.getTime() + elapsed_time * 1000);
+        // Convert the resulting Date object back to an ISO string
+        return endDateObj.toISOString();
+    }
 
-    public static spotifyPlaylistsUrl: string = 'https://api.spotify.com/v1/playlists/3Hvv07VydednTzQIBnSumd'
+
 
 }
