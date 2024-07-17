@@ -35,6 +35,10 @@ export class StravaService {
     return this.http.get<any>(Constants.baseServerUrl + `/Strava/GetActivityDetailsUrl?activityId=${activityId}`, { headers: this.headers });
   }
 
+  getStravaActivityStreamsUrl(activityId:number): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `/Strava/GetActivityStreamsUrl?activityId=${activityId}`, { headers: this.headers });
+  }
+
 
 
 
@@ -44,13 +48,11 @@ export class StravaService {
     return this.http.post<any>(url, body, { headers: this.headers });
   }
 
-  getStravaAthleteActivities(url: string, accessToken: string): Observable<any> {
+  //Strava common fetch api
+  StravaCommonGetApi(url: string, accessToken: string): Observable<any> {
     return this.http.get<any>(url, { headers: Constants.stravaHeader.set('Authorization', `Bearer ${accessToken}`) })
   }
 
-  getStravaActivityDetails(url: string, accessToken: string): Observable<any> {
-    return this.http.get<any>(url, { headers: Constants.stravaHeader.set('Authorization', `Bearer ${accessToken}`) })
-  }
 
 
 }

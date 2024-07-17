@@ -40,7 +40,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   showAudioFeatures: boolean = false;
   audioFeatures: any[] = [];
   isLoading: boolean = false;
-
+  activityStreams: any;
 
 
   constructor(
@@ -105,7 +105,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.stravaService.getStravaAthleteActivitiesUrl().subscribe((res) => {
       if (res.statusCode === 200) {
-        this.stravaService.getStravaAthleteActivities(res.payload, accessToken).subscribe((res) => {
+        this.stravaService.StravaCommonGetApi(res.payload, accessToken).subscribe((res) => {
           this.athleteActivities = res;
           //to calculate activity end time
           this.athleteActivities.forEach(activity => {
@@ -132,9 +132,10 @@ export class HomeComponent implements OnInit, OnDestroy {
         if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
           this.getRecentlyPlayedAudio(activityTime, activityUrl, spotifyAccessToken, stravaAccessToken);
         } else {
-          this.stravaService.getStravaActivityDetails(activityUrl, stravaAccessToken).subscribe((response) => {
+          this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
             response.end_date = Constants.getActivityEndTime(response.start_date, response.elapsed_time);
             this.activityDetails.push(response);
+            this.getActivityStreams(response.id, stravaAccessToken);
             console.log('Activity Details', this.activityDetails);
             this.pairItems(this.activityDetails, this.recentAudio);
           });
@@ -162,9 +163,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
           //to pair the activity and song
           if (stravaAccessToken.length > 0 && Constants.stravaSettings.clientId !== 0) {
-            this.stravaService.getStravaActivityDetails(activityUrl, stravaAccessToken).subscribe((response) => {
+            this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
               response.end_date = Constants.getActivityEndTime(response.start_date, response.elapsed_time);
               this.activityDetails.push(response);
+              this.getActivityStreams(response.id, stravaAccessToken);
               console.log('Activity Details', this.activityDetails);
               this.pairItems(this.activityDetails, this.recentAudio);
             });
@@ -177,34 +179,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   //To pair activity with Audio
-  // pairItems1(activities: any[], tracks: any[]) {
-  //   const pairedItems: any[] = [];
-  //   activities.forEach(activity => {
-  //     const activityTime = new Date(activity.start_date).getTime();
-
-  //     tracks.forEach(track => {
-  //       const trackTime = new Date(track.played_at).getTime();
-
-  //       if (Math.abs(activityTime - trackTime) <= 1 * 60 * 1000) { // 2-minute window
-  //         pairedItems.push({ activity, track });
-  //         this.pairedTrack = track;
-  //       }
-  //     });
-  //   });
-  //   if (pairedItems.length === 0) {
-  //     this.pairedTrack = {
-  //       track: {
-  //         id: 0,
-  //         name: 'No track',
-  //       }
-  //     };
-  //   };
-  //   console.log("pairedItems", pairedItems);
-  //   this.isLoading = false;
-  //   //  return pairedItems;
-  // }
-
-
   pairItems(activities: any[], tracks: any[]) {
     const result: { activity: any, tracks: any[] }[] = [];
     // debugger;
@@ -226,9 +200,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         track: {
           id: 0,
           name: 'No track',
-          artists:[{name:''}]
+          artists: [{ name: '' }]
         },
-        start_time:''
+        start_time: ''
       };
     };
     this.pairedResult = result;
@@ -238,10 +212,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.isLoading = false;
     return result;
   }
-
-
-
-
 
   //To get audio features
   getAudioFeatures(trackId: string) {
@@ -260,8 +230,22 @@ export class HomeComponent implements OnInit, OnDestroy {
     })
   }
 
+  //To get activity streams
+  getActivityStreams(activityId: number, stravaAccessToken: string) {
+    this.stravaService.getStravaActivityStreamsUrl(activityId).subscribe((urlResponse) => {
+      if (urlResponse.statusCode === 200) {
+        var streamsUrl = urlResponse.payload;
 
+        this.spotifyService.SpotifyCommonGetApi(streamsUrl, stravaAccessToken).subscribe((streamRes) => {
+          if (streamRes) {
+            this.activityStreams = streamRes;
+            console.log("this.activityStreams", this.activityStreams);
+          };
+        });
 
+      };
+    });
+  }
 
 
 
