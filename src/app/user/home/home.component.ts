@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   checkInterval: any;
   showDetails: boolean = false;
   recentAudio: any[] = [];
-  pairedTrack: any;
+  pairedResult: any;
   pairedTracks: any[] = [];
   showAudioFeatures: boolean = false;
   audioFeatures: any[] = [];
@@ -147,7 +147,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   getRecentlyPlayedAudio(activityTime: any, activityUrl: string, spotifyAccessToken: string, stravaAccessToken: string) {
     this.recentAudio = [];
     this.activityDetails = [];
-    this.spotifyAuthService.checkExpiryAndRefreshToken();
+    this.spotifyAuthService.refreshSpotifyAccessToken();
     this.spotifyService.getSpotifyRecentlyPlayedUrl(activityTime).subscribe((res) => {
       if (res.statusCode === 200) {
         const url = res.payload;
@@ -177,32 +177,32 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   //To pair activity with Audio
-  pairItems1(activities: any[], tracks: any[]) {
-    const pairedItems: any[] = [];
-    activities.forEach(activity => {
-      const activityTime = new Date(activity.start_date).getTime();
+  // pairItems1(activities: any[], tracks: any[]) {
+  //   const pairedItems: any[] = [];
+  //   activities.forEach(activity => {
+  //     const activityTime = new Date(activity.start_date).getTime();
 
-      tracks.forEach(track => {
-        const trackTime = new Date(track.played_at).getTime();
+  //     tracks.forEach(track => {
+  //       const trackTime = new Date(track.played_at).getTime();
 
-        if (Math.abs(activityTime - trackTime) <= 1 * 60 * 1000) { // 2-minute window
-          pairedItems.push({ activity, track });
-          this.pairedTrack = track;
-        }
-      });
-    });
-    if (pairedItems.length === 0) {
-      this.pairedTrack = {
-        track: {
-          id: 0,
-          name: 'No track',
-        }
-      };
-    };
-    console.log("pairedItems", pairedItems);
-    this.isLoading = false;
-    //  return pairedItems;
-  }
+  //       if (Math.abs(activityTime - trackTime) <= 1 * 60 * 1000) { // 2-minute window
+  //         pairedItems.push({ activity, track });
+  //         this.pairedTrack = track;
+  //       }
+  //     });
+  //   });
+  //   if (pairedItems.length === 0) {
+  //     this.pairedTrack = {
+  //       track: {
+  //         id: 0,
+  //         name: 'No track',
+  //       }
+  //     };
+  //   };
+  //   console.log("pairedItems", pairedItems);
+  //   this.isLoading = false;
+  //   //  return pairedItems;
+  // }
 
 
   pairItems(activities: any[], tracks: any[]) {
@@ -226,9 +226,12 @@ export class HomeComponent implements OnInit, OnDestroy {
         track: {
           id: 0,
           name: 'No track',
-        }
+          artists:[{name:''}]
+        },
+        start_time:''
       };
     };
+    this.pairedResult = result;
     console.log("pairedItems", result);
     console.log("this.pairedTracks", this.pairedTracks);
 
@@ -243,7 +246,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   //To get audio features
   getAudioFeatures(trackId: string) {
     this.audioFeatures = [];
-    this.spotifyAuthService.checkExpiryAndRefreshToken();
+    this.spotifyAuthService.refreshSpotifyAccessToken();
     this.spotifyService.getSpotifyAudioFeaturesUrl(trackId).subscribe((res) => {
       if (res.statusCode === 200) {
         var featuresUrl = res.payload;

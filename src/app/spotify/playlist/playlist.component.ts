@@ -91,11 +91,10 @@ export class PlaylistComponent implements OnInit {
   //To get the Current User's playlists from Spotify
   getCurrentUserPlaylists(spotifyAccessToken: any) {
     this.isLoading = true;
-    this.spotifyAuthService.checkExpiryAndRefreshToken();
+    this.spotifyAuthService.refreshSpotifyAccessToken();
     this.spotifyService.getCurrentUserPlaylistsUrl().subscribe((res) => {
       if (res.statusCode === 200) {
         var playlistsUrl = res.payload;
-        this.spotifyAuthService.checkExpiryAndRefreshToken();
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
           console.log(this.userPlaylists);
@@ -107,7 +106,7 @@ export class PlaylistComponent implements OnInit {
   }
 
   getPlayListTracks(url: string, playlistName: string) {
-    this.spotifyAuthService.checkExpiryAndRefreshToken();
+    this.spotifyAuthService.refreshSpotifyAccessToken();
     this.playlistTracks = [];
     this.showTracks = true;
     this.isLoading = true;
@@ -130,7 +129,7 @@ export class PlaylistComponent implements OnInit {
   getAudioFeatures(trackId: string, trackName: string) {
     this.audioFeatures = [];
     this.currentTrackName = trackName;
-    this.spotifyAuthService.checkExpiryAndRefreshToken();
+    this.spotifyAuthService.refreshSpotifyAccessToken();
     this.spotifyService.getSpotifyAudioFeaturesUrl(trackId).subscribe((res) => {
       if (res.statusCode === 200) {
         var featuresUrl = res.payload;
