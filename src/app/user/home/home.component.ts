@@ -122,11 +122,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   getActivityDetails(activityId: number, activityTime: any) {
     this.isLoading = true;
     this.activityDetails = [];
+    this.pairedTracks = [];
     this.stravaService.getStravaActivityDetailsUrl(activityId).subscribe((res) => {
       if (res.statusCode === 200) {
         this.showDetails = true;
         var activityUrl = res.payload;
         //debugger;
+
         const stravaAccessToken = localStorage.getItem('strava-bearer-token') || '';
         const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
         if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
@@ -158,6 +160,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           //To calculate track start time
           this.recentAudio.forEach(track => {
             track.start_time = Constants.getTrackStartTime(track.played_at, track.track.duration_ms);
+            //track.end_time = Constants.getTrackEndTime(track.played_at, track.track.duration_ms);
           });
           console.log("this.recentAudio", this.recentAudio);
 
@@ -187,7 +190,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       const activityEndDate = new Date(activity.end_date).getTime();
 
       const matchedTracks = tracks.filter(track => {
-        const trackStartDate = new Date(track.played_at).getTime();
+        const trackStartDate = new Date(track.start_time).getTime();
         return trackStartDate >= activityStartDate && trackStartDate <= activityEndDate;
       });
 
@@ -195,6 +198,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
 
     this.pairedTracks = result[0].tracks;
+    //to get Activity Streams for the activity
+    //result[0].activity.activity_streams = this.activityStreams;
+
     if (this.pairedTracks.length === 0) {
       this.pairedTracks[0] = {
         track: {
@@ -204,10 +210,25 @@ export class HomeComponent implements OnInit, OnDestroy {
         },
         start_time: ''
       };
+    } else {
+      //To get audio feature every song played during the activity
+      result[0].tracks.forEach((track) => {
+        this.spotifyService.getSpotifyAudioFeaturesUrl(track.track.id).subscribe((res) => {
+          if (res.statusCode === 200) {
+            var featuresUrl = res.payload;
+            const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+            this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
+              track.audio_features = audioFeature;
+              track.duration_mins = Constants.formatDuration(track.track.duration_ms);
+
+            });
+          };
+        });
+      });
     };
     this.pairedResult = result;
     console.log("pairedItems", result);
-    console.log("this.pairedTracks", this.pairedTracks);
+    //console.log("this.pairedTracks", this.pairedTracks);
 
     this.isLoading = false;
     return result;
@@ -221,13 +242,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (res.statusCode === 200) {
         var featuresUrl = res.payload;
         const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
-        this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-          this.audioFeatures.push(res);
+        this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
+          this.audioFeatures.push(audioFeature);
           this.showAudioFeatures = true;
-        })
-
-      }
-    })
+        });
+      };
+    });
   }
 
   //To get activity streams
@@ -239,7 +259,40 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.spotifyService.SpotifyCommonGetApi(streamsUrl, stravaAccessToken).subscribe((streamRes) => {
           if (streamRes) {
             this.activityStreams = streamRes;
-            console.log("this.activityStreams", this.activityStreams);
+            this.pairedResult[0].activity.activity_streams = this.activityStreams;
+            //console.log("this.activityStreams", this.activityStreams);
+
+            var activityStartTime = this.pairedResult[0].activity.start_date;
+            // var activityEndTime = this.pairedResult[0].activity.end_date;
+            var distanceStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'distance');
+            var timeStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'time');
+
+            var mappedStream = Constants.processStreams(activityStartTime, distanceStream, timeStream);
+            console.log('mappedStream', mappedStream);
+
+
+
+            //to add stream calculations into the tracks
+            this.pairedResult[0].tracks.forEach((track: any) => {
+              //debugger;
+              var trackStartTime = track.start_time;
+              var trackEndTime = track.played_at;
+
+              // track.distance_start = Constants.getStartingDistance(activityStartTime, activityEndTime, trackStartTime, trackEndTime, distanceStream);
+              // track.distance_end = Constants.getEndingDistance(activityStartTime, activityEndTime, trackStartTime, trackEndTime, distanceStream);
+            
+              var startDistObject = Constants.findNearestTime(mappedStream,trackStartTime) ;
+              var endDistObject = Constants.findNearestTime(mappedStream,trackEndTime) ;
+
+              track.distance_start = (startDistObject?.distance || 0) * (0.1000);
+              track.distance_end = (endDistObject?.distance || 0) * (0.1000);
+              track.distance = (track.distance_end - track.distance_start );
+              var hoursTime = (track.track.duration_ms)/(1000*60*60);
+            track.speed = (track.distance/(hoursTime));
+            })
+
+
+
           };
         });
 

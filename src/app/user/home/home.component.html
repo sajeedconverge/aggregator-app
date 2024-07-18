@@ -18,7 +18,8 @@
 
 <!-- Activities List -->
 <div class="mt-2" *ngIf="!showDetails && !showAudioFeatures">
-    <p-table [value]="athleteActivities" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }">
+    <p-table [value]="athleteActivities" styleClass="p-datatable-gridlines" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]" [tableStyle]="{ 'min-width': '50rem' }">
         <ng-template pTemplate="caption">
             <h3>Activities</h3>
         </ng-template>
@@ -44,7 +45,7 @@
                 <td>{{ activity.end_date | date:'MMM d, y, h:mm:ss a' }}</td>
                 <td>{{ activity.sport_type }}</td>
                 <td>{{ activity.distance }}</td>
-                <td>{{ activity.moving_time }}</td>
+                <td>{{ activity.elapsed_time }}</td>
                 <td>{{ activity.average_speed }}</td>
                 <td>{{ activity.max_speed }}</td>
             </tr>
@@ -118,7 +119,8 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th>Time</th>
+                <th>Start Time</th>
+                <th>End Time</th>
                 <th>Name</th>
                 <th>Artist </th>
                 <th>eBPM</th>
@@ -133,20 +135,23 @@
         </ng-template>
         <ng-template pTemplate="body" let-track>
             <tr>
-                <td >{{track.start_time | date: 'hh:mm:ss a'}}</td>
+                <td>{{track.start_time | date: 'hh:mm:ss a'}}</td>
+                <td>{{track.played_at | date: 'hh:mm:ss a'}}</td>
                 <td>
                     <p-button class="anchor_btn" [disabled]="track.track.id===0"
-                    (click)="getAudioFeatures(track.track.id)" [label]="track.track.name" [link]="true" />
+                        (click)="getAudioFeatures(track.track.id)" [label]="track.track.name" [link]="true" />
                 </td>
                 <td>{{track.track.artists[0].name}}</td>
+                <td>
+                    {{track.audio_features?.tempo}}
+                </td>
+                <td>{{track.duration_mins}}</td>
+                <td>{{track.distance | number:'1.2-2' }} km</td>
+                <td>{{track.distance_start | number:'1.2-2'}} km</td>
+                <td>{{track.distance_end | number:'1.2-2'}} km</td>
                 <td></td>
                 <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>{{track.speed | number:'1.2-2'}} km/hr</td>
             </tr>
         </ng-template>
     </p-table>
@@ -176,7 +181,7 @@
                 <th>Acousticness</th>
                 <th>Liveness</th>
                 <th>Valence</th>
-                <th>Tempo</th>
+                <th>eBPM</th>
                 <th>Duration</th>
                 <th>Track Href</th>
                 <th>Analysis Url</th>
