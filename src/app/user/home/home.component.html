@@ -1,6 +1,6 @@
 @if(isLoading) {
-    <app-progress-bar></app-progress-bar>
-    }
+<app-progress-bar></app-progress-bar>
+}
 
 <div class="" style="display: flex;justify-content: center;margin-top: 20px;margin-bottom: 10px;">
 
@@ -18,7 +18,8 @@
 
 <!-- Activities List -->
 <div class="mt-2" *ngIf="!showDetails && !showAudioFeatures">
-    <p-table [value]="athleteActivities" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }">
+    <p-table [value]="athleteActivities" styleClass="p-datatable-gridlines" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]" [tableStyle]="{ 'min-width': '50rem' }">
         <ng-template pTemplate="caption">
             <h3>Activities</h3>
         </ng-template>
@@ -26,9 +27,10 @@
             <tr>
                 <th>Activity Name</th>
                 <th>Start Date </th>
+                <th>End Date </th>
                 <th>Sport Type</th>
                 <th>Distance</th>
-                <th>Time</th>
+                <th>Duration</th>
                 <th>Avg Speed</th>
                 <th>Max Speed</th>
             </tr>
@@ -36,12 +38,14 @@
         <ng-template pTemplate="body" let-activity>
             <tr>
                 <td>
-                    <p-button (click)="getActivityDetails(activity.id,activity.start_date)" [label]="activity.name" [link]="true" />
+                    <p-button class="anchor_btn" (click)="getActivityDetails(activity.id,activity.start_date)"
+                        [label]="activity.name" [link]="true" />
                 </td>
                 <td>{{ activity.start_date | date:'MMM d, y, h:mm:ss a' }}</td>
+                <td>{{ activity.end_date | date:'MMM d, y, h:mm:ss a' }}</td>
                 <td>{{ activity.sport_type }}</td>
                 <td>{{ activity.distance }}</td>
-                <td>{{ activity.moving_time }}</td>
+                <td>{{ activity.elapsed_time }}</td>
                 <td>{{ activity.average_speed }}</td>
                 <td>{{ activity.max_speed }}</td>
             </tr>
@@ -51,7 +55,7 @@
 
 
 <!-- Activity Details -->
-<div class="mt-2" *ngIf="showDetails && !showAudioFeatures">
+<!-- <div class="mt-2" *ngIf="showDetails && !showAudioFeatures">
     <p-table [value]="activityDetails" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }">
         <ng-template pTemplate="caption">
 
@@ -64,8 +68,9 @@
         <ng-template pTemplate="header">
             <tr>
                 <th>Activity Name</th>
-                <th>Track</th>
+                <th>Tracks</th>
                 <th>Start Date </th>
+                <th>End Date </th>
                 <th>Sport Type</th>
                 <th>Distance</th>
                 <th>Time</th>
@@ -78,11 +83,17 @@
         <ng-template pTemplate="body" let-activity>
             <tr>
                 <td>{{ activity.name }}</td>
-                <td>
-                    <p-button [disabled]="pairedTrack.track.id===0" (click)="getAudioFeatures(pairedTrack.track.id)" [label]="pairedTrack.track.name"
-                        [link]="true" />
+                <td style="width: 25%;">
+
+                    @for(track of pairedTracks; track track.track.name) {
+                    <p-button class="anchor_btn" [disabled]="track.track.id===0"
+                        (click)="getAudioFeatures(track.track.id)" [label]="track.track.name" [link]="true" />
+                    <br />
+                    }
+
                 </td>
                 <td>{{ activity.start_date | date:'MMM d, y, h:mm:ss a' }}</td>
+                <td>{{ activity.end_date | date:'MMM d, y, h:mm:ss a' }}</td>
                 <td>{{ activity.sport_type }}</td>
                 <td>{{ activity.distance }}</td>
                 <td>{{ activity.moving_time }}</td>
@@ -94,7 +105,60 @@
             </tr>
         </ng-template>
     </p-table>
+</div> -->
+
+<div class="mt-2" *ngIf="showDetails && !showAudioFeatures">
+    <p-table [value]="pairedTracks" styleClass="p-datatable-gridlines"
+     [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_time'" [sortOrder]="1" >
+        <ng-template pTemplate="caption">
+
+            <div class="flex flex-row justify-content-between">
+                <h3>Activity Details</h3>
+                <p-button (click)="showDetails=false">Back</p-button>
+            </div>
+
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Name</th>
+                <th>Artist </th>
+                <th>eBPM</th>
+                <th>Duration</th>
+                <th>Distance Start</th>
+                <th>Distance End</th>
+                <th>Distance</th>
+                <th>Moving Time</th>
+                <th>Pace </th>
+                <th>Speed</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-track>
+            <tr>
+                <td>{{track.start_time | date: 'hh:mm:ss a'}}</td>
+                <td>{{track.played_at | date: 'hh:mm:ss a'}}</td>
+                <td>
+                    <p-button class="anchor_btn" [disabled]="track.track.id===0"
+                        (click)="getAudioFeatures(track.track.id)" [label]="track.track.name" [link]="true" />
+                </td>
+                <td>{{track.track.artists[0].name}}</td>
+                <td>
+                    {{track.audio_features?.tempo}}
+                </td>
+                <td>{{track.duration_mins}}</td>
+                <td>{{track.distance_start | number:'1.2-2'}} km</td>
+                <td>{{track.distance_end | number:'1.2-2'}} km</td>
+                <td>{{track.distance | number:'1.2-2' }} km</td>
+                <td>{{track.moving_time}}</td>
+                <td>{{track.pace | number:'1.2-2'}} hr/km</td>
+                <td>{{track.speed | number:'1.2-2'}} km/hr</td>
+            </tr>
+        </ng-template>
+    </p-table>
 </div>
+
+
 
 
 <!-- Audio Features -->
@@ -118,7 +182,7 @@
                 <th>Acousticness</th>
                 <th>Liveness</th>
                 <th>Valence</th>
-                <th>Tempo</th>
+                <th>eBPM</th>
                 <th>Duration</th>
                 <th>Track Href</th>
                 <th>Analysis Url</th>

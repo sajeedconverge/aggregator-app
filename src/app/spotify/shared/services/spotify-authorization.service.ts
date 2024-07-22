@@ -20,7 +20,12 @@ export class SpotifyAuthorizationService {
         //console.log(res);
         url = new URL(res.payload);
 
-        const spotifyWindow = window.open(url, '_blank', 'width=500,height=600');
+        const width = 500;
+        const height = 600;
+        const left = (screen.width / 2) - (width / 2);
+        const top = (screen.height / 2) - (height / 2);
+
+        const spotifyWindow = window.open(url, '_blank', `width=${width},height=${height},top=${top},left=${left}`);
         if (!spotifyWindow) {
           console.error('Failed to open the window');
           return;
@@ -117,7 +122,7 @@ export class SpotifyAuthorizationService {
       const timeDifferenceInMinutes = timeDifference / (1000 * 60);
 
       // If the difference is 10 minutes or less, call refreshSpotifyAccessToken
-      if (timeDifferenceInMinutes <= 10) {
+      if (timeDifferenceInMinutes <= 15) {
         this.refreshSpotifyAccessToken();
       }
     }

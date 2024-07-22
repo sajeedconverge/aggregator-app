@@ -58,3 +58,9 @@ body{
 .signin_mainpage p-card.register-card .p-card{
     box-shadow: none;
 }
+.anchor_btn button{
+    padding: 0px;
+}
+.anchor_btn button:focus{
+    box-shadow: none;
+}

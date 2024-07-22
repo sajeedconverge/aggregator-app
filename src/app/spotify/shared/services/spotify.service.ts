@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Constants } from '../../../shared/Constants';
 import { ResponseModel } from '../../../shared/shared-models';
+import { SpotifyAuthorizationService } from './spotify-authorization.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,19 +12,21 @@ export class SpotifyService {
   // headers = new HttpHeaders().set('Content-Type', 'application/json');
   headers = new HttpHeaders().set('Content-Type', 'application/json');
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient
+  ) { }
 
   // getSpotifyAccessTokenOld(body: any): Observable<any> {
   //   return this.http.post<any>(Constants.spotifyTokenUrl, body, { headers: Constants.spotifyHeader });
   // }
 
-  getArtists(token: string): Observable<any> {
-    return this.http.get<any>(Constants.spotifyArtistsUrl, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
-  }
+  // getArtists(token: string): Observable<any> {
+  //   return this.http.get<any>(Constants.spotifyArtistsUrl, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
+  // }
 
-  getPlaylists(token: string): Observable<any> {
-    return this.http.get<any>(Constants.spotifyPlaylistsUrl, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
-  }
+  // getPlaylists(token: string): Observable<any> {
+  //   return this.http.get<any>(Constants.spotifyPlaylistsUrl, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
+  // }
 
   //.net api calls
   getSpotifyAuthUrl(): Observable<ResponseModel> {
@@ -34,7 +37,7 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + '/Spotify/GetSpotifyAccessTokenUrl', { headers: this.headers });
   }
 
-  getSpotifyRecentlyPlayedUrl(activityTime:any): Observable<ResponseModel> {
+  getSpotifyRecentlyPlayedUrl(activityTime: any): Observable<ResponseModel> {
     return this.http.get<any>(Constants.baseServerUrl + `/Spotify/GetSpotifyRecentlyPlayedUrl?activityTime=${activityTime}`, { headers: this.headers });
   }
 
@@ -46,6 +49,10 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `/Spotify/GetAudioFeaturesUrl?trackId=${trackId}`, { headers: this.headers });
   }
 
+  getCurrentUserPlaylistsUrl(): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `/Spotify/GetCurrentUserPlaylistsUrl`, { headers: this.headers });
+  }
+
 
   //third party api calls
   //token api
@@ -55,13 +62,10 @@ export class SpotifyService {
     });
   }
   //fetch api
-  getSpotifyRecentlyPlayed(url: string, token: string): Observable<any> {
+  SpotifyCommonGetApi(url: string, token: string): Observable<any> {
     return this.http.get<any>(url, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
   }
 
-  getSpotifyAudioFeatures(url: string, token: string): Observable<any> {
-    return this.http.get<any>(url, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
-  }
 
 
 }

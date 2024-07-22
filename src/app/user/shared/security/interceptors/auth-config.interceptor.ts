@@ -7,7 +7,7 @@ import { SpotifyAuthorizationService } from '../../../../spotify/shared/services
 
 export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
   const spotifyAuthService = inject(SpotifyAuthorizationService);
-  spotifyAuthService.checkExpiryAndRefreshToken();
+  //spotifyAuthService.checkExpiryAndRefreshToken();
   const url: string = req.url;
 
   //for not spotify api calls
