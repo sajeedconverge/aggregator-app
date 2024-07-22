@@ -108,7 +108,8 @@
 </div> -->
 
 <div class="mt-2" *ngIf="showDetails && !showAudioFeatures">
-    <p-table [value]="pairedTracks" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }">
+    <p-table [value]="pairedTracks" styleClass="p-datatable-gridlines"
+     [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_time'" [sortOrder]="1" >
         <ng-template pTemplate="caption">
 
             <div class="flex flex-row justify-content-between">
@@ -125,9 +126,9 @@
                 <th>Artist </th>
                 <th>eBPM</th>
                 <th>Duration</th>
-                <th>Distance</th>
                 <th>Distance Start</th>
                 <th>Distance End</th>
+                <th>Distance</th>
                 <th>Moving Time</th>
                 <th>Pace </th>
                 <th>Speed</th>
@@ -146,11 +147,11 @@
                     {{track.audio_features?.tempo}}
                 </td>
                 <td>{{track.duration_mins}}</td>
-                <td>{{track.distance | number:'1.2-2' }} km</td>
                 <td>{{track.distance_start | number:'1.2-2'}} km</td>
                 <td>{{track.distance_end | number:'1.2-2'}} km</td>
-                <td></td>
-                <td></td>
+                <td>{{track.distance | number:'1.2-2' }} km</td>
+                <td>{{track.moving_time}}</td>
+                <td>{{track.pace | number:'1.2-2'}} hr/km</td>
                 <td>{{track.speed | number:'1.2-2'}} km/hr</td>
             </tr>
         </ng-template>

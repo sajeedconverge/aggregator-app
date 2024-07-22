@@ -208,8 +208,14 @@ export class HomeComponent implements OnInit, OnDestroy {
           name: 'No track',
           artists: [{ name: '' }]
         },
-        start_time: ''
+        start_time: '',
+        distance_start: 0.00,
+        distance_end: 0.00,
+        distance: 0.00,
+        speed: 0.00
       };
+      //if there is no match no streams would be fetched
+      this.isLoading = false;
     } else {
       //To get audio feature every song played during the activity
       result[0].tracks.forEach((track) => {
@@ -228,9 +234,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
     this.pairedResult = result;
     console.log("pairedItems", result);
-    //console.log("this.pairedTracks", this.pairedTracks);
-
-    this.isLoading = false;
     return result;
   }
 
@@ -263,14 +266,11 @@ export class HomeComponent implements OnInit, OnDestroy {
             //console.log("this.activityStreams", this.activityStreams);
 
             var activityStartTime = this.pairedResult[0].activity.start_date;
-            // var activityEndTime = this.pairedResult[0].activity.end_date;
             var distanceStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'distance');
             var timeStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'time');
 
             var mappedStream = Constants.processStreams(activityStartTime, distanceStream, timeStream);
             console.log('mappedStream', mappedStream);
-
-
 
             //to add stream calculations into the tracks
             this.pairedResult[0].tracks.forEach((track: any) => {
@@ -278,21 +278,36 @@ export class HomeComponent implements OnInit, OnDestroy {
               var trackStartTime = track.start_time;
               var trackEndTime = track.played_at;
 
-              // track.distance_start = Constants.getStartingDistance(activityStartTime, activityEndTime, trackStartTime, trackEndTime, distanceStream);
-              // track.distance_end = Constants.getEndingDistance(activityStartTime, activityEndTime, trackStartTime, trackEndTime, distanceStream);
-            
-              var startDistObject = Constants.findNearestTime(mappedStream,trackStartTime) ;
-              var endDistObject = Constants.findNearestTime(mappedStream,trackEndTime) ;
+              var startDistObject = Constants.findNearestStartTime(mappedStream, trackStartTime);
+              console.log('startDistObject',startDistObject);
+              //var endDistObject = Constants.findNearestStartTime(mappedStream, trackEndTime);
+              var endDistObject = Constants.findNearestEndTime(mappedStream,startDistObject.time ,trackEndTime);
+              console.log('endDistObject',endDistObject);
 
               track.distance_start = (startDistObject?.distance || 0) * (0.1000);
               track.distance_end = (endDistObject?.distance || 0) * (0.1000);
-              track.distance = (track.distance_end - track.distance_start );
-              var hoursTime = (track.track.duration_ms)/(1000*60*60);
-            track.speed = (track.distance/(hoursTime));
-            })
+              track.distance = (track.distance_end - track.distance_start);
+              // var hoursTime = (track.track.duration_ms) / (1000 * 60 * 60);
+              // track.speed = (track.distance / (hoursTime));
+              //debugger;
+              // var movingTimeSec = Math.floor((track.distance*1000 )/((track.speed)*(5/18)));
+              // track.moving_time = Constants.formatDuration(movingTimeSec*1000);
+              var movingTimeMs = 0;
+              //debugger;
+              for (let index = (startDistObject?.index || 0); index < (endDistObject?.index || 0); index++) {
+                movingTimeMs += mappedStream[index].duration_increment_ms;
+              };
+              //track.moving_time = Constants.formatDuration((movingTimeMs));
+              track.moving_time = Constants.formatDuration(Math.min(movingTimeMs,track.track.duration_ms));
+             
+              var hoursTime = (Math.min(movingTimeMs,track.track.duration_ms)) / (1000 * 60 * 60);
+              track.speed = (track.distance / (hoursTime));
+
+              track.pace = (1 / track.speed);
+            });
 
 
-
+            this.isLoading = false;
           };
         });
 
