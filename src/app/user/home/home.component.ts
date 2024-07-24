@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -6,12 +6,13 @@ import { FormsModule } from '@angular/forms';
 import { SpotifyAuthorizationService } from '../../spotify/shared/services/spotify-authorization.service';
 import { StravaAuthorizationService } from '../../strava/shared/services/strava-authorization.service';
 import { StravaService } from '../../strava/shared/services/strava.service';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { Constants } from '../../shared/Constants';
 import { CommonModule, DatePipe } from '@angular/common';
 import { SpotifyService } from '../../spotify/shared/services/spotify.service';
 import { HttpHeaders } from '@angular/common/http';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
+import { PrimeNGConfig } from 'primeng/api';
 
 @Component({
   selector: 'app-home',
@@ -45,16 +46,22 @@ export class HomeComponent implements OnInit, OnDestroy {
   recentlyPlayedFifty: any[] = [];
   stravaAccessToken: string = '';
   spotifyAccessToken: string = '';
+  @ViewChild('dt1') table1!: Table;
+  @ViewChild('dt2') table2!: Table;
+  @ViewChild('dt3') table3!: Table;
+  showData: boolean = false;
 
 
   constructor(
     private stravaAuthService: StravaAuthorizationService,
     private stravaService: StravaService,
     private spotifyAuthService: SpotifyAuthorizationService,
-    private spotifyService: SpotifyService
+    private spotifyService: SpotifyService,
+    private primengConfig: PrimeNGConfig,
   ) { }
 
   ngOnInit(): void {
+    this.primengConfig.ripple = true;
     this.startCheckingToken();
     this.fetchThirdPartyDetails();
 
@@ -141,6 +148,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                   });
                   console.log('athlete activities', this.athleteActivities);
                   this.isLoading = false;
+                  this.showData = true;
 
                 };
               });
