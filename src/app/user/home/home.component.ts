@@ -123,18 +123,21 @@ export class HomeComponent implements OnInit, OnDestroy {
               this.spotifyService.SpotifyCommonGetApi(response.payload, this.spotifyAccessToken).subscribe((res) => {
                 if (res.items.length > 0) {
                   this.recentlyPlayedFifty = res.items;
+                  this.recentlyPlayedFifty.forEach(track=> {
+                    track.start_time = Constants.getTrackStartTime(track.played_at, track.track.duration_ms);
+                  });
 
 
                   //to calculate activity end time
                   this.nonFilteredActivities.forEach(activity => {
                     activity.end_date = Constants.getActivityEndTime(activity.start_date, activity.elapsed_time);
 
-                    activity.audio = Constants.assignRecentAudioToActivity(activity,this.recentlyPlayedFifty);
+                    activity.audio = Constants.assignRecentAudioToActivity(activity, this.recentlyPlayedFifty);
 
                     //activity.isVisible = (activity.distance > 0 && activity.audio.length>0) ? true : false
-                  if(activity.distance > 0 && activity.audio.length>0) {
-                    this.athleteActivities.push(activity);
-                  }
+                    if (activity.distance > 0 && activity.audio.length > 0) {
+                      this.athleteActivities.push(activity);
+                    }
                   });
                   console.log('athlete activities', this.athleteActivities);
                   this.isLoading = false;
@@ -211,6 +214,18 @@ export class HomeComponent implements OnInit, OnDestroy {
       };
     });
   }
+
+  //this method will be called in activities list to pair songs to each activity
+  // pairAudioActivity(activity: any) {
+  //   this.spotifyService.getSpotifyRecentlyPlayedUrl(activity.start_date).subscribe((urlResponse) => {
+  //     if (urlResponse.statusCode === 200) {
+  //       const url = urlResponse.payload;
+  //       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((audioResponse) => {
+
+  //     };
+  //   });
+
+  // }
 
   //To pair activity with Audio
   pairItems(activities: any[], tracks: any[]) {

@@ -135,7 +135,7 @@ export class Constants {
     
     public static assignRecentAudioToActivity(activity: any, recentAudio: any[]): any[] {
         const audioInRange = recentAudio.filter(audio =>
-            this.isDateBetween(audio.played_at, activity.start_date, activity.end_date)
+            this.isDateBetween(audio.start_time, activity.start_date, activity.end_date)
         );
         return audioInRange;
     }
