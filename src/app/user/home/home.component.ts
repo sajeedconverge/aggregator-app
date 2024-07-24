@@ -31,6 +31,7 @@ import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.com
 })
 export class HomeComponent implements OnInit, OnDestroy {
   athleteActivities: any[] = [];
+  nonFilteredActivities: any[] = [];
   activityDetails: any[] = [];
   checkInterval: any;
   showDetails: boolean = false;
@@ -41,6 +42,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   audioFeatures: any[] = [];
   isLoading: boolean = false;
   activityStreams: any;
+  recentlyPlayedFifty: any[] = [];
+  stravaAccessToken: string = '';
+  spotifyAccessToken: string = '';
 
 
   constructor(
@@ -65,9 +69,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   startCheckingToken(): void {
     this.checkInterval = setInterval(() => {
-      const stravaAccessToken = localStorage.getItem('strava-bearer-token') || '';
-      if (stravaAccessToken.length > 0 && Constants.stravaSettings.clientId !== 0) {
-        this.getAthleteActivities(stravaAccessToken);
+      this.stravaAccessToken = localStorage.getItem('strava-bearer-token') || '';
+      this.spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+
+      if (
+        this.stravaAccessToken.length > 0 && Constants.stravaSettings.clientId !== 0 &&
+        this.spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0
+      ) {
+        this.getAthleteActivities(this.stravaAccessToken);
         clearInterval(this.checkInterval); // Stop the interval
       };
     }, 2000); // Check every 2 seconds, adjust as needed
@@ -103,16 +112,38 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   getAthleteActivities(accessToken: string) {
     this.isLoading = true;
-    this.stravaService.getStravaAthleteActivitiesUrl().subscribe((res) => {
-      if (res.statusCode === 200) {
-        this.stravaService.StravaCommonGetApi(res.payload, accessToken).subscribe((res) => {
-          this.athleteActivities = res;
-          //to calculate activity end time
-          this.athleteActivities.forEach(activity => {
-            activity.end_date = Constants.getActivityEndTime(activity.start_date, activity.elapsed_time);
-          });
-          console.log('athlete activities', this.athleteActivities);
-          this.isLoading = false;
+    this.stravaService.getStravaAthleteActivitiesUrl().subscribe((resp) => {
+      if (resp.statusCode === 200) {
+        this.stravaService.StravaCommonGetApi(resp.payload, accessToken).subscribe((res) => {
+          //this.athleteActivities = res;
+          this.nonFilteredActivities = res;
+          //To get fifty recently played songs
+          this.spotifyService.GetSpotifyRecentlyPlayedFiftyUrl().subscribe((response) => {
+            if (response.statusCode === 200) {
+              this.spotifyService.SpotifyCommonGetApi(response.payload, this.spotifyAccessToken).subscribe((res) => {
+                if (res.items.length > 0) {
+                  this.recentlyPlayedFifty = res.items;
+
+
+                  //to calculate activity end time
+                  this.nonFilteredActivities.forEach(activity => {
+                    activity.end_date = Constants.getActivityEndTime(activity.start_date, activity.elapsed_time);
+
+                    activity.audio = Constants.assignRecentAudioToActivity(activity,this.recentlyPlayedFifty);
+
+                    //activity.isVisible = (activity.distance > 0 && activity.audio.length>0) ? true : false
+                  if(activity.distance > 0 && activity.audio.length>0) {
+                    this.athleteActivities.push(activity);
+                  }
+                  });
+                  console.log('athlete activities', this.athleteActivities);
+                  this.isLoading = false;
+
+                };
+              });
+            };
+          })
+
         });
       };
     });
@@ -279,10 +310,10 @@ export class HomeComponent implements OnInit, OnDestroy {
               var trackEndTime = track.played_at;
 
               var startDistObject = Constants.findNearestStartTime(mappedStream, trackStartTime);
-              console.log('startDistObject',startDistObject);
+              //console.log('startDistObject',startDistObject);
               //var endDistObject = Constants.findNearestStartTime(mappedStream, trackEndTime);
-              var endDistObject = Constants.findNearestEndTime(mappedStream,startDistObject.time ,trackEndTime);
-              console.log('endDistObject',endDistObject);
+              var endDistObject = Constants.findNearestEndTime(mappedStream, startDistObject.time, trackEndTime);
+              //console.log('endDistObject',endDistObject);
 
               track.distance_start = (startDistObject?.distance || 0) * (0.1000);
               track.distance_end = (endDistObject?.distance || 0) * (0.1000);
@@ -298,9 +329,9 @@ export class HomeComponent implements OnInit, OnDestroy {
                 movingTimeMs += mappedStream[index].duration_increment_ms;
               };
               //track.moving_time = Constants.formatDuration((movingTimeMs));
-              track.moving_time = Constants.formatDuration(Math.min(movingTimeMs,track.track.duration_ms));
-             
-              var hoursTime = (Math.min(movingTimeMs,track.track.duration_ms)) / (1000 * 60 * 60);
+              track.moving_time = Constants.formatDuration(Math.min(movingTimeMs, track.track.duration_ms));
+
+              var hoursTime = (Math.min(movingTimeMs, track.track.duration_ms)) / (1000 * 60 * 60);
               track.speed = (track.distance / (hoursTime));
 
               track.pace = (1 / track.speed);

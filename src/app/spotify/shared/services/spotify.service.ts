@@ -53,6 +53,10 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `/Spotify/GetCurrentUserPlaylistsUrl`, { headers: this.headers });
   }
 
+  GetSpotifyRecentlyPlayedFiftyUrl(): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `/Spotify/GetSpotifyRecentlyPlayedFiftyUrl`, { headers: this.headers });
+  }
+
 
   //third party api calls
   //token api
