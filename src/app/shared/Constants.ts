@@ -5,7 +5,7 @@ import { StravaSettings } from "../strava/shared/models/strava-models";
 export class Constants {
 
     public static baseServerUrl: string = 'https://localhost:44354/api/v1';
-    // public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1';
+    //public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1';
 
     //public static isLoggedInFlag: boolean = false;
 
@@ -122,5 +122,27 @@ export class Constants {
         });
         return nearestElement;
     }
+
+    //private method to check that the given date lies between startDate and EndDate
+    static isDateBetween(date: string, startDate: string, endDate: string): boolean {
+        const targetDate = new Date(date).getTime();
+        const start = new Date(startDate).getTime();
+        const end = new Date(endDate).getTime();
+
+        return targetDate >= start && targetDate <= end;
+    }
+
+    
+    public static assignRecentAudioToActivity(activity: any, recentAudio: any[]): any[] {
+        const audioInRange = recentAudio.filter(audio =>
+            this.isDateBetween(audio.start_time, activity.start_date, activity.end_date)
+        );
+        return audioInRange;
+    }
+
+
+
+
+
 
 }
