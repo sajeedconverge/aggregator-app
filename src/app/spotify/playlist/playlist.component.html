@@ -29,7 +29,8 @@
         <div class="col-3 all_list_grid p-3 justify-content-center"
             (click)="getPlayListTracks(playlist.tracks.href,playlist.name)">
             <div class="all_listgrid_inner">
-                <img [src]="playlist.images[0].url">
+                <div *ngIf="playlist.images!==null "></div>
+                <img [src]="playlist?.images[0].url">
                 <h3>{{playlist.name}}</h3>
             </div>
         </div>

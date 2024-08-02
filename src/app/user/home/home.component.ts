@@ -324,7 +324,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             var timeStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'time');
 
             var mappedStream = Constants.processStreams(activityStartTime, distanceStream, timeStream);
-            console.log('mappedStream', mappedStream);
+            // console.log('mappedStream', mappedStream);
 
             //to add stream calculations into the tracks
             this.pairedResult[0].tracks.forEach((track: any) => {
