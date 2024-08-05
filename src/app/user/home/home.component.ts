@@ -130,18 +130,21 @@ export class HomeComponent implements OnInit, OnDestroy {
               this.spotifyService.SpotifyCommonGetApi(response.payload, this.spotifyAccessToken).subscribe((res) => {
                 if (res.items.length > 0) {
                   this.recentlyPlayedFifty = res.items;
-                  this.recentlyPlayedFifty.forEach(track=> {
+                  this.recentlyPlayedFifty.forEach(track => {
                     track.start_time = Constants.getTrackStartTime(track.played_at, track.track.duration_ms);
                   });
-
 
                   //to calculate activity end time
                   this.nonFilteredActivities.forEach(activity => {
                     activity.end_date = Constants.getActivityEndTime(activity.start_date, activity.elapsed_time);
 
                     activity.audio = Constants.assignRecentAudioToActivity(activity, this.recentlyPlayedFifty);
+                    //activity duration formatted to minutes
+                    activity.duration_mins = Constants.formatDuration(activity.elapsed_time * 1000); // multiplied with 1000 to convert sec to ms 
+                    //activity distance converted from meters to km
+                    activity.distance_km = (activity.distance / 1000);
 
-                    //activity.isVisible = (activity.distance > 0 && activity.audio.length>0) ? true : false
+
                     if (activity.distance > 0 && activity.audio.length > 0) {
                       this.athleteActivities.push(activity);
                     }
@@ -369,6 +372,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  clear1(table: Table) {
+    table.clear();
+    //this.searchValue = ''
+  }
+
+  clear2(table: Table) {
+    table.clear();
+    //this.searchValue = ''
+  }
+
+  clear3(table: Table) {
+    table.clear();
+    //this.searchValue = ''
+  }
 
 
 

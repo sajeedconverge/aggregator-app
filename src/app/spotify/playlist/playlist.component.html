@@ -13,7 +13,7 @@
 </div>
 }@else {
 
-<section class="playlist_pagetitle_section">
+<section class="playlist_pagetitle_section" *ngIf="!showTracks && !showAudioFeatures">
     <div class="flex">
         <div class="flex flex-1 playlist_pagetitle justify-content-center m-2 px-5 py-3">
             <h2>Playlists</h2>
@@ -29,8 +29,12 @@
         <div class="col-3 all_list_grid p-3 justify-content-center"
             (click)="getPlayListTracks(playlist.tracks.href,playlist.name)">
             <div class="all_listgrid_inner">
-                <div *ngIf="playlist.images!==null "></div>
+
+                @if (playlist.images===null) {
+                <img src="images/defaultPlaylistImage.png">
+                }@else {
                 <img [src]="playlist?.images[0].url">
+                }
                 <h3>{{playlist.name}}</h3>
             </div>
         </div>
@@ -61,7 +65,7 @@
                     Artist <p-sortIcon field="category" />
                 </th>
                 <th pSortableColumn="quantity">
-                    External Url 
+                    External Url
                 </th>
             </tr>
         </ng-template>
@@ -78,6 +82,11 @@
                     <p-button class="anchor_btn" (click)="openInSpotify(track.track.external_urls.spotify)"
                         label="Open in Spotify" [link]="true" />
                 </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr class="">
+                <td colspan="5">No tracks found in the current playlist.</td>
             </tr>
         </ng-template>
     </p-table>

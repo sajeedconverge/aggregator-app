@@ -18,6 +18,7 @@ import { RegisterComponent } from "../register/register.component";
 import { UserModule } from '../user.module';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { UserLoginRequest } from '../shared/models/user-models';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-signin',
@@ -93,7 +94,10 @@ export class SigninComponent implements OnInit {
         //this.loggedIn = (user != null);
 
         //console.log(user.provider, user);
-        this.accountService.externalLogin(this.user).subscribe((res) => {
+        this.accountService.externalLogin(this.user).pipe(
+          debounceTime(300), // Ensure only one call is made within 300ms
+          distinctUntilChanged() // Ensure only distinct values trigger the API call
+        ).subscribe((res) => {
           //initial login process to store user data
           this.authService.setAccessToken(res.payload.token);
           //console.log(res);
