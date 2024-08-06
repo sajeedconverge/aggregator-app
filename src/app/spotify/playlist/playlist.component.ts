@@ -27,7 +27,7 @@ import { ButtonModule } from 'primeng/button';
 export class PlaylistComponent implements OnInit {
   isLoading: boolean = false;
   checkInterval: any;
-  isSpotifyLinked: boolean = true;
+  isSpotifyLinked: boolean = false;
   userPlaylists: any[] = [];
   messages: Message[] = [
     { severity: 'warn', detail: 'Spofity not linked. Please, link spotify.' },

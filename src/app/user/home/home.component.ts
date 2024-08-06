@@ -12,7 +12,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { SpotifyService } from '../../spotify/shared/services/spotify.service';
 import { HttpHeaders } from '@angular/common/http';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
-import { PrimeNGConfig } from 'primeng/api';
+import { Message, PrimeNGConfig } from 'primeng/api';
+import { MessagesModule } from 'primeng/messages';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +26,8 @@ import { PrimeNGConfig } from 'primeng/api';
     FormsModule,
     TableModule,
     DatePipe,
-    ProgressBarComponent
+    ProgressBarComponent,
+    MessagesModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
@@ -50,6 +52,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('dt2') table2!: Table;
   @ViewChild('dt3') table3!: Table;
   showData: boolean = false;
+  messages: Message[] = [
+    { severity: 'warn', detail: 'Strava not linked. Please, link strava.' },
+  ];
+  isStravaLinked: boolean = false;
 
 
   constructor(
@@ -85,6 +91,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       ) {
         this.getAthleteActivities(this.stravaAccessToken);
         clearInterval(this.checkInterval); // Stop the interval
+        this.isStravaLinked = true;
+      } else {
+        this.isStravaLinked = false;
       };
     }, 2000); // Check every 2 seconds, adjust as needed
   }
@@ -377,7 +386,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     //this.searchValue = '' 
   }
 
-  
+
 
 
 

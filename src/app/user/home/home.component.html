@@ -15,13 +15,21 @@
     </div>
 </div> -->
 
+@if(!isStravaLinked) {
+<div class="m-2 p-1">
+    <div class="card">
+        <p-messages [(value)]="messages" [enableService]="false" />
+    </div>
+</div>
+}@else {
+
 
 <!-- Activities List -->
 <div *ngIf="!showDetails && !showAudioFeatures && showData">
-    <p-table #dt1 [value]="athleteActivities" styleClass="p-datatable-gridlines"
-     sortMode="multiple" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="athleteActivities.length"
+    <p-table #dt1 [value]="athleteActivities" styleClass="p-datatable-gridlines" sortMode="multiple" [rows]="10"
+        [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="athleteActivities.length"
         [paginator]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-    [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_date'" [sortOrder]="1">
+        [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_date'" [sortOrder]="1">
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between">
                 <h2>Activities</h2>
@@ -31,7 +39,7 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="name" >
+                <th pSortableColumn="name">
                     Activity Name <p-sortIcon field="name" />
                 </th>
                 <th pSortableColumn="start_date">Start Date <p-sortIcon field="start_date" /></th>
@@ -44,7 +52,7 @@
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-activity>
-            <tr >
+            <tr>
                 <td>
                     <p-button class="anchor_btn" (click)="getActivityDetails(activity.id,activity.start_date)"
                         [label]="activity.name" [link]="true" />
@@ -66,8 +74,8 @@
 
 <!-- Activity Details -->
 <div class="mt-2" *ngIf="showDetails && !showAudioFeatures">
-    <p-table #dt2 [value]="pairedTracks" styleClass="p-datatable-gridlines"
-     [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_time'" [sortOrder]="1" >
+    <p-table #dt2 [value]="pairedTracks" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }"
+        [sortField]="'start_time'" [sortOrder]="1">
         <ng-template pTemplate="caption">
 
             <div class="flex flex-row justify-content-between">
@@ -164,3 +172,5 @@
         </ng-template>
     </p-table>
 </div>
+
+}
