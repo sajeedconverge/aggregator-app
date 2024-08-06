@@ -19,6 +19,8 @@ import { UserModule } from '../user.module';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { UserLoginRequest } from '../shared/models/user-models';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { StravaAuthorizationService } from '../../strava/shared/services/strava-authorization.service';
+import { SpotifyAuthorizationService } from '../../spotify/shared/services/spotify-authorization.service';
 
 @Component({
   selector: 'app-signin',
@@ -59,7 +61,9 @@ export class SigninComponent implements OnInit {
     private authService: AuthService,
     private spotifyService: SpotifyService,
     private stravaService: StravaService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private stravaAuthService: StravaAuthorizationService,
+    private spotifyAuthService: SpotifyAuthorizationService,
   ) {
 
   }
@@ -87,7 +91,7 @@ export class SigninComponent implements OnInit {
     })
 
     this.socialAuthService.authState.subscribe((user) => {
-     // debugger;
+      // debugger;
       if (user) {
         this.isLoading = true;
         this.user = user;
@@ -100,8 +104,12 @@ export class SigninComponent implements OnInit {
         ).subscribe((res) => {
           //initial login process to store user data
           this.authService.setAccessToken(res.payload.token);
+          this.authService.setUserEmail(res.payload.email);
+          this.authService.setSpotifyRefreshToken(res.payload.spotifyRefreshToken);
+          this.authService.setStravaRefreshToken(res.payload.stravaRefreshToken);
           //console.log(res);
-
+          
+          
           setTimeout(() => {
             this.isLoading = false;
             this.router.navigate(['/home']);
@@ -110,11 +118,13 @@ export class SigninComponent implements OnInit {
             this.spotifyService.getSpotifyData().subscribe((res) => {
               if (res.statusCode === 200) {
                 Constants.spotifySettings = res.payload;
+                this.spotifyAuthService.refreshSpotifyAccessToken();
               }
             });
             this.stravaService.getStravaData().subscribe((res) => {
               if (res.statusCode === 200) {
                 Constants.stravaSettings = res.payload;
+                this.stravaAuthService.refreshStravaAccessToken();
               }
             });
           }, 1500);

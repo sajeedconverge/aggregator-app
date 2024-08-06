@@ -2,7 +2,7 @@
 <app-progress-bar></app-progress-bar>
 }
 
-<div class="" style="display: flex;justify-content: center;margin-top: 20px;margin-bottom: 10px;">
+<!-- <div class="" style="display: flex;justify-content: center;margin-top: 20px;margin-bottom: 10px;">
 
     <div class="m-2">
         <p-button (onClick)="callSpotifyAuth()">
@@ -13,20 +13,20 @@
         <p-button (onClick)="callStravaAuth()">
             <i class="bi bi-strava mr-2"></i>Link Strava </p-button>
     </div>
-</div>
+</div> -->
 
 
 <!-- Activities List -->
-<div class="mt-2" *ngIf="!showDetails && !showAudioFeatures && showData">
-    <p-table #dt1 [value]="athleteActivities" styleClass="p-datatable-gridlines" sortMode="multiple"
-    [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="athleteActivities.length"
+<div *ngIf="!showDetails && !showAudioFeatures && showData">
+    <p-table #dt1 [value]="athleteActivities" styleClass="p-datatable-gridlines"
+     sortMode="multiple" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="athleteActivities.length"
         [paginator]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-    [tableStyle]="{ 'min-width': '50rem' }">
+    [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_date'" [sortOrder]="1">
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between">
-                <h3>Activities</h3>
+                <h2>Activities</h2>
 
-                <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear1(dt1)" />
+                <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear(dt1)" />
             </div>
         </ng-template>
         <ng-template pTemplate="header">

@@ -76,8 +76,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   startCheckingToken(): void {
     this.checkInterval = setInterval(() => {
-      this.stravaAccessToken = localStorage.getItem('strava-bearer-token') || '';
-      this.spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+      this.stravaAccessToken = sessionStorage.getItem('strava-bearer-token') || '';
+      this.spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
 
       if (
         this.stravaAccessToken.length > 0 && Constants.stravaSettings.clientId !== 0 &&
@@ -108,13 +108,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  callSpotifyAuth() {
-    this.spotifyAuthService.loginToSpotify();
-  }
+  // callSpotifyAuth() {
+  //   this.spotifyAuthService.loginToSpotify();
+  // }
 
-  callStravaAuth() {
-    this.stravaAuthService.loginToStrava();
-  }
+  // callStravaAuth() {
+  //   this.stravaAuthService.loginToStrava();
+  // }
 
 
   getAthleteActivities(accessToken: string) {
@@ -174,8 +174,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         var activityUrl = res.payload;
         //debugger;
 
-        const stravaAccessToken = localStorage.getItem('strava-bearer-token') || '';
-        const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+        const stravaAccessToken = sessionStorage.getItem('strava-bearer-token') || '';
+        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
         if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
           this.getRecentlyPlayedAudio(activityTime, activityUrl, spotifyAccessToken, stravaAccessToken);
         } else {
@@ -279,7 +279,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.spotifyService.getSpotifyAudioFeaturesUrl(track.track.id).subscribe((res) => {
           if (res.statusCode === 200) {
             var featuresUrl = res.payload;
-            const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+            const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
             this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
               track.audio_features = audioFeature;
               track.duration_mins = Constants.formatDuration(track.track.duration_ms);
@@ -301,7 +301,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.spotifyService.getSpotifyAudioFeaturesUrl(trackId).subscribe((res) => {
       if (res.statusCode === 200) {
         var featuresUrl = res.payload;
-        const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
         this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
           this.audioFeatures.push(audioFeature);
           this.showAudioFeatures = true;
@@ -372,21 +372,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  clear1(table: Table) {
+  clear(table: Table) {
     table.clear();
-    //this.searchValue = ''
+    //this.searchValue = '' 
   }
 
-  clear2(table: Table) {
-    table.clear();
-    //this.searchValue = ''
-  }
-
-  clear3(table: Table) {
-    table.clear();
-    //this.searchValue = ''
-  }
-
+  
 
 
 
