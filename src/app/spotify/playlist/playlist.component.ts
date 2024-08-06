@@ -27,7 +27,7 @@ import { ButtonModule } from 'primeng/button';
 export class PlaylistComponent implements OnInit {
   isLoading: boolean = false;
   checkInterval: any;
-  isSpotifyLinked: boolean = false;
+  isSpotifyLinked: boolean = true;
   userPlaylists: any[] = [];
   messages: Message[] = [
     { severity: 'warn', detail: 'Spofity not linked. Please, link spotify.' },
@@ -46,12 +46,14 @@ export class PlaylistComponent implements OnInit {
   constructor(
     private spotifyService: SpotifyService,
     private spotifyAuthService: SpotifyAuthorizationService
-  ) { }
+  ) {
+    this.startCheckingToken();
+    this.fetchThirdPartyDetails();
+   }
 
   ngOnInit(): void {
     //this.isLoading = true;
-    this.startCheckingToken();
-    this.fetchThirdPartyDetails();
+    
   }
 
   ngOnDestroy(): void {

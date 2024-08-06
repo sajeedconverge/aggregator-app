@@ -55,7 +55,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   messages: Message[] = [
     { severity: 'warn', detail: 'Strava not linked. Please, link strava.' },
   ];
-  isStravaLinked: boolean = false;
+  isStravaLinked: boolean = true;
 
 
   constructor(
@@ -64,12 +64,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     private spotifyAuthService: SpotifyAuthorizationService,
     private spotifyService: SpotifyService,
     private primengConfig: PrimeNGConfig,
-  ) { }
-
-  ngOnInit(): void {
+  ) {
     this.primengConfig.ripple = true;
     this.startCheckingToken();
     this.fetchThirdPartyDetails();
+   }
+
+  ngOnInit(): void {
+    
 
   }
 
