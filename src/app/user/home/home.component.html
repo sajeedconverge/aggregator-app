@@ -73,7 +73,7 @@
 
 
 <!-- Activity Details -->
-<div class="mt-2" *ngIf="showDetails && !showAudioFeatures">
+<div *ngIf="showDetails && !showAudioFeatures">
     <p-table #dt2 [value]="pairedTracks" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }"
         [sortField]="'start_time'" [sortOrder]="1">
         <ng-template pTemplate="caption">
@@ -128,7 +128,7 @@
 
 
 <!-- Audio Features -->
-<div class="mt-2" *ngIf="showAudioFeatures">
+<div *ngIf="showAudioFeatures">
     <p-table #dt3 [value]="audioFeatures" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }">
         <ng-template pTemplate="caption">
 

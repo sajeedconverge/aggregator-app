@@ -112,14 +112,14 @@ export class StravaAuthorizationService {
               Constants.stravaHeader.set('Authorization', res.access_token);
               //to update strava token
               
-              var tokenRequest: ProviderTokenRequest = {
-                email: sessionStorage.getItem('user-email') || '',
-                provider: 'Strava',
-                token: res.refresh_token
-              }
-              this.accountService.storeProviderRefreshToken(tokenRequest).subscribe((res) => {
-                console.log(res);
-              });
+              // var tokenRequest: ProviderTokenRequest = {
+              //   email: sessionStorage.getItem('user-email') || '',
+              //   provider: 'Strava',
+              //   token: res.refresh_token
+              // }
+              // this.accountService.storeProviderRefreshToken(tokenRequest).subscribe((res) => {
+              //   console.log(res);
+              // });
             }
           })
 
