@@ -1,7 +1,7 @@
 <!-- Top nav bar -->
 <div class="topnav flex flex-row justify-content-between p-2" *ngIf="isUserLoggedIn">
     <div class="ml-2">
-        @if (isUserLoggedIn) {
+        <!-- @if (isUserLoggedIn) { -->
         @if (sidebarVisible) {
         <p-button (click)="sidebarVisible = false" icon="pi pi-times" severity="secondary">
         </p-button>
@@ -10,7 +10,7 @@
         <p-button (click)="sidebarVisible = true" icon="pi pi-bars" severity="secondary">
         </p-button>
         }
-        }
+        <!-- } -->
     </div>
     <div></div>
     <div class="mr-2">
