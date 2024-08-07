@@ -1,13 +1,18 @@
 import { Injectable } from '@angular/core';
 import { StravaService } from './strava.service';
 import { Constants } from '../../../shared/Constants';
+import { ProviderTokenRequest } from '../../../user/shared/models/user-models';
+import { AccountService } from '../../../user/shared/services/account.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StravaAuthorizationService {
 
-  constructor(private stravaService: StravaService) { }
+  constructor(
+    private stravaService: StravaService,
+    private accountService: AccountService
+  ) { }
 
   //#to open spotify login modal
   loginToStrava() {
@@ -60,21 +65,72 @@ export class StravaAuthorizationService {
         this.stravaService.generateStravaAccessToken(tokenUrl, body).subscribe((res) => {
           if (res) {
             console.log("new access token strava", res);
-            localStorage.setItem('strava-bearer-token', res.access_token);
-            localStorage.setItem('strava-refresh-token', res.refresh_token);
+            sessionStorage.setItem('strava-bearer-token', res.access_token);
+            sessionStorage.setItem('strava-refresh-token', res.refresh_token);
             const tokenExpiryTime = new Date(res.expires_at * 1000);
-            localStorage.setItem('strava-token-expiry-time', tokenExpiryTime.toString());
+            sessionStorage.setItem('strava-token-expiry-time', tokenExpiryTime.toString());
 
             Constants.stravaHeader.set('Authorization', res.access_token);
 
-            
+            var tokenRequest: ProviderTokenRequest = {
+              email: sessionStorage.getItem('user-email') || '',
+              provider: 'Strava',
+              token: res.refresh_token
+            }
+
+            this.accountService.storeProviderRefreshToken(tokenRequest).subscribe((res) => {
+              console.log(res);
+            });
           };
         })
       }
     });
   }
 
-  
+  //#To generate auth token from refresh token
+  refreshStravaAccessToken() {
+    const refreshToken: string = sessionStorage.getItem('strava-refresh-token') || '';
+    if (refreshToken.length > 0) {
+      const body: any = {
+        client_id: Constants.stravaSettings.clientId,
+        client_secret: Constants.stravaSettings.clientSecret,
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken
+      };
+      this.stravaService.getStravaTokenRefreshUrl().subscribe((response) => {
+        if (response.statusCode === 200) {
+          var refreshUrl: string = response.payload;
+
+          this.stravaService.generateStravaAccessToken(refreshUrl, body).subscribe((res) => {
+            if (res) {
+              console.log("new access token strava", res);
+              sessionStorage.setItem('strava-bearer-token', res.access_token);
+              sessionStorage.setItem('strava-refresh-token', res.refresh_token);
+              const tokenExpiryTime = new Date(res.expires_at * 1000);
+              sessionStorage.setItem('strava-token-expiry-time', tokenExpiryTime.toString());
+
+              Constants.stravaHeader.set('Authorization', res.access_token);
+              //to update strava token
+              
+              // var tokenRequest: ProviderTokenRequest = {
+              //   email: sessionStorage.getItem('user-email') || '',
+              //   provider: 'Strava',
+              //   token: res.refresh_token
+              // }
+              // this.accountService.storeProviderRefreshToken(tokenRequest).subscribe((res) => {
+              //   console.log(res);
+              // });
+            }
+          })
+
+        }
+      })
+
+
+
+    }
+  }
+
 
 
 

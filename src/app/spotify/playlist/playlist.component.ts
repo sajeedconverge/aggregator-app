@@ -46,12 +46,14 @@ export class PlaylistComponent implements OnInit {
   constructor(
     private spotifyService: SpotifyService,
     private spotifyAuthService: SpotifyAuthorizationService
-  ) { }
+  ) {
+    this.startCheckingToken();
+    this.fetchThirdPartyDetails();
+   }
 
   ngOnInit(): void {
     //this.isLoading = true;
-    this.startCheckingToken();
-    this.fetchThirdPartyDetails();
+    
   }
 
   ngOnDestroy(): void {
@@ -63,7 +65,7 @@ export class PlaylistComponent implements OnInit {
 
   startCheckingToken(): void {
     this.checkInterval = setInterval(() => {
-      const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+      const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
       if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
         this.getCurrentUserPlaylists(spotifyAccessToken);
         this.isSpotifyLinked = true;
@@ -111,7 +113,7 @@ export class PlaylistComponent implements OnInit {
     this.showTracks = true;
     this.isLoading = true;
     this.currentPlayListName = playlistName;
-    const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
     if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((res) => {
         this.playlistTracks = res.items;
@@ -133,7 +135,7 @@ export class PlaylistComponent implements OnInit {
     this.spotifyService.getSpotifyAudioFeaturesUrl(trackId).subscribe((res) => {
       if (res.statusCode === 200) {
         var featuresUrl = res.payload;
-        const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
         this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
           this.audioFeatures.push(res);
           this.showAudioFeatures = true;

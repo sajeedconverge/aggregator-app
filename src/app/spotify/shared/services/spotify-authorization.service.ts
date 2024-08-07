@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Constants } from '../../../shared/Constants';
 import { SpotifyService } from './spotify.service';
+import { AccountService } from '../../../user/shared/services/account.service';
+import { ProviderTokenRequest } from '../../../user/shared/models/user-models';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +10,8 @@ import { SpotifyService } from './spotify.service';
 export class SpotifyAuthorizationService {
 
   constructor(
-    private spotifyService: SpotifyService
+    private spotifyService: SpotifyService,
+    private accountService: AccountService
   ) { }
 
 
@@ -43,10 +46,10 @@ export class SpotifyAuthorizationService {
             // Error is expected due to cross-origin policies when accessing the window.location.href
           }
         }, 1000);
-        
+
       };
     });
-    
+
   }
 
   //# To get spotify auth code from url
@@ -70,13 +73,23 @@ export class SpotifyAuthorizationService {
         this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
           if (res) {
             //console.log("new access token", res);
-            localStorage.setItem('spotify-bearer-token', res.access_token);
-            localStorage.setItem('spotify-refresh-token', res.refresh_token);
+            sessionStorage.setItem('spotify-bearer-token', res.access_token);
+            sessionStorage.setItem('spotify-refresh-token', res.refresh_token);
 
             const currentDateTime = new Date();
             const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
             //console.log(currentDateTime, tokenExpiryTime);
-            localStorage.setItem('sbt-expiry-time', tokenExpiryTime.toString());
+            sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toString());
+
+            var tokenRequest: ProviderTokenRequest = {
+              email: sessionStorage.getItem('user-email') || '',
+              provider: 'Spotify',
+              token: res.refresh_token
+            }
+
+            this.accountService.storeProviderRefreshToken(tokenRequest).subscribe((res)=>{
+              console.log(res);
+            });
           };
         })
       }
@@ -84,7 +97,7 @@ export class SpotifyAuthorizationService {
   }
   //To refresh access token
   refreshSpotifyAccessToken() {
-    const refreshToken: string = localStorage.getItem('spotify-refresh-token') || '';
+    const refreshToken: string = sessionStorage.getItem('spotify-refresh-token') || '';
 
     var body = new URLSearchParams();
     body.set('grant_type', 'refresh_token');
@@ -97,12 +110,12 @@ export class SpotifyAuthorizationService {
         this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
           if (res) {
             //console.log("refresh access token", res);
-            localStorage.setItem('spotify-bearer-token', res.access_token);
+            sessionStorage.setItem('spotify-bearer-token', res.access_token);
 
             const currentDateTime = new Date();
             const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
             //console.log(currentDateTime, tokenExpiryTime);
-            localStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
+            sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
           };
         })
       };
@@ -110,7 +123,7 @@ export class SpotifyAuthorizationService {
   }
   //To check sbt expiry and refresh the access token
   checkExpiryAndRefreshToken() {
-    const sbtExpiryTime = localStorage.getItem('sbt-expiry-time');
+    const sbtExpiryTime = sessionStorage.getItem('sbt-expiry-time');
     if (sbtExpiryTime) {
       const futureDateTime = new Date(sbtExpiryTime);
       const currentTime = new Date();

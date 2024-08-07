@@ -12,7 +12,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { SpotifyService } from '../../spotify/shared/services/spotify.service';
 import { HttpHeaders } from '@angular/common/http';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
-import { PrimeNGConfig } from 'primeng/api';
+import { Message, PrimeNGConfig } from 'primeng/api';
+import { MessagesModule } from 'primeng/messages';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +26,8 @@ import { PrimeNGConfig } from 'primeng/api';
     FormsModule,
     TableModule,
     DatePipe,
-    ProgressBarComponent
+    ProgressBarComponent,
+    MessagesModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
@@ -50,6 +52,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('dt2') table2!: Table;
   @ViewChild('dt3') table3!: Table;
   showData: boolean = false;
+  messages: Message[] = [
+    { severity: 'warn', detail: 'Strava not linked. Please, link strava.' },
+  ];
+  isStravaLinked: boolean = true;
 
 
   constructor(
@@ -58,12 +64,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     private spotifyAuthService: SpotifyAuthorizationService,
     private spotifyService: SpotifyService,
     private primengConfig: PrimeNGConfig,
-  ) { }
-
-  ngOnInit(): void {
+  ) {
     this.primengConfig.ripple = true;
     this.startCheckingToken();
     this.fetchThirdPartyDetails();
+   }
+
+  ngOnInit(): void {
+    
 
   }
 
@@ -76,8 +84,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   startCheckingToken(): void {
     this.checkInterval = setInterval(() => {
-      this.stravaAccessToken = localStorage.getItem('strava-bearer-token') || '';
-      this.spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+      this.stravaAccessToken = sessionStorage.getItem('strava-bearer-token') || '';
+      this.spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
 
       if (
         this.stravaAccessToken.length > 0 && Constants.stravaSettings.clientId !== 0 &&
@@ -85,6 +93,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       ) {
         this.getAthleteActivities(this.stravaAccessToken);
         clearInterval(this.checkInterval); // Stop the interval
+        this.isStravaLinked = true;
+      } else {
+        this.isStravaLinked = false;
       };
     }, 2000); // Check every 2 seconds, adjust as needed
   }
@@ -108,13 +119,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  callSpotifyAuth() {
-    this.spotifyAuthService.loginToSpotify();
-  }
+  // callSpotifyAuth() {
+  //   this.spotifyAuthService.loginToSpotify();
+  // }
 
-  callStravaAuth() {
-    this.stravaAuthService.loginToStrava();
-  }
+  // callStravaAuth() {
+  //   this.stravaAuthService.loginToStrava();
+  // }
 
 
   getAthleteActivities(accessToken: string) {
@@ -130,18 +141,21 @@ export class HomeComponent implements OnInit, OnDestroy {
               this.spotifyService.SpotifyCommonGetApi(response.payload, this.spotifyAccessToken).subscribe((res) => {
                 if (res.items.length > 0) {
                   this.recentlyPlayedFifty = res.items;
-                  this.recentlyPlayedFifty.forEach(track=> {
+                  this.recentlyPlayedFifty.forEach(track => {
                     track.start_time = Constants.getTrackStartTime(track.played_at, track.track.duration_ms);
                   });
-
 
                   //to calculate activity end time
                   this.nonFilteredActivities.forEach(activity => {
                     activity.end_date = Constants.getActivityEndTime(activity.start_date, activity.elapsed_time);
 
                     activity.audio = Constants.assignRecentAudioToActivity(activity, this.recentlyPlayedFifty);
+                    //activity duration formatted to minutes
+                    activity.duration_mins = Constants.formatDuration(activity.elapsed_time * 1000); // multiplied with 1000 to convert sec to ms 
+                    //activity distance converted from meters to km
+                    activity.distance_km = (activity.distance / 1000);
 
-                    //activity.isVisible = (activity.distance > 0 && activity.audio.length>0) ? true : false
+
                     if (activity.distance > 0 && activity.audio.length > 0) {
                       this.athleteActivities.push(activity);
                     }
@@ -171,8 +185,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         var activityUrl = res.payload;
         //debugger;
 
-        const stravaAccessToken = localStorage.getItem('strava-bearer-token') || '';
-        const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+        const stravaAccessToken = sessionStorage.getItem('strava-bearer-token') || '';
+        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
         if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
           this.getRecentlyPlayedAudio(activityTime, activityUrl, spotifyAccessToken, stravaAccessToken);
         } else {
@@ -276,7 +290,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.spotifyService.getSpotifyAudioFeaturesUrl(track.track.id).subscribe((res) => {
           if (res.statusCode === 200) {
             var featuresUrl = res.payload;
-            const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+            const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
             this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
               track.audio_features = audioFeature;
               track.duration_mins = Constants.formatDuration(track.track.duration_ms);
@@ -298,7 +312,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.spotifyService.getSpotifyAudioFeaturesUrl(trackId).subscribe((res) => {
       if (res.statusCode === 200) {
         var featuresUrl = res.payload;
-        const spotifyAccessToken = localStorage.getItem('spotify-bearer-token') || '';
+        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
         this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
           this.audioFeatures.push(audioFeature);
           this.showAudioFeatures = true;
@@ -324,7 +338,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             var timeStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'time');
 
             var mappedStream = Constants.processStreams(activityStartTime, distanceStream, timeStream);
-            console.log('mappedStream', mappedStream);
+            // console.log('mappedStream', mappedStream);
 
             //to add stream calculations into the tracks
             this.pairedResult[0].tracks.forEach((track: any) => {
@@ -367,6 +381,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       };
     });
+  }
+
+  clear(table: Table) {
+    table.clear();
+    //this.searchValue = '' 
   }
 
 

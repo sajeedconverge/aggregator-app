@@ -57,6 +57,9 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `/Spotify/GetSpotifyRecentlyPlayedFiftyUrl`, { headers: this.headers });
   }
 
+  getSpotifyAudioAnalysisUrl(trackId: string): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `/Spotify/GetAudioAnalysisUrl?trackId=${trackId}`, { headers: this.headers });
+  }
 
   //third party api calls
   //token api

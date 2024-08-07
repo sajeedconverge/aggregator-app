@@ -70,9 +70,9 @@ export class RegisterComponent {
         this.user = user;
         //this.loggedIn = (user != null);
 
-       // console.log(user.provider, user);
+        // console.log(user.provider, user);
         this.accountService.externalLogin(this.user).subscribe((res) => {
-          //localStorage.setItem("social-user", JSON.stringify(this.user));
+          //sessionStorage.setItem("social-user", JSON.stringify(this.user));
           this.authService.setAccessToken(res.payload.token);
           //console.log(res);
 
@@ -113,13 +113,11 @@ export class RegisterComponent {
     if (this.registerForm.valid) {
       this.UserRequest = this.registerForm.value;
       this.accountService.register(this.UserRequest).subscribe((res) => {
-        //debugger;
-        //if (res) {
-
-        console.log('register success', res);
-
-        this.router.navigate(['/']);
-        //};
+        if (res.statusCode === 200) {
+          console.log('register success', res);
+          window.location.reload();
+          //this.router.navigate(['/']);
+        };
       });
     };
 

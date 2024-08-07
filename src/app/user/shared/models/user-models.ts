@@ -9,3 +9,9 @@ export interface UserLoginRequest {
     email: string
     password: string
 }
+
+export interface ProviderTokenRequest {
+    email: string
+    provider: string
+    token: string
+  }

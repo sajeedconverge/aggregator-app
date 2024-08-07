@@ -10,7 +10,7 @@ import { Constants } from '../../../shared/Constants';
 export class StravaService {
 
   headers = new HttpHeaders().set('Content-Type', 'application/json');
-  accessToken = localStorage.getItem('strava-bearer-token');
+  accessToken = sessionStorage.getItem('strava-bearer-token');
 
   constructor(private http: HttpClient) { }
 
@@ -39,6 +39,9 @@ export class StravaService {
     return this.http.get<any>(Constants.baseServerUrl + `/Strava/GetActivityStreamsUrl?activityId=${activityId}`, { headers: this.headers });
   }
 
+  getStravaTokenRefreshUrl(): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `/Strava/GetTokenRefreshUrl`, { headers: this.headers });
+  }
 
 
 
