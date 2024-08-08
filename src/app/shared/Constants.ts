@@ -1,11 +1,11 @@
 import { HttpHeaders } from "@angular/common/http";
-import { SpotifySettings } from "../spotify/shared/models/spotify-models";
-import { StravaSettings } from "../strava/shared/models/strava-models";
+import { PairedTrackJsonObject, SpotifySettings, TrackJsonObject } from "../spotify/shared/models/spotify-models";
+import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "../strava/shared/models/strava-models";
 
 export class Constants {
 
-    public static baseServerUrl: string = 'https://localhost:44354/api/v1';
-    //public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1';
+    public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
+    //public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     //public static isLoggedInFlag: boolean = false;
 
@@ -23,8 +23,6 @@ export class Constants {
         redirectClientUrl: "",
         scope: ""
     }
-
-
 
     public static spotifyHeader = new HttpHeaders({});
 
@@ -132,7 +130,7 @@ export class Constants {
         return targetDate >= start && targetDate <= end;
     }
 
-    
+
     public static assignRecentAudioToActivity(activity: any, recentAudio: any[]): any[] {
         const audioInRange = recentAudio.filter(audio =>
             this.isDateBetween(audio.start_time, activity.start_date, activity.end_date)
@@ -140,9 +138,95 @@ export class Constants {
         return audioInRange;
     }
 
+    public static typeCastActivityJson(activity: any): ActivityJsonObject {
+        var activityJson: ActivityJsonObject = {
+            id: activity.id,
+            name: activity.name,
+            distance: activity.distance,
+            moving_time: activity.moving_time,
+            elapsed_time: activity.elapsed_time,
+            total_elevation_gain: activity.total_elevation_gain,
+            type: activity.type,
+            sport_type: activity.sport_type,
+            start_date: activity.start_date,
+            start_date_local: activity.start_date_local,
+            timezone: activity.timezone,
+            utc_offset: activity.utc_offset,
+            average_speed: activity.average_speed,
+            max_speed: activity.max_speed,
+            average_heartrate: activity.average_heartrate,
+            max_heartrate: activity.max_heartrate,
+            elev_high: activity.elev_high,
+            elev_low: activity.elev_low,
+            upload_id: activity.upload_id,
+            external_id: activity.external_id,
+            suffer_score: activity.suffer_score,
+            calories: activity.calories,
+        };
+        return activityJson;
+    }
 
+    public static typeCastActivityDetailJson(ActivityDetail: any): ActivityDetailJsonObject {
+        var actvityDetailJson: ActivityDetailJsonObject = {
+            id: ActivityDetail.id,
+            name: ActivityDetail.name,
+            distance: ActivityDetail.distance,
+            moving_time: ActivityDetail.moving_time,
+            elapsed_time: ActivityDetail.elapsed_time,
+            total_elevation_gain: ActivityDetail.total_elevation_gain,
+            type: ActivityDetail.type,
+            sport_type: ActivityDetail.sport_type,
+            start_date: ActivityDetail.start_date,
+            start_date_local: ActivityDetail.start_date_local,
+            timezone: ActivityDetail.timezone,
+            utc_offset: ActivityDetail.utc_offset,
+            average_speed: ActivityDetail.average_speed,
+            max_speed: ActivityDetail.max_speed,
+            average_heartrate: ActivityDetail.average_heartrate,
+            max_heartrate: ActivityDetail.max_heartrate,
+            elev_high: ActivityDetail.elev_high,
+            elev_low: ActivityDetail.elev_low,
+            upload_id: ActivityDetail.upload_id,
+            external_id: ActivityDetail.external_id,
+            suffer_score: ActivityDetail.suffer_score,
+            calories: ActivityDetail.calories,
+            end_date: ActivityDetail.end_date,
+            audio: ActivityDetail.audio,
+            duration_mins: ActivityDetail.duration_mins,
+            distance_km: ActivityDetail.distance_km
+        };
+        return actvityDetailJson;
+    }
 
+    public static typeCastTrackJson(track: any): TrackJsonObject {
+        var trackJson: TrackJsonObject = {
+            album: track.track.album,
+            artists: track.track.artists,
+            duration_ms: track.track.duration_ms,
+            id: track.track.id,
+            name: track.track.name,
+            popularity: track.track.popularity,
+            type: track.track.type,
+            uri: track.track.uri,
+            AudioFeatures: track.audio_features,
+        };
+        return trackJson
+    }
 
-
+    public static typeCastPairedTrackJson(pairedTrack: any): PairedTrackJsonObject {
+        var PairedTrackJson: PairedTrackJsonObject = {
+            distance: pairedTrack.distance,
+            distance_end: pairedTrack.distance_end,
+            distance_start: pairedTrack.distance_start,
+            duration_mins: pairedTrack.duration_mins,
+            moving_time: pairedTrack.moving_time,
+            pace: pairedTrack.pace,
+            played_at: pairedTrack.played_at,
+            speed: pairedTrack.speed,
+            start_time: pairedTrack.start_time,
+            trackid: pairedTrack.track.id
+        };
+        return PairedTrackJson;
+    }
 
 }

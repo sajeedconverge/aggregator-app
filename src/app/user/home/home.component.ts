@@ -14,6 +14,9 @@ import { HttpHeaders } from '@angular/common/http';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { Message, PrimeNGConfig } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
+import { ActivityJsonObject, PostActivityDetailRequest, PostActivityRequest } from '../../strava/shared/models/strava-models';
+import { AuthService } from '../shared/services/auth.service';
+import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
 
 @Component({
   selector: 'app-home',
@@ -64,14 +67,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     private spotifyAuthService: SpotifyAuthorizationService,
     private spotifyService: SpotifyService,
     private primengConfig: PrimeNGConfig,
+    private authService: AuthService
   ) {
     this.primengConfig.ripple = true;
     this.startCheckingToken();
     this.fetchThirdPartyDetails();
-   }
+  }
 
   ngOnInit(): void {
-    
+
 
   }
 
@@ -163,12 +167,25 @@ export class HomeComponent implements OnInit, OnDestroy {
                   console.log('athlete activities', this.athleteActivities);
                   this.isLoading = false;
                   this.showData = true;
+                  //Code to store these activities into the DB
+                  this.athleteActivities.forEach((activity) => {
+                    const activityJsonObject = Constants.typeCastActivityJson(activity);
+                    var activityRequest: PostActivityRequest = {
+                      userEmail: this.authService.getUserEmail(),
+                      providerActivityId: activity.id,
+                      jsonData: JSON.stringify(activityJsonObject)
+                    };
+                    this.stravaService.postActivity(activityRequest).subscribe((response) => {
+                      if (response.statusCode === 200) {
+                        console.log("activity stored in db");
+                      };
+                    });
+                  });
 
                 };
               });
             };
           })
-
         });
       };
     });
@@ -183,7 +200,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (res.statusCode === 200) {
         this.showDetails = true;
         var activityUrl = res.payload;
-        //debugger;
 
         const stravaAccessToken = sessionStorage.getItem('strava-bearer-token') || '';
         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
@@ -210,7 +226,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.spotifyService.getSpotifyRecentlyPlayedUrl(activityTime).subscribe((res) => {
       if (res.statusCode === 200) {
         const url = res.payload;
-        // debugger;
+
         this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((audioResponse) => {
           this.recentAudio = audioResponse.items;
           //To calculate track start time
@@ -238,21 +254,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   //this method will be called in activities list to pair songs to each activity
-  // pairAudioActivity(activity: any) {
-  //   this.spotifyService.getSpotifyRecentlyPlayedUrl(activity.start_date).subscribe((urlResponse) => {
-  //     if (urlResponse.statusCode === 200) {
-  //       const url = urlResponse.payload;
-  //       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((audioResponse) => {
-
-  //     };
-  //   });
-
-  // }
-
-  //To pair activity with Audio
   pairItems(activities: any[], tracks: any[]) {
     const result: { activity: any, tracks: any[] }[] = [];
-    // debugger;
+
     activities.forEach(activity => {
       const activityStartDate = new Date(activity.start_date).getTime();
       const activityEndDate = new Date(activity.end_date).getTime();
@@ -261,13 +265,10 @@ export class HomeComponent implements OnInit, OnDestroy {
         const trackStartDate = new Date(track.start_time).getTime();
         return trackStartDate >= activityStartDate && trackStartDate <= activityEndDate;
       });
-
       result.push({ activity, tracks: matchedTracks });
     });
 
     this.pairedTracks = result[0].tracks;
-    //to get Activity Streams for the activity
-    //result[0].activity.activity_streams = this.activityStreams;
 
     if (this.pairedTracks.length === 0) {
       this.pairedTracks[0] = {
@@ -357,11 +358,11 @@ export class HomeComponent implements OnInit, OnDestroy {
               track.distance = (track.distance_end - track.distance_start);
               // var hoursTime = (track.track.duration_ms) / (1000 * 60 * 60);
               // track.speed = (track.distance / (hoursTime));
-              //debugger;
+
               // var movingTimeSec = Math.floor((track.distance*1000 )/((track.speed)*(5/18)));
               // track.moving_time = Constants.formatDuration(movingTimeSec*1000);
               var movingTimeMs = 0;
-              //debugger;
+
               for (let index = (startDistObject?.index || 0); index < (endDistObject?.index || 0); index++) {
                 movingTimeMs += mappedStream[index].duration_increment_ms;
               };
@@ -388,6 +389,38 @@ export class HomeComponent implements OnInit, OnDestroy {
     //this.searchValue = '' 
   }
 
+  saveActivityDetails() {
+    //to store activity detail and track json
+    var pairedTrackJsonArray: PairedTrackJsonObject[] = [];
+    this.pairedTracks.forEach(pt => {
+      var PTrackJson = Constants.typeCastPairedTrackJson(pt);
+      pairedTrackJsonArray.push(PTrackJson);
+      //To store individual track into db
+      debugger;
+      var trackJson = Constants.typeCastTrackJson(pt);
+      var PostTrackRequest: PostTrackRequest = {
+        providerTrackId: pt.track.id,
+        trackData: JSON.stringify(trackJson)
+      };
+      this.spotifyService.postTrack(PostTrackRequest).subscribe((postTrackResponse) => {
+        if (postTrackResponse.statusCode === 200) {
+          console.log("track added successfully.");
+        }
+      });
+
+    });
+    var activityDetailJson = Constants.typeCastActivityDetailJson(this.pairedResult[0].activity)
+    activityDetailJson.audio = pairedTrackJsonArray;
+    var activityDetailRequest: PostActivityDetailRequest = {
+      providerActivityId: activityDetailJson.id,
+      jsonData: JSON.stringify(activityDetailJson)
+    };
+    this.stravaService.postActivityDetail(activityDetailRequest).subscribe((adResponse) => {
+      if (adResponse.statusCode === 200) {
+        console.log("actvity detail added successfully.")
+      };
+    });
+  }
 
 
 

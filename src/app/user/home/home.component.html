@@ -80,7 +80,11 @@
 
             <div class="flex flex-row justify-content-between">
                 <h3>Activity Details</h3>
-                <p-button (click)="showDetails=false">Back</p-button>
+                <div>
+                    <p-button label="Save" severity="success" (click)="saveActivityDetails()" icon="pi pi-save" iconPos="right" />
+                    
+                    <p-button (click)="showDetails=false" class="ml-2">Back</p-button>
+                </div>
             </div>
 
         </ng-template>

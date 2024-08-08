@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ResponseModel } from '../../../shared/shared-models';
 import { Constants } from '../../../shared/Constants';
+import { PostActivityDetailRequest, PostActivityRequest } from '../models/strava-models';
 
 @Injectable({
   providedIn: 'root'
@@ -16,37 +17,47 @@ export class StravaService {
 
   //.net api calls
   getStravaAuthUrl(): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + '/Strava/GetStravaAuthUrl', { headers: this.headers })
+    return this.http.get<any>(Constants.baseServerUrl + 'Strava/GetStravaAuthUrl', { headers: this.headers })
   }
 
   getStravaData(): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + '/Strava/GetStravaData', { headers: this.headers })
+    return this.http.get<any>(Constants.baseServerUrl + 'Strava/GetStravaData', { headers: this.headers })
   }
 
   getStravaAccessTokenUrl(): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + '/Strava/GetStravaAccessTokenUrl', { headers: this.headers });
+    return this.http.get<any>(Constants.baseServerUrl + 'Strava/GetStravaAccessTokenUrl', { headers: this.headers });
   }
 
   getStravaAthleteActivitiesUrl(): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + '/Strava/GetAthleteActivitiesUrl', { headers: this.headers });
+    return this.http.get<any>(Constants.baseServerUrl + 'Strava/GetAthleteActivitiesUrl', { headers: this.headers });
   }
 
   getStravaActivityDetailsUrl(activityId:number): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + `/Strava/GetActivityDetailsUrl?activityId=${activityId}`, { headers: this.headers });
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetActivityDetailsUrl?activityId=${activityId}`, { headers: this.headers });
   }
 
   getStravaActivityStreamsUrl(activityId:number): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + `/Strava/GetActivityStreamsUrl?activityId=${activityId}`, { headers: this.headers });
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetActivityStreamsUrl?activityId=${activityId}`, { headers: this.headers });
   }
 
   getStravaTokenRefreshUrl(): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + `/Strava/GetTokenRefreshUrl`, { headers: this.headers });
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetTokenRefreshUrl`, { headers: this.headers });
   }
+
+  postActivity(request: PostActivityRequest): Observable<any> {
+    return this.http.post<any>(Constants.baseServerUrl + 'Strava/PostActivity', request, { headers: this.headers });
+  }
+
+  postActivityDetail(request: PostActivityDetailRequest): Observable<any> {
+    return this.http.post<any>(Constants.baseServerUrl + 'Strava/PostActivityDetail', request, { headers: this.headers });
+  }
+
 
 
 
 
   // third party api calls
+  //token api
   generateStravaAccessToken(url: string, body: any): Observable<any> {
     return this.http.post<any>(url, body, { headers: this.headers });
   }
