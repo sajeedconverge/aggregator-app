@@ -29,7 +29,7 @@
     <p-table #dt1 [value]="athleteActivities" styleClass="p-datatable-gridlines" sortMode="multiple" [rows]="10"
         [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="athleteActivities.length"
         [paginator]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_date'" [sortOrder]="1">
+        [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_date'" [sortOrder]="-1">
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between">
                 <h2>Activities</h2>
@@ -84,10 +84,10 @@
             <div class="flex flex-row justify-content-between">
                 <h3>Activity Details</h3>
                 <div>
-                    <p-button label="Save" severity="success" (click)="saveActivityDetails()" icon="pi pi-save"
+                    <p-button label="Save" severity="success" [disabled]="isADSaved" (click)="saveActivityDetails()" icon="pi pi-save"
                         iconPos="right" />
 
-                    <p-button (click)="showDetails=false" class="ml-2">Back</p-button>
+                    <p-button (click)="showDetails=false && isADSaved=false" class="ml-2">Back</p-button>
                 </div>
             </div>
 
@@ -114,7 +114,7 @@
                 <td>{{track.played_at | date: 'hh:mm:ss a'}}</td>
                 <td>
                     <p-button class="anchor_btn" [disabled]="track?.track?.id===''"
-                        (click)="getAudioFeatures(track.track?.id)" [label]="track.track?.name" [link]="true" />
+                        (click)="getAudioFeatures(track.track?.id,track.isSaved)" [label]="track.track?.name" [link]="true" />
                 </td>
                 <td>{{track.track?.artists[0]?.name}}</td>
                 <td>
