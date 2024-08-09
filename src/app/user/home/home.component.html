@@ -57,7 +57,7 @@
         <ng-template pTemplate="body" let-activity>
             <tr>
                 <td>
-                    <p-button class="anchor_btn" (click)="getActivityDetails(activity.id,activity.start_date)"
+                    <p-button class="anchor_btn" (click)="getActivityDetails(activity.id,activity.start_date,activity.isSaved)"
                         [label]="activity.name" [link]="true" />
                 </td>
                 <td>{{ activity.start_date | date:'MMM d, y, h:mm:ss a' }}</td>
@@ -113,12 +113,13 @@
                 <td>{{track.start_time | date: 'hh:mm:ss a'}}</td>
                 <td>{{track.played_at | date: 'hh:mm:ss a'}}</td>
                 <td>
-                    <p-button class="anchor_btn" [disabled]="track.track.id===0"
-                        (click)="getAudioFeatures(track.track.id)" [label]="track.track.name" [link]="true" />
+                    <p-button class="anchor_btn" [disabled]="track?.track?.id===''"
+                        (click)="getAudioFeatures(track.track?.id)" [label]="track.track?.name" [link]="true" />
                 </td>
-                <td>{{track.track.artists[0].name}}</td>
+                <td>{{track.track?.artists[0]?.name}}</td>
                 <td>
-                    {{track.audio_features?.tempo}}
+                    <!-- first choice for saved track and second for track from api -->
+                    {{track.isSaved ? track.track?.audio_features?.tempo : track.audio_features?.tempo}}
                 </td>
                 <td>{{track.duration_mins}}</td>
                 <td>{{track.distance_start | number:'1.2-2'}} km</td>

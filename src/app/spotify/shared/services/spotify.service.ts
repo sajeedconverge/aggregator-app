@@ -54,6 +54,16 @@ export class SpotifyService {
     return this.http.post<any>(Constants.baseServerUrl + 'Spotify/PostTrack', request, { headers: this.headers });
   }
 
+  getTrackById(providerId:string): Observable<any>{
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetActivityByProviderId?providerId=${providerId}`, { headers: this.headers })
+    .pipe(
+      map(response => {
+        response.payload.jsonData = JSON.parse(response.payload.jsonData);
+        return response;
+      })
+    );
+  }
+
   getAllTracks(): Observable<any> {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetAllTracks`, { headers: this.headers })
       .pipe(

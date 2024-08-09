@@ -81,6 +81,43 @@ export class StravaService {
     );
   }
 
+  getActivityById(providerId:number){
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetActivityByProviderId?providerId=${providerId}`, { headers: this.headers })
+    .pipe(
+      map(response => {
+        // Check if payload is an object and has jsonData
+        if (response.payload && typeof response.payload === 'object' && response.payload.jsonData) {
+          response.payload.jsonData = Constants.convertToValidJson(response.payload.jsonData);
+        }
+        return response;
+      })
+    );
+  }
+
+  getActivityDetailById(providerId:number){
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetActivityDetailByProviderId?providerId=${providerId}`, { headers: this.headers })
+    .pipe(
+      map(response => {
+        // Check if payload is an object and has jsonData
+        if (response.payload && typeof response.payload === 'object' && response.payload.jsonData) {
+          response.payload.jsonData = Constants.convertToValidJson(response.payload.jsonData);
+        }
+        return response;
+      })
+    );
+  }
+
+
+
+
+
+
+
+
+
+
+
+
 
   // third party api calls
   //token api

@@ -70,12 +70,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     private authService: AuthService
   ) {
     this.primengConfig.ripple = true;
-    this.startCheckingToken();
-    this.fetchThirdPartyDetails();
+
+    this.fetchActivitiesFromDb();
+
+    //  this.startCheckingToken();
+    //  this.fetchThirdPartyDetails();
   }
 
   ngOnInit(): void {
-    this.fetchActivitiesFromDb();
+
 
   }
 
@@ -192,30 +195,35 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   //#To get actvity details by Id
-  getActivityDetails(activityId: number, activityTime: any) {
-    this.isLoading = true;
-    this.activityDetails = [];
-    this.pairedTracks = [];
-    this.stravaService.getStravaActivityDetailsUrl(activityId).subscribe((res) => {
-      if (res.statusCode === 200) {
-        this.showDetails = true;
-        var activityUrl = res.payload;
+  getActivityDetails(activityId: number, activityTime: any, isSaved: boolean) {
+    if (isSaved) {
+      this.getSavedADAndPairAudio(activityId);
+    } else {
+      this.isLoading = true;
+      // Calling external APIs
+      this.activityDetails = [];
+      this.pairedTracks = [];
+      this.stravaService.getStravaActivityDetailsUrl(activityId).subscribe((res) => {
+        if (res.statusCode === 200) {
+          this.showDetails = true;
+          var activityUrl = res.payload;
 
-        const stravaAccessToken = sessionStorage.getItem('strava-bearer-token') || '';
-        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-        if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
-          this.getRecentlyPlayedAudio(activityTime, activityUrl, spotifyAccessToken, stravaAccessToken);
-        } else {
-          this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
-            response.end_date = Constants.getActivityEndTime(response.start_date, response.elapsed_time);
-            this.activityDetails.push(response);
-            this.getActivityStreams(response.id, stravaAccessToken);
-            console.log('Activity Details', this.activityDetails);
-            this.pairItems(this.activityDetails, this.recentAudio);
-          });
-        }
-      };
-    })
+          const stravaAccessToken = sessionStorage.getItem('strava-bearer-token') || '';
+          const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+          if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
+            this.getRecentlyPlayedAudio(activityTime, activityUrl, spotifyAccessToken, stravaAccessToken);
+          } else {
+            this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
+              response.end_date = Constants.getActivityEndTime(response.start_date, response.elapsed_time);
+              this.activityDetails.push(response);
+              this.getActivityStreams(response.id, stravaAccessToken);
+              console.log('Activity Details', this.activityDetails);
+              this.pairItems(this.activityDetails, this.recentAudio);
+            });
+          }
+        };
+      });
+    }
   }
 
   //#To Get recently played audio and pair it with current activity
@@ -273,7 +281,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.pairedTracks.length === 0) {
       this.pairedTracks[0] = {
         track: {
-          id: 0,
+          id: '',
           name: 'No track',
           artists: [{ name: '' }]
         },
@@ -396,7 +404,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       var PTrackJson = Constants.typeCastPairedTrackJson(pt);
       pairedTrackJsonArray.push(PTrackJson);
       //To store individual track into db
-      debugger;
       var trackJson = Constants.typeCastTrackJson(pt);
       var PostTrackRequest: PostTrackRequest = {
         providerTrackId: pt.track.id,
@@ -422,30 +429,67 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  FetchActivitiesFromStrava(){
+  FetchActivitiesFromStrava() {
 
   }
 
 
   fetchActivitiesFromDb() {
-    this.isLoading=true;
-    this.stravaService.getAllActivities().subscribe((actResponse)=> {
-      if(actResponse.statusCode===200){
-        
-        console.log(actResponse);
-
-        this.spotifyService.getAllTracks().subscribe((res)=> {
-          if(res.statusCode===200){
-            console.log('trackresponse',res);
-          }
+    this.isLoading = true;
+    this.stravaService.getAllActivities().subscribe((actResponse) => {
+      if (actResponse.statusCode === 200) {
+        //this.athleteActivities= actResponse.payload;
+        actResponse.payload.forEach((activity: any) => {
+          activity.jsonData.isSaved = true; //Boolean value to differenciate that it is from db
+          this.athleteActivities.push(activity.jsonData)
         })
+        //console.log(actResponse);
+        console.log("db fetched activities", this.athleteActivities);
 
-        this.isLoading=false;
+        // this.spotifyService.getAllTracks().subscribe((res) => {
+        //   if (res.statusCode === 200) {
+        //     res.payload.forEach((dbTrack: any) => {
+        //       this.recentAudio.push(dbTrack.jsonData);
+        //     });
+        //     //console.log('trackresponse',res);
+        //     console.log("db fetched audio", this.recentAudio);
+
+        //   }
+        // });
+        this.showData = true;
+        this.isLoading = false;
       };
     });
   }
 
+  getSavedADAndPairAudio(activityId: number) {
+    this.isLoading = true;
+    this.stravaService.getActivityDetailById(activityId).subscribe((dbResponse) => {
+      if (dbResponse.statusCode === 200) {
+        this.activityDetails.push(dbResponse.payload.jsonData);
+        console.log("db fetched activityDetails", this.activityDetails);
+        this.showDetails = true;
+        //preceeding code
+        this.pairedTracks = this.activityDetails[0].audio;
+        this.pairedTracks.forEach(pt=>{
+          pt.isSaved=true; //Boolean value to differenciate that it is from db
+          //api call to gettrack by provider id
+          this.spotifyService.getTrackById(pt.trackid).subscribe(trackResponse=>{
+            if(trackResponse.statusCode===200){
+              pt.track=trackResponse.payload.jsonData;
+            };
+          })
+        })
+        console.log("this.pairedTracks", this.pairedTracks);
 
+
+        this.isLoading = false;
+      } else {
+        this.isLoading = false;
+      };
+
+    })
+  }
 
 
 

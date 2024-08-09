@@ -159,6 +159,9 @@ export class Constants {
             external_id: activity.external_id,
             suffer_score: activity.suffer_score,
             calories: activity.calories,
+            end_date: activity.end_date,
+            duration_mins: activity.duration_mins,
+            distance_km: activity.distance_km
         };
         return activityJson;
     }
@@ -205,7 +208,7 @@ export class Constants {
             popularity: track.track.popularity,
             type: track.track.type,
             uri: track.track.uri,
-            AudioFeatures: track.audio_features,
+            audio_features: track.audio_features,
         };
         return trackJson
     }
