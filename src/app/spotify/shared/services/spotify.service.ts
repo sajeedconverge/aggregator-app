@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Constants } from '../../../shared/Constants';
 import { ResponseModel } from '../../../shared/shared-models';
 import { SpotifyAuthorizationService } from './spotify-authorization.service';
@@ -54,6 +54,19 @@ export class SpotifyService {
     return this.http.post<any>(Constants.baseServerUrl + 'Spotify/PostTrack', request, { headers: this.headers });
   }
 
+  getAllTracks(): Observable<any> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetAllTracks`, { headers: this.headers })
+      .pipe(
+        map(response => {
+          // Parse the jsonData property for each track
+          response.payload = response.payload.map((track: any) => {
+            track.jsonData = JSON.parse(track.jsonData);
+            return track;
+          });
+          return response;
+        })
+      );
+  }
 
 
 

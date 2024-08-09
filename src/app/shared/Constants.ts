@@ -7,9 +7,6 @@ export class Constants {
     public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
     //public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
-    //public static isLoggedInFlag: boolean = false;
-
-
     public static spotifySettings: SpotifySettings = {
         clientId: "",
         clientSecret: "",
@@ -228,5 +225,30 @@ export class Constants {
         };
         return PairedTrackJson;
     }
+
+    // Function to convert NumberLong and other non-JSON compliant elements
+    public static convertToValidJson(jsonString: string): any {
+        // Replace `NumberLong` and similar patterns
+        const validJsonString = jsonString.replace(/NumberLong\(["']?(\d+)["']?\)/g, (match, p1) => {
+            return p1; // replace with the numeric value
+        });
+
+        // Parse the cleaned string
+        try {
+            return JSON.parse(validJsonString);
+        } catch (e) {
+            console.error('Error parsing JSON:', e);
+            return null; // or handle the error as appropriate
+        }
+    }
+
+
+
+
+
+
+
+
+
 
 }

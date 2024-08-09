@@ -56,7 +56,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('dt3') table3!: Table;
   showData: boolean = false;
   messages: Message[] = [
-    { severity: 'warn', detail: 'Strava not linked. Please, link strava.' },
+    { severity: 'warn', detail: 'Strava and Spotify not linked. Please, link them first.' },
   ];
   isStravaLinked: boolean = true;
 
@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
+    this.fetchActivitiesFromDb();
 
   }
 
@@ -421,6 +421,30 @@ export class HomeComponent implements OnInit, OnDestroy {
       };
     });
   }
+
+  FetchActivitiesFromStrava(){
+
+  }
+
+
+  fetchActivitiesFromDb() {
+    this.isLoading=true;
+    this.stravaService.getAllActivities().subscribe((actResponse)=> {
+      if(actResponse.statusCode===200){
+        
+        console.log(actResponse);
+
+        this.spotifyService.getAllTracks().subscribe((res)=> {
+          if(res.statusCode===200){
+            console.log('trackresponse',res);
+          }
+        })
+
+        this.isLoading=false;
+      };
+    });
+  }
+
 
 
 

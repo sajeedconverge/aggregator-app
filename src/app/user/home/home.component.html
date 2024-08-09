@@ -33,8 +33,11 @@
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between">
                 <h2>Activities</h2>
-
-                <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear(dt1)" />
+                <div>
+                    <p-button label="Fetch" severity="info" (click)="FetchActivitiesFromStrava()" icon="pi pi-file-import"
+                    iconPos="right" />
+                    <p-button label="Clear" class="ml-2" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear(dt1)" />
+                </div>
             </div>
         </ng-template>
         <ng-template pTemplate="header">
@@ -81,8 +84,9 @@
             <div class="flex flex-row justify-content-between">
                 <h3>Activity Details</h3>
                 <div>
-                    <p-button label="Save" severity="success" (click)="saveActivityDetails()" icon="pi pi-save" iconPos="right" />
-                    
+                    <p-button label="Save" severity="success" (click)="saveActivityDetails()" icon="pi pi-save"
+                        iconPos="right" />
+
                     <p-button (click)="showDetails=false" class="ml-2">Back</p-button>
                 </div>
             </div>

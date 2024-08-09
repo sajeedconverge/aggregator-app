@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ResponseModel } from '../../../shared/shared-models';
 import { Constants } from '../../../shared/Constants';
 import { PostActivityDetailRequest, PostActivityRequest } from '../models/strava-models';
@@ -52,8 +52,34 @@ export class StravaService {
     return this.http.post<any>(Constants.baseServerUrl + 'Strava/PostActivityDetail', request, { headers: this.headers });
   }
 
+  getAllActivities():Observable<any>{
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetAllActivities`, { headers: this.headers })
+    .pipe(
+      map(response => {
+        // Parse the jsonData property for each activity
+        response.payload = response.payload.map((activity: any) => {
+          // Use the conversion function to handle non-JSON compliant data
+          activity.jsonData = Constants.convertToValidJson(activity.jsonData);
+          return activity;
+        });
+        return response;
+      })
+    );
+  }
 
-
+  getAllActivityDetails():Observable<any>{
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetAllActivityDetails`, { headers: this.headers })
+    .pipe(
+      map(response => {
+        // Parse the jsonData property for each track
+        response.payload = response.payload.map((activityDetail: any) => {
+          activityDetail.jsonData = Constants.convertToValidJson(activityDetail.jsonData);
+          return activityDetail;
+        });
+        return response;
+      })
+    );
+  }
 
 
   // third party api calls
