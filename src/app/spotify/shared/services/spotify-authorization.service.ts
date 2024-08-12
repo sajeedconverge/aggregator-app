@@ -66,7 +66,7 @@ export class SpotifyAuthorizationService {
     body.set('grant_type', 'authorization_code');
     body.set('code', authCode);
     body.set('redirect_uri', Constants.spotifySettings.redirectClientUrl);
-
+    debugger;
     this.spotifyService.getSpotifyAccessTokenUrl().subscribe((res) => {
       if (res.statusCode === 200) {
         const tokenUrl: string = res.payload;
@@ -87,7 +87,7 @@ export class SpotifyAuthorizationService {
               token: res.refresh_token
             }
 
-            this.accountService.storeProviderRefreshToken(tokenRequest).subscribe((res)=>{
+            this.accountService.storeProviderRefreshToken(tokenRequest).subscribe((res) => {
               console.log(res);
             });
           };

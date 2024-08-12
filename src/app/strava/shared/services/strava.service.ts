@@ -28,8 +28,8 @@ export class StravaService {
     return this.http.get<any>(Constants.baseServerUrl + 'Strava/GetStravaAccessTokenUrl', { headers: this.headers });
   }
 
-  getStravaAthleteActivitiesUrl(): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + 'Strava/GetAthleteActivitiesUrl', { headers: this.headers });
+  getStravaAthleteActivitiesUrl(latestActivityTime:string): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetAthleteActivitiesUrl?latestActivityTime=${latestActivityTime}`, { headers: this.headers });
   }
 
   getStravaActivityDetailsUrl(activityId:number): Observable<ResponseModel> {

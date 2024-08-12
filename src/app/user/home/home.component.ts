@@ -74,7 +74,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.fetchActivitiesFromDb();
 
     //  this.startCheckingToken();
-    //  this.fetchThirdPartyDetails();
+    this.fetchThirdPartyDetails();
   }
 
   ngOnInit(): void {
@@ -137,7 +137,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   getAthleteActivities(accessToken: string) {
     this.isLoading = true;
-    this.stravaService.getStravaAthleteActivitiesUrl().subscribe((resp) => {
+    if (this.athleteActivities.length > 0) {
+      var latestActivityTime = this.athleteActivities[0].start_date;
+    };
+    this.stravaService.getStravaAthleteActivitiesUrl(latestActivityTime).subscribe((resp) => {
       if (resp.statusCode === 200) {
         this.stravaService.StravaCommonGetApi(resp.payload, accessToken).subscribe((res) => {
           //this.athleteActivities = res;
@@ -166,6 +169,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                     if (activity.distance > 0 && activity.audio.length > 0) {
                       this.athleteActivities.push(activity);
                     };
+
                   });
                   console.log('athlete activities', this.athleteActivities);
                   this.isLoading = false;
@@ -184,7 +188,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                       };
                     });
                   });
-
+                  this.athleteActivities.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
                 };
               });
             };
@@ -196,8 +200,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   //#To get actvity details by Id
   getActivityDetails(activityId: number, activityTime: any, isSaved: boolean) {
+    this.isADSaved = false;
     if (isSaved) {
-      this.getSavedADAndPairAudio(activityId);
+      this.getSavedADAndPairAudio(activityId, activityTime);
     } else {
       this.isLoading = true;
       // Calling external APIs
@@ -264,7 +269,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   //this method will be called in activities list to pair songs to each activity
   pairItems(activities: any[], tracks: any[]) {
     const result: { activity: any, tracks: any[] }[] = [];
-
     activities.forEach(activity => {
       const activityStartDate = new Date(activity.start_date).getTime();
       const activityEndDate = new Date(activity.end_date).getTime();
@@ -405,6 +409,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   saveActivityDetails() {
+    this.isLoading = true;
     //to store activity detail and track json
     var pairedTrackJsonArray: PairedTrackJsonObject[] = [];
     this.pairedTracks.forEach(pt => {
@@ -431,14 +436,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
     this.stravaService.postActivityDetail(activityDetailRequest).subscribe((adResponse) => {
       if (adResponse.statusCode === 200) {
-        console.log("actvity detail added successfully.")
+        console.log("actvity detail added successfully.");
+        this.isADSaved = true;
+        this.isLoading = false;
       };
     });
   }
 
   FetchActivitiesFromStrava() {
-//  this.startCheckingToken();
-//      this.fetchThirdPartyDetails();
+    this.startCheckingToken();
+    this.fetchThirdPartyDetails();
   }
 
 
@@ -471,9 +478,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  getSavedADAndPairAudio(activityId: number) {
+  getSavedADAndPairAudio(activityId: number, activityTime: any) {
     this.isLoading = true;
-    this.isADSaved = true;
     this.activityDetails = [];
     this.stravaService.getActivityDetailById(activityId).subscribe((dbResponse) => {
       if (dbResponse.statusCode === 200) {
@@ -489,17 +495,25 @@ export class HomeComponent implements OnInit, OnDestroy {
             if (trackResponse.statusCode === 200) {
               pt.track = trackResponse.payload.jsonData;
             };
-          })
+          });
+          this.isADSaved = true;
         })
         console.log("this.pairedTracks", this.pairedTracks);
 
 
         this.isLoading = false;
+      } else if (dbResponse.statusCode === 404) {
+        this.getActivityDetails(activityId, activityTime, false);
       } else {
         this.isLoading = false;
       };
 
-    })
+    }
+      // , err => {
+      //   console.log(err);
+      //   this.getActivityDetails(activityId, activityTime, false);
+      // }
+    );
   }
 
 
