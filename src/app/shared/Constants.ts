@@ -65,15 +65,17 @@ export class Constants {
     public static processStreams(activityStartTime: string, distanceStream: any, timeStream: any): any[] {
         const result: any[] = [];
         let currentTime = new Date(activityStartTime).getTime(); // Convert start time to milliseconds
+        var currentTime2 = currentTime;
         //debugger;
         for (let i = 0; i < timeStream.data.length; i++) {
             if (i > 0) {
                 // const timeDifference = timeStream.data[i] - timeStream.data[i - 1];
-                currentTime += timeStream.data[i] * 1000; // Convert seconds to milliseconds and add to current time
+                //currentTime += timeStream.data[i] * 1000; // Convert seconds to milliseconds and add to current time
+                currentTime2 = currentTime + timeStream.data[i] * 1000;
             };
 
             result.push({
-                time: new Date(currentTime).toISOString(),
+                time: new Date(currentTime2).toISOString(),
                 distance: distanceStream.data[i],
                 duration_increment_ms: (timeStream.data[i] * 1000),
                 index: i

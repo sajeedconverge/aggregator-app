@@ -14,7 +14,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { Message, PrimeNGConfig } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
-import { ActivityJsonObject, PostActivityDetailRequest, PostActivityRequest } from '../../strava/shared/models/strava-models';
+import {  PostActivityDetailRequest, PostActivityRequest } from '../../strava/shared/models/strava-models';
 import { AuthService } from '../shared/services/auth.service';
 import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
 
@@ -125,15 +125,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  // callSpotifyAuth() {
-  //   this.spotifyAuthService.loginToSpotify();
-  // }
-
-  // callStravaAuth() {
-  //   this.stravaAuthService.loginToStrava();
-  // }
-
 
   getAthleteActivities(accessToken: string) {
     this.isLoading = true;
@@ -327,7 +318,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.audioFeatures.push(currentTrack.track.audio_features);
       this.showAudioFeatures = true;
     } else {
-      // this.spotifyAuthService.refreshSpotifyAccessToken();
+      this.spotifyAuthService.refreshSpotifyAccessToken();
       this.spotifyService.getSpotifyAudioFeaturesUrl(trackId).subscribe((res) => {
         if (res.statusCode === 200) {
           var featuresUrl = res.payload;
@@ -351,41 +342,35 @@ export class HomeComponent implements OnInit, OnDestroy {
           if (streamRes) {
             this.activityStreams = streamRes;
             this.pairedResult[0].activity.activity_streams = this.activityStreams;
-            //console.log("this.activityStreams", this.activityStreams);
-
+            console.log("this.activityStreams", this.activityStreams);
+            
             var activityStartTime = this.pairedResult[0].activity.start_date;
             var distanceStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'distance');
             var timeStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'time');
 
             var mappedStream = Constants.processStreams(activityStartTime, distanceStream, timeStream);
-            // console.log('mappedStream', mappedStream);
+            console.log('mappedStream', mappedStream);
 
             //to add stream calculations into the tracks
             this.pairedResult[0].tracks.forEach((track: any) => {
-              //debugger;
+              
               var trackStartTime = track.start_time;
               var trackEndTime = track.played_at;
 
               var startDistObject = Constants.findNearestStartTime(mappedStream, trackStartTime);
               //console.log('startDistObject',startDistObject);
-              //var endDistObject = Constants.findNearestStartTime(mappedStream, trackEndTime);
+              
               var endDistObject = Constants.findNearestEndTime(mappedStream, startDistObject.time, trackEndTime);
               //console.log('endDistObject',endDistObject);
 
-              track.distance_start = (startDistObject?.distance || 0) * (0.1000);
-              track.distance_end = (endDistObject?.distance || 0) * (0.1000);
+              track.distance_start = (startDistObject?.distance || 0) /1000;
+              track.distance_end = (endDistObject?.distance || 0) /1000;
               track.distance = (track.distance_end - track.distance_start);
-              // var hoursTime = (track.track.duration_ms) / (1000 * 60 * 60);
-              // track.speed = (track.distance / (hoursTime));
 
-              // var movingTimeSec = Math.floor((track.distance*1000 )/((track.speed)*(5/18)));
-              // track.moving_time = Constants.formatDuration(movingTimeSec*1000);
               var movingTimeMs = 0;
-
               for (let index = (startDistObject?.index || 0); index < (endDistObject?.index || 0); index++) {
                 movingTimeMs += mappedStream[index].duration_increment_ms;
               };
-              //track.moving_time = Constants.formatDuration((movingTimeMs));
               track.moving_time = Constants.formatDuration(Math.min(movingTimeMs, track.track.duration_ms));
 
               var hoursTime = (Math.min(movingTimeMs, track.track.duration_ms)) / (1000 * 60 * 60);
@@ -453,7 +438,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.stravaService.getAllActivities().subscribe((actResponse) => {
       if (actResponse.statusCode === 200) {
-        //this.athleteActivities= actResponse.payload;
         actResponse.payload.forEach((activity: any) => {
           activity.jsonData.isSaved = true; //Boolean value to differenciate that it is from db
           this.athleteActivities.push(activity.jsonData)
@@ -461,17 +445,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.athleteActivities.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
         //console.log(actResponse);
         console.log("db fetched activities", this.athleteActivities);
-
-        // this.spotifyService.getAllTracks().subscribe((res) => {
-        //   if (res.statusCode === 200) {
-        //     res.payload.forEach((dbTrack: any) => {
-        //       this.recentAudio.push(dbTrack.jsonData);
-        //     });
-        //     //console.log('trackresponse',res);
-        //     console.log("db fetched audio", this.recentAudio);
-
-        //   }
-        // });
         this.showData = true;
         this.isLoading = false;
       };
