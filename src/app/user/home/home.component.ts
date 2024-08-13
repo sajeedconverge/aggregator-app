@@ -14,7 +14,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { Message, PrimeNGConfig } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
-import {  PostActivityDetailRequest, PostActivityRequest } from '../../strava/shared/models/strava-models';
+import { PostActivityDetailRequest, PostActivityRequest } from '../../strava/shared/models/strava-models';
 import { AuthService } from '../shared/services/auth.service';
 import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
 
@@ -343,7 +343,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             this.activityStreams = streamRes;
             this.pairedResult[0].activity.activity_streams = this.activityStreams;
             console.log("this.activityStreams", this.activityStreams);
-            
+
             var activityStartTime = this.pairedResult[0].activity.start_date;
             var distanceStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'distance');
             var timeStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'time');
@@ -353,18 +353,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
             //to add stream calculations into the tracks
             this.pairedResult[0].tracks.forEach((track: any) => {
-              
+
               var trackStartTime = track.start_time;
               var trackEndTime = track.played_at;
 
               var startDistObject = Constants.findNearestStartTime(mappedStream, trackStartTime);
               //console.log('startDistObject',startDistObject);
-              
+
               var endDistObject = Constants.findNearestEndTime(mappedStream, startDistObject.time, trackEndTime);
               //console.log('endDistObject',endDistObject);
 
-              track.distance_start = (startDistObject?.distance || 0) /1000;
-              track.distance_end = (endDistObject?.distance || 0) /1000;
+              track.distance_start = (startDistObject?.distance || 0) / 1000;
+              track.distance_end = (endDistObject?.distance || 0) / 1000;
               track.distance = (track.distance_end - track.distance_start);
 
               var movingTimeMs = 0;
@@ -445,9 +445,13 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.athleteActivities.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
         //console.log(actResponse);
         console.log("db fetched activities", this.athleteActivities);
-        this.showData = true;
-        this.isLoading = false;
+
+      } else if (actResponse.statusCode === 404) {
+
+
       };
+      this.showData = true;
+      this.isLoading = false;
     });
   }
 
