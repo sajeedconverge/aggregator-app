@@ -12,11 +12,13 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { SpotifyService } from '../../spotify/shared/services/spotify.service';
 import { HttpHeaders } from '@angular/common/http';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
-import { Message, PrimeNGConfig } from 'primeng/api';
+import { Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { PostActivityDetailRequest, PostActivityRequest } from '../../strava/shared/models/strava-models';
 import { AuthService } from '../shared/services/auth.service';
 import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
+import { ToastModule } from 'primeng/toast';
+
 
 @Component({
   selector: 'app-home',
@@ -30,10 +32,12 @@ import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/mo
     TableModule,
     DatePipe,
     ProgressBarComponent,
-    MessagesModule
+    MessagesModule,
+    ToastModule
   ],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrl: './home.component.css',
+  providers: [MessageService]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   athleteActivities: any[] = [];
@@ -56,7 +60,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('dt3') table3!: Table;
   showData: boolean = false;
   messages: Message[] = [
-    { severity: 'warn', detail: 'Strava and Spotify not linked. Please, link them first.' },
+    { severity: 'warn', detail: 'Strava or Spotify not linked. Please, link them first.' },
   ];
   isStravaLinked: boolean = true;
   isADSaved: boolean = false;
@@ -67,13 +71,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     private spotifyAuthService: SpotifyAuthorizationService,
     private spotifyService: SpotifyService,
     private primengConfig: PrimeNGConfig,
-    private authService: AuthService
+    private authService: AuthService,
+    private messageService: MessageService
   ) {
+    this.spotifyAuthService.checkExpiryAndRefreshToken();
     this.primengConfig.ripple = true;
-
     this.fetchActivitiesFromDb();
-
-    //  this.startCheckingToken();
     this.fetchThirdPartyDetails();
   }
 
@@ -206,6 +209,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 
           const stravaAccessToken = sessionStorage.getItem('strava-bearer-token') || '';
           const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+          if (!stravaAccessToken) {
+            this.showAudioFeatures = true;
+           this.messageService.add({ severity: 'warn', summary: 'Failure', detail: 'Details of the Activity is not saved and the Strava is not linked.' });
+            this.isLoading = false;
+          };
+
           if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
             this.getRecentlyPlayedAudio(activityTime, activityUrl, spotifyAccessToken, stravaAccessToken);
           } else {
@@ -216,7 +225,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               console.log('Activity Details', this.activityDetails);
               this.pairItems(this.activityDetails, this.recentAudio);
             });
-          }
+          };
         };
       });
     }
@@ -368,10 +377,13 @@ export class HomeComponent implements OnInit, OnDestroy {
               track.distance = (track.distance_end - track.distance_start);
 
               var movingTimeMs = 0;
-              for (let index = (startDistObject?.index || 0); index < (endDistObject?.index || 0); index++) {
-                movingTimeMs += mappedStream[index].duration_increment_ms;
-              };
+              // for (let index = (startDistObject?.index || 0); index < (endDistObject?.index || 0); index++) {
+              //   movingTimeMs += mappedStream[index].duration_increment_ms;
+              // };
+              movingTimeMs = (endDistObject?.duration_increment_ms)-(startDistObject?.duration_increment_ms)
+
               track.moving_time = Constants.formatDuration(Math.min(movingTimeMs, track.track.duration_ms));
+              //track.moving_time = Constants.formatDuration(movingTimeMs);
 
               var hoursTime = (Math.min(movingTimeMs, track.track.duration_ms)) / (1000 * 60 * 60);
               track.speed = (track.distance / (hoursTime));
@@ -448,7 +460,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       } else if (actResponse.statusCode === 404) {
 
-
       };
       this.showData = true;
       this.isLoading = false;
@@ -467,12 +478,13 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.pairedTracks = this.activityDetails[0].audio;
         this.pairedTracks.forEach(pt => {
           pt.isSaved = true; //Boolean value to differenciate that it is from db
-          //api call to gettrack by provider id
-          this.spotifyService.getTrackById(pt.trackid).subscribe(trackResponse => {
-            if (trackResponse.statusCode === 200) {
-              pt.track = trackResponse.payload.jsonData;
-            };
-          });
+          //removed the api calls from the track (Code improvization)
+          pt.track = JSON.parse(pt.track)
+          // this.spotifyService.getTrackById(pt.trackid).subscribe(trackResponse => {
+          //   if (trackResponse.statusCode === 200) {
+          //     pt.track = trackResponse.payload.jsonData;
+          //   };
+          // });
           this.isADSaved = true;
         })
         console.log("this.pairedTracks", this.pairedTracks);

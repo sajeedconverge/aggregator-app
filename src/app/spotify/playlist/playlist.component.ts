@@ -47,6 +47,7 @@ export class PlaylistComponent implements OnInit {
     private spotifyService: SpotifyService,
     private spotifyAuthService: SpotifyAuthorizationService
   ) {
+    this.spotifyAuthService.checkExpiryAndRefreshToken();
     this.startCheckingToken();
     this.fetchThirdPartyDetails();
    }

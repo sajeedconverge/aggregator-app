@@ -134,7 +134,7 @@ export class SpotifyAuthorizationService {
       const timeDifferenceInMinutes = timeDifference / (1000 * 60);
 
       // If the difference is 10 minutes or less, call refreshSpotifyAccessToken
-      if (timeDifferenceInMinutes <= 15) {
+      if ((timeDifferenceInMinutes <= 15) || (futureDateTime > currentTime)) {
         this.refreshSpotifyAccessToken();
       }
     }

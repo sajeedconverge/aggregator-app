@@ -35,4 +35,5 @@ export interface PairedTrackJsonObject {
     speed:any
     start_time:any
     trackid:string
+    track?:any
 }
