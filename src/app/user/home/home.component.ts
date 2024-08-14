@@ -18,6 +18,7 @@ import { PostActivityDetailRequest, PostActivityRequest } from '../../strava/sha
 import { AuthService } from '../shared/services/auth.service';
 import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
 import { ToastModule } from 'primeng/toast';
+import { BadgeModule } from 'primeng/badge';
 
 
 @Component({
@@ -33,7 +34,8 @@ import { ToastModule } from 'primeng/toast';
     DatePipe,
     ProgressBarComponent,
     MessagesModule,
-    ToastModule
+    ToastModule,
+    BadgeModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',

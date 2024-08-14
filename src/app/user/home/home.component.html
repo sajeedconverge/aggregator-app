@@ -22,9 +22,10 @@
             <div class="flex justify-content-between">
                 <h2>Activities</h2>
                 <div>
-                    <p-button label="Fetch" severity="info" (click)="FetchActivitiesFromStrava()" icon="pi pi-file-import"
-                    iconPos="right" />
-                    <p-button label="Clear" class="ml-2" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear(dt1)" />
+                    <p-button label="Fetch" severity="info" (click)="FetchActivitiesFromStrava()"
+                        icon="pi pi-file-import" iconPos="right" />
+                    <p-button label="Clear" class="ml-2" [outlined]="true" icon="pi pi-filter-slash"
+                        (onClick)="clear(dt1)" />
                 </div>
             </div>
         </ng-template>
@@ -45,8 +46,15 @@
         <ng-template pTemplate="body" let-activity>
             <tr>
                 <td>
-                    <p-button class="anchor_btn" (click)="getActivityDetails(activity.id,activity.start_date,activity.isSaved)"
-                        [label]="activity.name" [link]="true" />
+                    <div class="flex flex-row justify-content-between">
+                        <p-button class="anchor_btn"
+                            (click)="getActivityDetails(activity.id,activity.start_date,activity.isSaved)"
+                            [label]="activity.name" [link]="true" />
+
+                        <!-- <p-badge></p-badge> -->
+                        <i *ngIf="!activity.isSaved" pBadge style="font-size: 2rem; margin: auto;"
+                         [value]="'New'" severity="danger"></i>
+                    </div>
                 </td>
                 <td>{{ activity.start_date | date:'MMM d, y, h:mm:ss a' }}</td>
                 <td>{{ activity.end_date | date:'MMM d, y, h:mm:ss a' }}</td>
@@ -77,8 +85,8 @@
             <div class="flex flex-row justify-content-between">
                 <h3>Activity Details</h3>
                 <div>
-                    <p-button label="Save" severity="success" [disabled]="isADSaved" (click)="saveActivityDetails()" icon="pi pi-save"
-                        iconPos="right" />
+                    <p-button label="Save" severity="success" [disabled]="isADSaved" (click)="saveActivityDetails()"
+                        icon="pi pi-save" iconPos="right" />
 
                     <p-button (click)="showDetails=false && isADSaved=false" class="ml-2">Back</p-button>
                 </div>
@@ -107,7 +115,8 @@
                 <td>{{track.played_at | date: 'hh:mm:ss a'}}</td>
                 <td>
                     <p-button class="anchor_btn" [disabled]="track?.track?.id===''"
-                        (click)="getAudioFeatures(track.track?.id,track.isSaved)" [label]="track.track?.name" [link]="true" />
+                        (click)="getAudioFeatures(track.track?.id,track.isSaved)" [label]="track.track?.name"
+                        [link]="true" />
                 </td>
                 <td>{{track.track?.artists[0]?.name}}</td>
                 <td>
