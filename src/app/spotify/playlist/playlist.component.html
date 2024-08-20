@@ -117,8 +117,8 @@
                 <th>Valence</th>
                 <th>Tempo</th>
                 <th>Duration</th>
-                <th>Track Href</th>
-                <th>Analysis Url</th>
+                <!-- <th>Track Href</th>
+                <th>Analysis Url</th> -->
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-audioFeature>
@@ -132,9 +132,9 @@
                 <td>{{ audioFeature.liveness }}</td>
                 <td>{{ audioFeature.valence }}</td>
                 <td>{{ audioFeature.tempo }}</td>
-                <td>{{ audioFeature.duration_ms }}</td>
-                <td>{{ audioFeature.track_href }}</td>
-                <td>{{ audioFeature.analysis_url }}</td>
+                <td>{{ formatTrackDuration(audioFeature.duration_ms) }}</td>
+                <!-- <td>{{ audioFeature.track_href }}</td>
+                <td>{{ audioFeature.analysis_url }}</td> -->
             </tr>
         </ng-template>
     </p-table>

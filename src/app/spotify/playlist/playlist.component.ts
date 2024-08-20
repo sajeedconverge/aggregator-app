@@ -146,7 +146,9 @@ export class PlaylistComponent implements OnInit {
     })
   }
 
-
+  formatTrackDuration(durationMs:number){
+    return Constants.formatDuration(durationMs);
+  }
 
 
 

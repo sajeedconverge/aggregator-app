@@ -4,8 +4,8 @@ import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "..
 
 export class Constants {
 
-    //public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
-    public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
+    public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
+    //public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     public static spotifySettings: SpotifySettings = {
         clientId: "",
@@ -129,10 +129,19 @@ export class Constants {
         return targetDate >= start && targetDate <= end;
     }
 
+    //#Considers only start time of the track 
+    // public static assignRecentAudioToActivity(activity: any, recentAudio: any[]): any[] {
+    //     const audioInRange = recentAudio.filter(audio =>
+    //         this.isDateBetween(audio.start_time, activity.start_date, activity.end_date)
+    //     );
+    //     return audioInRange;
+    // }
 
+    //#Considers the start time and end time of the track
     public static assignRecentAudioToActivity(activity: any, recentAudio: any[]): any[] {
         const audioInRange = recentAudio.filter(audio =>
-            this.isDateBetween(audio.start_time, activity.start_date, activity.end_date)
+            this.isDateBetween(audio.start_time, activity.start_date, activity.end_date) ||
+            this.isDateBetween(audio.played_at, activity.start_date, activity.end_date)
         );
         return audioInRange;
     }
