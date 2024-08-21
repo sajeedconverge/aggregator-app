@@ -390,8 +390,6 @@ export class HomeComponent implements OnInit, OnDestroy {
               var hoursTime = (Math.min(movingTimeMs, track.track.duration_ms)) / (1000 * 60 * 60);
               track.speed = (track.distance / (hoursTime));
 
-              //track.pace = (track.speed>0) ? (1 / track.speed):0;
-              debugger;
               track.pace = (track.speed>0) ? (1000 / ((track.distance*1000)/(Math.min(movingTimeMs/1000, track.track.duration_ms/1000)))):0;
               track.pace = Constants.formatDuration(track.pace*1000);
             });
