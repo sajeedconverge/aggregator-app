@@ -41,6 +41,9 @@ export interface ActivityJsonObject {
     external_id: any
     suffer_score: any
     calories: any
+    end_date: any
+    duration_mins: any
+    distance_km: any
 }
 
 export interface ActivityDetailJsonObject {

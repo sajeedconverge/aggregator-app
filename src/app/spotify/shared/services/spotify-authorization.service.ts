@@ -66,7 +66,6 @@ export class SpotifyAuthorizationService {
     body.set('grant_type', 'authorization_code');
     body.set('code', authCode);
     body.set('redirect_uri', Constants.spotifySettings.redirectClientUrl);
-
     this.spotifyService.getSpotifyAccessTokenUrl().subscribe((res) => {
       if (res.statusCode === 200) {
         const tokenUrl: string = res.payload;
@@ -87,7 +86,7 @@ export class SpotifyAuthorizationService {
               token: res.refresh_token
             }
 
-            this.accountService.storeProviderRefreshToken(tokenRequest).subscribe((res)=>{
+            this.accountService.storeProviderRefreshToken(tokenRequest).subscribe((res) => {
               console.log(res);
             });
           };
@@ -135,7 +134,7 @@ export class SpotifyAuthorizationService {
       const timeDifferenceInMinutes = timeDifference / (1000 * 60);
 
       // If the difference is 10 minutes or less, call refreshSpotifyAccessToken
-      if (timeDifferenceInMinutes <= 15) {
+      if ((timeDifferenceInMinutes <= 15) || (futureDateTime > currentTime)) {
         this.refreshSpotifyAccessToken();
       }
     }

@@ -7,9 +7,6 @@ export class Constants {
     public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
     //public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
-    //public static isLoggedInFlag: boolean = false;
-
-
     public static spotifySettings: SpotifySettings = {
         clientId: "",
         clientSecret: "",
@@ -68,15 +65,17 @@ export class Constants {
     public static processStreams(activityStartTime: string, distanceStream: any, timeStream: any): any[] {
         const result: any[] = [];
         let currentTime = new Date(activityStartTime).getTime(); // Convert start time to milliseconds
+        var currentTime2 = currentTime;
         //debugger;
         for (let i = 0; i < timeStream.data.length; i++) {
             if (i > 0) {
                 // const timeDifference = timeStream.data[i] - timeStream.data[i - 1];
-                currentTime += timeStream.data[i] * 1000; // Convert seconds to milliseconds and add to current time
+                //currentTime += timeStream.data[i] * 1000; // Convert seconds to milliseconds and add to current time
+                currentTime2 = currentTime + timeStream.data[i] * 1000;
             };
 
             result.push({
-                time: new Date(currentTime).toISOString(),
+                time: new Date(currentTime2).toISOString(),
                 distance: distanceStream.data[i],
                 duration_increment_ms: (timeStream.data[i] * 1000),
                 index: i
@@ -130,10 +129,19 @@ export class Constants {
         return targetDate >= start && targetDate <= end;
     }
 
+    //#Considers only start time of the track 
+    // public static assignRecentAudioToActivity(activity: any, recentAudio: any[]): any[] {
+    //     const audioInRange = recentAudio.filter(audio =>
+    //         this.isDateBetween(audio.start_time, activity.start_date, activity.end_date)
+    //     );
+    //     return audioInRange;
+    // }
 
+    //#Considers the start time and end time of the track
     public static assignRecentAudioToActivity(activity: any, recentAudio: any[]): any[] {
         const audioInRange = recentAudio.filter(audio =>
-            this.isDateBetween(audio.start_time, activity.start_date, activity.end_date)
+            this.isDateBetween(audio.start_time, activity.start_date, activity.end_date) ||
+            this.isDateBetween(audio.played_at, activity.start_date, activity.end_date)
         );
         return audioInRange;
     }
@@ -162,6 +170,9 @@ export class Constants {
             external_id: activity.external_id,
             suffer_score: activity.suffer_score,
             calories: activity.calories,
+            end_date: activity.end_date,
+            duration_mins: activity.duration_mins,
+            distance_km: activity.distance_km
         };
         return activityJson;
     }
@@ -208,7 +219,7 @@ export class Constants {
             popularity: track.track.popularity,
             type: track.track.type,
             uri: track.track.uri,
-            AudioFeatures: track.audio_features,
+            audio_features: track.audio_features,
         };
         return trackJson
     }
@@ -224,9 +235,33 @@ export class Constants {
             played_at: pairedTrack.played_at,
             speed: pairedTrack.speed,
             start_time: pairedTrack.start_time,
-            trackid: pairedTrack.track.id
+            trackid: pairedTrack.track.id,
+            //track:pairedTrack.track
         };
         return PairedTrackJson;
     }
+
+    // Function to convert NumberLong and other non-JSON compliant elements
+    public static convertToValidJson(jsonString: string): any {
+        // Replace `NumberLong` and similar patterns
+        const validJsonString = jsonString.replace(/NumberLong\(["']?(\d+)["']?\)/g, (match, p1) => {
+            return p1; // replace with the numeric value
+        });
+
+        // Parse the cleaned string
+        try {
+            return JSON.parse(validJsonString);
+        } catch (e) {
+            console.error('Error parsing JSON:', e);
+            return null; // or handle the error as appropriate
+        }
+    }
+
+
+
+
+
+
+
 
 }

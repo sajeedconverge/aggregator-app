@@ -12,11 +12,14 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { SpotifyService } from '../../spotify/shared/services/spotify.service';
 import { HttpHeaders } from '@angular/common/http';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
-import { Message, PrimeNGConfig } from 'primeng/api';
+import { Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
-import { ActivityJsonObject, PostActivityDetailRequest, PostActivityRequest } from '../../strava/shared/models/strava-models';
+import { PostActivityDetailRequest, PostActivityRequest } from '../../strava/shared/models/strava-models';
 import { AuthService } from '../shared/services/auth.service';
 import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
+import { ToastModule } from 'primeng/toast';
+import { BadgeModule } from 'primeng/badge';
+
 
 @Component({
   selector: 'app-home',
@@ -30,10 +33,13 @@ import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/mo
     TableModule,
     DatePipe,
     ProgressBarComponent,
-    MessagesModule
+    MessagesModule,
+    ToastModule,
+    BadgeModule
   ],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrl: './home.component.css',
+  providers: [MessageService]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   athleteActivities: any[] = [];
@@ -56,10 +62,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('dt3') table3!: Table;
   showData: boolean = false;
   messages: Message[] = [
-    { severity: 'warn', detail: 'Strava not linked. Please, link strava.' },
+    { severity: 'warn', detail: 'Strava or Spotify not linked. Please, link them first.' },
   ];
   isStravaLinked: boolean = true;
-
+  isADSaved: boolean = false;
 
   constructor(
     private stravaAuthService: StravaAuthorizationService,
@@ -67,10 +73,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     private spotifyAuthService: SpotifyAuthorizationService,
     private spotifyService: SpotifyService,
     private primengConfig: PrimeNGConfig,
-    private authService: AuthService
+    private authService: AuthService,
+    private messageService: MessageService
   ) {
+    this.spotifyAuthService.checkExpiryAndRefreshToken();
     this.primengConfig.ripple = true;
-    this.startCheckingToken();
+    this.fetchActivitiesFromDb();
     this.fetchThirdPartyDetails();
   }
 
@@ -123,18 +131,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  // callSpotifyAuth() {
-  //   this.spotifyAuthService.loginToSpotify();
-  // }
-
-  // callStravaAuth() {
-  //   this.stravaAuthService.loginToStrava();
-  // }
-
-
   getAthleteActivities(accessToken: string) {
     this.isLoading = true;
-    this.stravaService.getStravaAthleteActivitiesUrl().subscribe((resp) => {
+    if (this.athleteActivities.length > 0) {
+      var latestActivityTime = this.athleteActivities[0].start_date;
+    };
+    this.stravaService.getStravaAthleteActivitiesUrl(latestActivityTime).subscribe((resp) => {
       if (resp.statusCode === 200) {
         this.stravaService.StravaCommonGetApi(resp.payload, accessToken).subscribe((res) => {
           //this.athleteActivities = res;
@@ -162,7 +164,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
                     if (activity.distance > 0 && activity.audio.length > 0) {
                       this.athleteActivities.push(activity);
-                    }
+                    };
+
                   });
                   console.log('athlete activities', this.athleteActivities);
                   this.isLoading = false;
@@ -181,7 +184,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                       };
                     });
                   });
-
+                  this.athleteActivities.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
                 };
               });
             };
@@ -192,30 +195,42 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   //#To get actvity details by Id
-  getActivityDetails(activityId: number, activityTime: any) {
-    this.isLoading = true;
-    this.activityDetails = [];
-    this.pairedTracks = [];
-    this.stravaService.getStravaActivityDetailsUrl(activityId).subscribe((res) => {
-      if (res.statusCode === 200) {
-        this.showDetails = true;
-        var activityUrl = res.payload;
+  getActivityDetails(activityId: number, activityTime: any, isSaved: boolean) {
+    this.isADSaved = false;
+    if (isSaved) {
+      this.getSavedADAndPairAudio(activityId, activityTime);
+    } else {
+      this.isLoading = true;
+      // Calling external APIs
+      this.activityDetails = [];
+      this.pairedTracks = [];
+      this.stravaService.getStravaActivityDetailsUrl(activityId).subscribe((res) => {
+        if (res.statusCode === 200) {
+          this.showDetails = true;
+          var activityUrl = res.payload;
 
-        const stravaAccessToken = sessionStorage.getItem('strava-bearer-token') || '';
-        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-        if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
-          this.getRecentlyPlayedAudio(activityTime, activityUrl, spotifyAccessToken, stravaAccessToken);
-        } else {
-          this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
-            response.end_date = Constants.getActivityEndTime(response.start_date, response.elapsed_time);
-            this.activityDetails.push(response);
-            this.getActivityStreams(response.id, stravaAccessToken);
-            console.log('Activity Details', this.activityDetails);
-            this.pairItems(this.activityDetails, this.recentAudio);
-          });
-        }
-      };
-    })
+          const stravaAccessToken = sessionStorage.getItem('strava-bearer-token') || '';
+          const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+          if (!stravaAccessToken) {
+            this.showAudioFeatures = true;
+           this.messageService.add({ severity: 'warn', summary: 'Failure', detail: 'Details of the Activity is not saved and the Strava is not linked.' });
+            this.isLoading = false;
+          };
+
+          if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
+            this.getRecentlyPlayedAudio(activityTime, activityUrl, spotifyAccessToken, stravaAccessToken);
+          } else {
+            this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
+              response.end_date = Constants.getActivityEndTime(response.start_date, response.elapsed_time);
+              this.activityDetails.push(response);
+              this.getActivityStreams(response.id, stravaAccessToken);
+              console.log('Activity Details', this.activityDetails);
+              this.pairItems(this.activityDetails, this.recentAudio);
+            });
+          };
+        };
+      });
+    }
   }
 
   //#To Get recently played audio and pair it with current activity
@@ -256,7 +271,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   //this method will be called in activities list to pair songs to each activity
   pairItems(activities: any[], tracks: any[]) {
     const result: { activity: any, tracks: any[] }[] = [];
-
     activities.forEach(activity => {
       const activityStartDate = new Date(activity.start_date).getTime();
       const activityEndDate = new Date(activity.end_date).getTime();
@@ -273,7 +287,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.pairedTracks.length === 0) {
       this.pairedTracks[0] = {
         track: {
-          id: 0,
+          id: '',
           name: 'No track',
           artists: [{ name: '' }]
         },
@@ -307,19 +321,26 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   //To get audio features
-  getAudioFeatures(trackId: string) {
+  getAudioFeatures(trackId: string, isSaved: boolean) {
     this.audioFeatures = [];
-    this.spotifyAuthService.refreshSpotifyAccessToken();
-    this.spotifyService.getSpotifyAudioFeaturesUrl(trackId).subscribe((res) => {
-      if (res.statusCode === 200) {
-        var featuresUrl = res.payload;
-        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-        this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
-          this.audioFeatures.push(audioFeature);
-          this.showAudioFeatures = true;
-        });
-      };
-    });
+    if (isSaved) {
+      var currentTrack = this.pairedTracks.find(pt => pt.trackid === trackId);
+      //console.log(currentTrack);
+      this.audioFeatures.push(currentTrack.track.audio_features);
+      this.showAudioFeatures = true;
+    } else {
+      this.spotifyAuthService.refreshSpotifyAccessToken();
+      this.spotifyService.getSpotifyAudioFeaturesUrl(trackId).subscribe((res) => {
+        if (res.statusCode === 200) {
+          var featuresUrl = res.payload;
+          const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+          this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
+            this.audioFeatures.push(audioFeature);
+            this.showAudioFeatures = true;
+          });
+        };
+      });
+    };
   }
 
   //To get activity streams
@@ -332,47 +353,45 @@ export class HomeComponent implements OnInit, OnDestroy {
           if (streamRes) {
             this.activityStreams = streamRes;
             this.pairedResult[0].activity.activity_streams = this.activityStreams;
-            //console.log("this.activityStreams", this.activityStreams);
+            console.log("this.activityStreams", this.activityStreams);
 
             var activityStartTime = this.pairedResult[0].activity.start_date;
             var distanceStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'distance');
             var timeStream = this.pairedResult[0].activity.activity_streams.find((stream: any) => stream.type === 'time');
 
             var mappedStream = Constants.processStreams(activityStartTime, distanceStream, timeStream);
-            // console.log('mappedStream', mappedStream);
+            console.log('mappedStream', mappedStream);
 
             //to add stream calculations into the tracks
             this.pairedResult[0].tracks.forEach((track: any) => {
-              //debugger;
+
               var trackStartTime = track.start_time;
               var trackEndTime = track.played_at;
 
               var startDistObject = Constants.findNearestStartTime(mappedStream, trackStartTime);
               //console.log('startDistObject',startDistObject);
-              //var endDistObject = Constants.findNearestStartTime(mappedStream, trackEndTime);
+
               var endDistObject = Constants.findNearestEndTime(mappedStream, startDistObject.time, trackEndTime);
               //console.log('endDistObject',endDistObject);
 
-              track.distance_start = (startDistObject?.distance || 0) * (0.1000);
-              track.distance_end = (endDistObject?.distance || 0) * (0.1000);
+              track.distance_start = (startDistObject?.distance || 0) / 1000;
+              track.distance_end = (endDistObject?.distance || 0) / 1000;
               track.distance = (track.distance_end - track.distance_start);
-              // var hoursTime = (track.track.duration_ms) / (1000 * 60 * 60);
-              // track.speed = (track.distance / (hoursTime));
 
-              // var movingTimeSec = Math.floor((track.distance*1000 )/((track.speed)*(5/18)));
-              // track.moving_time = Constants.formatDuration(movingTimeSec*1000);
               var movingTimeMs = 0;
+              // for (let index = (startDistObject?.index || 0); index < (endDistObject?.index || 0); index++) {
+              //   movingTimeMs += mappedStream[index].duration_increment_ms;
+              // };
+              movingTimeMs = (endDistObject?.duration_increment_ms)-(startDistObject?.duration_increment_ms)
 
-              for (let index = (startDistObject?.index || 0); index < (endDistObject?.index || 0); index++) {
-                movingTimeMs += mappedStream[index].duration_increment_ms;
-              };
-              //track.moving_time = Constants.formatDuration((movingTimeMs));
               track.moving_time = Constants.formatDuration(Math.min(movingTimeMs, track.track.duration_ms));
+              //track.moving_time = Constants.formatDuration(movingTimeMs);
 
               var hoursTime = (Math.min(movingTimeMs, track.track.duration_ms)) / (1000 * 60 * 60);
               track.speed = (track.distance / (hoursTime));
 
-              track.pace = (1 / track.speed);
+              track.pace = (track.speed>0) ? (1000 / ((track.distance*1000)/(Math.min(movingTimeMs/1000, track.track.duration_ms/1000)))):0;
+              track.pace = Constants.formatDuration(track.pace*1000);
             });
 
 
@@ -390,13 +409,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   saveActivityDetails() {
+    this.isLoading = true;
     //to store activity detail and track json
     var pairedTrackJsonArray: PairedTrackJsonObject[] = [];
     this.pairedTracks.forEach(pt => {
       var PTrackJson = Constants.typeCastPairedTrackJson(pt);
       pairedTrackJsonArray.push(PTrackJson);
       //To store individual track into db
-      debugger;
       var trackJson = Constants.typeCastTrackJson(pt);
       var PostTrackRequest: PostTrackRequest = {
         providerTrackId: pt.track.id,
@@ -417,12 +436,81 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
     this.stravaService.postActivityDetail(activityDetailRequest).subscribe((adResponse) => {
       if (adResponse.statusCode === 200) {
-        console.log("actvity detail added successfully.")
+        console.log("actvity detail added successfully.");
+        this.isADSaved = true;
+        this.isLoading = false;
       };
     });
   }
 
+  FetchActivitiesFromStrava() {
+    this.startCheckingToken();
+    this.fetchThirdPartyDetails();
+  }
 
+
+  fetchActivitiesFromDb() {
+    this.isLoading = true;
+    this.stravaService.getAllActivities().subscribe((actResponse) => {
+      if (actResponse.statusCode === 200) {
+        actResponse.payload.forEach((activity: any) => {
+          activity.jsonData.isSaved = true; //Boolean value to differenciate that it is from db
+          this.athleteActivities.push(activity.jsonData)
+        });
+        this.athleteActivities.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
+        //console.log(actResponse);
+        console.log("db fetched activities", this.athleteActivities);
+
+      } else if (actResponse.statusCode === 404) {
+
+      };
+      this.showData = true;
+      this.isLoading = false;
+    });
+  }
+
+  getSavedADAndPairAudio(activityId: number, activityTime: any) {
+    this.isLoading = true;
+    this.activityDetails = [];
+    this.stravaService.getActivityDetailById(activityId).subscribe((dbResponse) => {
+      if (dbResponse.statusCode === 200) {
+        this.activityDetails.push(dbResponse.payload.jsonData);
+        console.log("db fetched activityDetails", this.activityDetails);
+        this.showDetails = true;
+        //preceeding code
+        this.pairedTracks = this.activityDetails[0].audio;
+        this.pairedTracks.forEach(pt => {
+          pt.isSaved = true; //Boolean value to differenciate that it is from db
+          //removed the api calls from the track (Code improvization)
+          pt.track = JSON.parse(pt.track)
+          // this.spotifyService.getTrackById(pt.trackid).subscribe(trackResponse => {
+          //   if (trackResponse.statusCode === 200) {
+          //     pt.track = trackResponse.payload.jsonData;
+          //   };
+          // });
+          this.isADSaved = true;
+        })
+        console.log("this.pairedTracks", this.pairedTracks);
+
+
+        this.isLoading = false;
+      } else if (dbResponse.statusCode === 404) {
+        this.getActivityDetails(activityId, activityTime, false);
+      } else {
+        this.isLoading = false;
+      };
+
+    }
+      // , err => {
+      //   console.log(err);
+      //   this.getActivityDetails(activityId, activityTime, false);
+      // }
+    );
+  }
+
+  formatTrackDuration(durationMs:number){
+    return Constants.formatDuration(durationMs);
+  }
 
 
 }

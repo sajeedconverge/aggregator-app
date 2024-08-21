@@ -16,6 +16,7 @@ import { AuthService } from '../shared/services/auth.service';
 import { Router } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserRegisterRequest } from '../shared/models/user-models';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -71,7 +72,10 @@ export class RegisterComponent {
         //this.loggedIn = (user != null);
 
         // console.log(user.provider, user);
-        this.accountService.externalLogin(this.user).subscribe((res) => {
+        this.accountService.externalLogin(this.user).pipe(
+          debounceTime(300), // Ensure only one call is made within 300ms
+          distinctUntilChanged() // Ensure only distinct values trigger the API call
+        ).subscribe((res) => {
           //sessionStorage.setItem("social-user", JSON.stringify(this.user));
           this.authService.setAccessToken(res.payload.token);
           //console.log(res);
@@ -110,6 +114,7 @@ export class RegisterComponent {
   }
 
   onSubmit() {
+    this.isLoading=true;
     if (this.registerForm.valid) {
       this.UserRequest = this.registerForm.value;
       this.accountService.register(this.UserRequest).subscribe((res) => {
@@ -118,6 +123,7 @@ export class RegisterComponent {
           window.location.reload();
           //this.router.navigate(['/']);
         };
+        this.isLoading=false;
       });
     };
 

@@ -1,19 +1,7 @@
+<p-toast></p-toast>
 @if(isLoading) {
 <app-progress-bar></app-progress-bar>
 }
-
-<!-- <div class="" style="display: flex;justify-content: center;margin-top: 20px;margin-bottom: 10px;">
-
-    <div class="m-2">
-        <p-button (onClick)="callSpotifyAuth()">
-            <i class="bi bi-spotify mr-2"></i> Link Spotify </p-button>
-    </div>
-
-    <div class="m-2">
-        <p-button (onClick)="callStravaAuth()">
-            <i class="bi bi-strava mr-2"></i>Link Strava </p-button>
-    </div>
-</div> -->
 
 @if(!isStravaLinked) {
 <div class="m-2 p-1">
@@ -29,12 +17,16 @@
     <p-table #dt1 [value]="athleteActivities" styleClass="p-datatable-gridlines" sortMode="multiple" [rows]="10"
         [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="athleteActivities.length"
         [paginator]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_date'" [sortOrder]="1">
+        [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_date'" [sortOrder]="-1">
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between">
                 <h2>Activities</h2>
-
-                <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear(dt1)" />
+                <div>
+                    <p-button label="Fetch" severity="info" (click)="FetchActivitiesFromStrava()"
+                        icon="pi pi-file-import" iconPos="right" />
+                    <p-button label="Clear" class="ml-2" [outlined]="true" icon="pi pi-filter-slash"
+                        (onClick)="clear(dt1)" />
+                </div>
             </div>
         </ng-template>
         <ng-template pTemplate="header">
@@ -54,8 +46,15 @@
         <ng-template pTemplate="body" let-activity>
             <tr>
                 <td>
-                    <p-button class="anchor_btn" (click)="getActivityDetails(activity.id,activity.start_date)"
-                        [label]="activity.name" [link]="true" />
+                    <div class="flex flex-row justify-content-between">
+                        <p-button class="anchor_btn"
+                            (click)="getActivityDetails(activity.id,activity.start_date,activity.isSaved)"
+                            [label]="activity.name" [link]="true" />
+
+                        <!-- <p-badge></p-badge> -->
+                        <i *ngIf="!activity.isSaved" pBadge style="font-size: 2rem; margin: auto;"
+                         [value]="'New'" severity="danger"></i>
+                    </div>
                 </td>
                 <td>{{ activity.start_date | date:'MMM d, y, h:mm:ss a' }}</td>
                 <td>{{ activity.end_date | date:'MMM d, y, h:mm:ss a' }}</td>
@@ -66,6 +65,11 @@
                 <td>{{ activity.duration_mins }}</td>
                 <td>{{ activity.average_speed | number:'1.2-2'}} km/hr</td>
                 <td>{{ activity.max_speed | number:'1.2-2'}} km/hr</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="10">No activities found.</td>
             </tr>
         </ng-template>
     </p-table>
@@ -81,9 +85,10 @@
             <div class="flex flex-row justify-content-between">
                 <h3>Activity Details</h3>
                 <div>
-                    <p-button label="Save" severity="success" (click)="saveActivityDetails()" icon="pi pi-save" iconPos="right" />
-                    
-                    <p-button (click)="showDetails=false" class="ml-2">Back</p-button>
+                    <p-button label="Save" severity="success" [disabled]="isADSaved" (click)="saveActivityDetails()"
+                        icon="pi pi-save" iconPos="right" />
+
+                    <p-button (click)="showDetails=false && isADSaved=false" class="ml-2">Back</p-button>
                 </div>
             </div>
 
@@ -109,19 +114,21 @@
                 <td>{{track.start_time | date: 'hh:mm:ss a'}}</td>
                 <td>{{track.played_at | date: 'hh:mm:ss a'}}</td>
                 <td>
-                    <p-button class="anchor_btn" [disabled]="track.track.id===0"
-                        (click)="getAudioFeatures(track.track.id)" [label]="track.track.name" [link]="true" />
+                    <p-button class="anchor_btn" [disabled]="track?.track?.id===''"
+                        (click)="getAudioFeatures(track.track?.id,track.isSaved)" [label]="track.track?.name"
+                        [link]="true" />
                 </td>
-                <td>{{track.track.artists[0].name}}</td>
+                <td>{{track.track?.artists[0]?.name}}</td>
                 <td>
-                    {{track.audio_features?.tempo}}
+                    <!-- first choice for saved track and second for track from api -->
+                    {{track.isSaved ? track.track?.audio_features?.tempo : track.audio_features?.tempo}}
                 </td>
                 <td>{{track.duration_mins}}</td>
                 <td>{{track.distance_start | number:'1.2-2'}} km</td>
                 <td>{{track.distance_end | number:'1.2-2'}} km</td>
                 <td>{{track.distance | number:'1.2-2' }} km</td>
                 <td>{{track.moving_time}}</td>
-                <td>{{track.pace | number:'1.2-2'}} hr/km</td>
+                <td>{{track.pace }} /km</td>
                 <td>{{track.speed | number:'1.2-2'}} km/hr</td>
             </tr>
         </ng-template>
@@ -154,8 +161,8 @@
                 <th>Valence</th>
                 <th>eBPM</th>
                 <th>Duration</th>
-                <th>Track Href</th>
-                <th>Analysis Url</th>
+                <!-- <th>Track Href</th>
+                <th>Analysis Url</th> -->
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-audioFeature>
@@ -169,9 +176,9 @@
                 <td>{{ audioFeature.liveness }}</td>
                 <td>{{ audioFeature.valence }}</td>
                 <td>{{ audioFeature.tempo }}</td>
-                <td>{{ audioFeature.duration_ms }}</td>
-                <td>{{ audioFeature.track_href }}</td>
-                <td>{{ audioFeature.analysis_url }}</td>
+                <td>{{ formatTrackDuration(audioFeature.duration_ms) }}</td>
+                <!-- <td>{{ audioFeature.track_href }}</td>
+                <td>{{ audioFeature.analysis_url }}</td> -->
             </tr>
         </ng-template>
     </p-table>

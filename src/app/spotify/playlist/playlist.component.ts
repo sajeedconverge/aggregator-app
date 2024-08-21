@@ -9,6 +9,8 @@ import { Message } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { PlaylistDetailsComponent } from '../playlist-details/playlist-details.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-playlist',
@@ -19,6 +21,9 @@ import { ButtonModule } from 'primeng/button';
     MessagesModule,
     TableModule,
     ButtonModule,
+    PlaylistDetailsComponent,
+
+
 
   ],
   templateUrl: './playlist.component.html',
@@ -45,15 +50,17 @@ export class PlaylistComponent implements OnInit {
 
   constructor(
     private spotifyService: SpotifyService,
-    private spotifyAuthService: SpotifyAuthorizationService
+    private spotifyAuthService: SpotifyAuthorizationService,
+    private router: Router
   ) {
+    this.spotifyAuthService.checkExpiryAndRefreshToken();
     this.startCheckingToken();
     this.fetchThirdPartyDetails();
-   }
+  }
 
   ngOnInit(): void {
     //this.isLoading = true;
-    
+
   }
 
   ngOnDestroy(): void {
@@ -94,59 +101,65 @@ export class PlaylistComponent implements OnInit {
   getCurrentUserPlaylists(spotifyAccessToken: any) {
     this.isLoading = true;
     this.spotifyAuthService.refreshSpotifyAccessToken();
+    //this.spotifyAuthService.checkExpiryAndRefreshToken();
     this.spotifyService.getCurrentUserPlaylistsUrl().subscribe((res) => {
       if (res.statusCode === 200) {
         var playlistsUrl = res.payload;
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
           console.log(this.userPlaylists);
-          this.isLoading = false;
-        });
 
+        });
+        this.isLoading = false;
       }
     })
   }
+
 
   getPlayListTracks(url: string, playlistName: string) {
-    this.spotifyAuthService.refreshSpotifyAccessToken();
-    this.playlistTracks = [];
-    this.showTracks = true;
-    this.isLoading = true;
-    this.currentPlayListName = playlistName;
-    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-    if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
-      this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((res) => {
-        this.playlistTracks = res.items;
-        console.log("this.playlistTracks", this.playlistTracks);
-        this.isLoading = false;
-      });
-    };
+    sessionStorage.setItem('playlist-items-url' , url);
+    sessionStorage.setItem('playlist-name' , playlistName);
+    this.router.navigate(['/spotify/playlist-details'])
   }
 
-  openInSpotify(url: string) {
-    window.open(url, '_blank');
-  }
+  // getPlayListTracks1(url: string, playlistName: string) {
+  //   this.spotifyAuthService.refreshSpotifyAccessToken();
+  //   this.playlistTracks = [];
+  //   this.showTracks = true;
+  //   this.isLoading = true;
+  //   this.currentPlayListName = playlistName;
+  //   const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+  //   if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
+  //     this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {
+  //       this.playlistTracks = resp.items;
+  //       // To assign Audio Features to the track
+  //       this.playlistTracks.forEach(pltrack => {
+  //         // this.spotifyService.getTrackById(pltrack.track.id).subscribe((response) => {
+  //         //   debugger;
+  //         //   if (response.statusCode === 200) {
+  //         //     console.log(response);
+  //         //     pltrack.audioFeatures = response.payload.jsonData.audio_features;
+  //         //   } else {
+  //         this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
+  //           if (res.statusCode === 200) {
+  //             var featuresUrl = res.payload;
+  //             const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+  //             this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
+  //               pltrack.audioFeatures = res;
+  //             });
 
-  //To get audio features
-  getAudioFeatures(trackId: string, trackName: string) {
-    this.audioFeatures = [];
-    this.currentTrackName = trackName;
-    this.spotifyAuthService.refreshSpotifyAccessToken();
-    this.spotifyService.getSpotifyAudioFeaturesUrl(trackId).subscribe((res) => {
-      if (res.statusCode === 200) {
-        var featuresUrl = res.payload;
-        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-        this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-          this.audioFeatures.push(res);
-          this.showAudioFeatures = true;
-        })
+  //           }
+  //         })
+  //         //   }
+  //         // });
 
-      }
-    })
-  }
-
-
-
+  //         console.log(pltrack);
+  //       });
+  //       console.log("this.playlistTracks", this.playlistTracks);
+  //       this.isLoading = false;
+  //     });
+  //   };
+  // }
 
 
 

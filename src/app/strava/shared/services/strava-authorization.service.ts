@@ -103,7 +103,7 @@ export class StravaAuthorizationService {
 
           this.stravaService.generateStravaAccessToken(refreshUrl, body).subscribe((res) => {
             if (res) {
-              console.log("new access token strava", res);
+              // console.log("new access token strava", res);
               sessionStorage.setItem('strava-bearer-token', res.access_token);
               sessionStorage.setItem('strava-refresh-token', res.refresh_token);
               const tokenExpiryTime = new Date(res.expires_at * 1000);
@@ -130,8 +130,6 @@ export class StravaAuthorizationService {
 
     }
   }
-
-
 
 
 

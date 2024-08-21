@@ -108,8 +108,8 @@ export class SigninComponent implements OnInit {
           this.authService.setSpotifyRefreshToken(res.payload.spotifyRefreshToken);
           this.authService.setStravaRefreshToken(res.payload.stravaRefreshToken);
           //console.log(res);
-          
-          
+
+
           setTimeout(() => {
             this.isLoading = false;
             this.router.navigate(['/home']);
@@ -160,24 +160,27 @@ export class SigninComponent implements OnInit {
         if (res.statusCode === 200) {
 
           console.log('login success', res);
-
           //initial login process to store user data
           this.authService.setAccessToken(res.payload.token);
+          this.authService.setUserEmail(res.payload.email);
+          this.authService.setSpotifyRefreshToken(res.payload.spotifyRefreshToken);
+          this.authService.setStravaRefreshToken(res.payload.stravaRefreshToken);
           console.log(res);
 
           setTimeout(() => {
             this.isLoading = false;
             this.router.navigate(['/home']);
-            //Constants.isLoggedInFlag = this.loggedIn;
-            //to set the spotify settings from api to client app
+            //to set the spotify settings from api to client app and refresh tokens
             this.spotifyService.getSpotifyData().subscribe((res) => {
               if (res.statusCode === 200) {
                 Constants.spotifySettings = res.payload;
+                this.spotifyAuthService.refreshSpotifyAccessToken();
               }
             });
             this.stravaService.getStravaData().subscribe((res) => {
               if (res.statusCode === 200) {
                 Constants.stravaSettings = res.payload;
+                this.stravaAuthService.refreshStravaAccessToken();
               }
             });
           }, 1500);
