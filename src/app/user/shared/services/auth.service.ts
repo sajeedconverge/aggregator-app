@@ -72,4 +72,14 @@ export class AuthService {
     return sessionStorage.getItem('strava-refresh-token') || '';
   }
 
+  setSpotifyUserId(token: string) {
+    sessionStorage.setItem('spotify-user-id', token);
+  }
+  getSpotifyUserId(): string | null {
+    return sessionStorage.getItem('spotify-user-id') || '';
+  }
+
+
+
+
 }

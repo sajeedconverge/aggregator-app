@@ -55,10 +55,13 @@ export class SpotifyService {
   }
 
   getTrackById(providerId:string): Observable<any>{
-    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetActivityByProviderId?providerId=${providerId}`, { headers: this.headers })
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetTrackByProviderId?providerId=${providerId}`, { headers: this.headers })
     .pipe(
       map(response => {
-        response.payload.jsonData = JSON.parse(response.payload.jsonData);
+        // Check if payload is an object and has jsonData
+        if (response.payload && typeof response.payload === 'object' && response.payload.jsonData) {
+          response.payload.jsonData = Constants.convertToValidJson(response.payload.jsonData);
+        }
         return response;
       })
     );
@@ -77,6 +80,27 @@ export class SpotifyService {
         })
       );
   }
+
+  getCreateNewPlaylistUrl(userId:string): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetCreateNewPlaylistUrl?userId=${userId}`, { headers: this.headers });
+  }
+  
+  getUserProfileUrl(): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetUserProfileUrl`, { headers: this.headers });
+  }
+
+  getPlaylistOpsUrl(playlistId:string): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetPlaylistOpsUrl?playlistId=${playlistId}`, { headers: this.headers });
+  }
+
+  mapSpotifyUser(userId:string,spotifyUserId:string): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/MapSpotifyUser?userId=${userId}&spotifyUserId=${spotifyUserId}`, { headers: this.headers });
+  }
+
+getSpotifyUser(userId:string): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSpotifyUser?userId=${userId}`, { headers: this.headers });
+  }
+
 
 
 

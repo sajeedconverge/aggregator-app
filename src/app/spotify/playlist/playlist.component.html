@@ -44,101 +44,14 @@
 </section>
 <!-- All Playlist section end -->
 
-<!-- Playlist Tracks List -->
-<div class="palylist_table" *ngIf="showTracks && !showAudioFeatures">
-    <p-table [value]="playlistTracks" [tableStyle]="{'min-width': '60rem'}">
-        <ng-template pTemplate="caption">
-            <div class="flex flex-row justify-content-between">
-                <h3>Tracks</h3>
-                <h3>{{currentPlayListName}}</h3>
-                <p-button (click)="showTracks=false">Back</p-button>
-            </div>
-        </ng-template>
-        <ng-template pTemplate="header">
-            <tr>
-                <th style="width:80px">
-                </th>
-                <th pSortableColumn="name">
-                    Title <p-sortIcon field="name" />
-                </th>
-                <th pSortableColumn="category">
-                    Artist <p-sortIcon field="category" />
-                </th>
-                <th pSortableColumn="quantity">
-                    External Url
-                </th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-track>
-            <tr>
-                <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
-                </td>
-                <td>
-                    <p-button class="anchor_btn" (click)="getAudioFeatures(track.track.id, track.track.name)"
-                        [label]="track.track.name" [link]="true" />
-                </td>
-                <td>{{ track.track.artists[0].name }}</td>
-                <td>
-                    <p-button class="anchor_btn" (click)="openInSpotify(track.track.external_urls.spotify)"
-                        label="Open in Spotify" [link]="true" />
-                </td>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-            <tr class="">
-                <td colspan="5">No tracks found in the current playlist.</td>
-            </tr>
-        </ng-template>
-    </p-table>
 
-</div>
+<!-- <ng-container *ngIf="showTracks">
+    <app-playlist-details [playlistTracks]="playlistTracks" [currentPlayListName]="currentPlayListName"
+    (closeEvent)="closePlaylistDetails($event)"></app-playlist-details>
+</ng-container> -->
 
-<!-- Audio Features -->
-<div class="mt-2" *ngIf="showAudioFeatures">j ...........c-
-    <p-table [value]="audioFeatures" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }">
-        <ng-template pTemplate="caption">
 
-            <div class="flex flex-row justify-content-between">
-                <h3>Audio Features</h3>
-                <h3>{{currentTrackName}}</h3>
-                <p-button (click)="showAudioFeatures=false">Back</p-button>
-            </div>
 
-        </ng-template>
-        <ng-template pTemplate="header">
-            <tr>
-                <th>Danceability</th>
-                <th>Energy</th>
-                <th>Key </th>
-                <th>Loudness</th>
-                <th>Speechiness</th>
-                <th>Acousticness</th>
-                <th>Liveness</th>
-                <th>Valence</th>
-                <th>Tempo</th>
-                <th>Duration</th>
-                <!-- <th>Track Href</th>
-                <th>Analysis Url</th> -->
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-audioFeature>
-            <tr>
-                <td>{{ audioFeature.danceability }}</td>
-                <td>{{ audioFeature.energy }}</td>
-                <td>{{ audioFeature.key }}</td>
-                <td>{{ audioFeature.loudness }}</td>
-                <td>{{ audioFeature.speechiness }}</td>
-                <td>{{ audioFeature.acousticness }}</td>
-                <td>{{ audioFeature.liveness }}</td>
-                <td>{{ audioFeature.valence }}</td>
-                <td>{{ audioFeature.tempo }}</td>
-                <td>{{ formatTrackDuration(audioFeature.duration_ms) }}</td>
-                <!-- <td>{{ audioFeature.track_href }}</td>
-                <td>{{ audioFeature.analysis_url }}</td> -->
-            </tr>
-        </ng-template>
-    </p-table>
-</div>
 
 
 
