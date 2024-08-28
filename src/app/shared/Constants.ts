@@ -61,6 +61,41 @@ export class Constants {
         return hoursStr + ":" + minutesStr + ":" + secondsStr;
     }
 
+    public static formatMilliseconds(milliseconds: number): string {
+        if (milliseconds < 0) {
+            throw new Error("Milliseconds cannot be negative");
+        }
+
+        const hours = Math.floor(milliseconds / 3600000);
+        const minutes = Math.floor((milliseconds % 3600000) / 60000);
+        const seconds = Math.floor((milliseconds
+            % 60000) / 1000);
+
+        const formattedHours = hours.toString().padStart(2, "0");
+        const formattedMinutes = minutes.toString().padStart(2, "0");
+        const formattedSeconds = seconds.toString().padStart(2, "0");
+
+        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+
+    }
+
+    // public static transformSeconds(value: number): string {
+    //     // Convert seconds to an integer
+    //     const totalSeconds = Math.floor(value);
+
+    //     // Calculate hours, minutes, and seconds
+    //     const hours = Math.floor(totalSeconds / 3600);
+    //     const minutes = Math.floor((totalSeconds % 3600) / 60);
+    //     const seconds = totalSeconds % 60;
+
+    //     // Format the time as H:MM:SS
+    //     return `${hours}:${this.padZero(minutes)}:${this.padZero(seconds)}`;
+    // }
+
+    // public static padZero(num: number): string {
+    //     return num < 10 ? `0${num}` : `${num}`;
+    // }
+
     //To combine time stream and distance streams data and crete a timestampped data array 
     public static processStreams(activityStartTime: string, distanceStream: any, timeStream: any): any[] {
         const result: any[] = [];
@@ -265,3 +300,5 @@ export class Constants {
 
 
 }
+
+
