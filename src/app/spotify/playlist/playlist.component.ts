@@ -107,7 +107,7 @@ export class PlaylistComponent implements OnInit {
         var playlistsUrl = res.payload;
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
-          console.log(this.userPlaylists);
+          //console.log(this.userPlaylists);
 
         });
         this.isLoading = false;
@@ -115,53 +115,11 @@ export class PlaylistComponent implements OnInit {
     })
   }
 
-
   getPlayListTracks(url: string, playlistName: string) {
     sessionStorage.setItem('playlist-items-url' , url);
     sessionStorage.setItem('playlist-name' , playlistName);
     this.router.navigate(['/spotify/playlist-details'])
   }
-
-  // getPlayListTracks1(url: string, playlistName: string) {
-  //   this.spotifyAuthService.refreshSpotifyAccessToken();
-  //   this.playlistTracks = [];
-  //   this.showTracks = true;
-  //   this.isLoading = true;
-  //   this.currentPlayListName = playlistName;
-  //   const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-  //   if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
-  //     this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {
-  //       this.playlistTracks = resp.items;
-  //       // To assign Audio Features to the track
-  //       this.playlistTracks.forEach(pltrack => {
-  //         // this.spotifyService.getTrackById(pltrack.track.id).subscribe((response) => {
-  //         //   debugger;
-  //         //   if (response.statusCode === 200) {
-  //         //     console.log(response);
-  //         //     pltrack.audioFeatures = response.payload.jsonData.audio_features;
-  //         //   } else {
-  //         this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
-  //           if (res.statusCode === 200) {
-  //             var featuresUrl = res.payload;
-  //             const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-  //             this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-  //               pltrack.audioFeatures = res;
-  //             });
-
-  //           }
-  //         })
-  //         //   }
-  //         // });
-
-  //         console.log(pltrack);
-  //       });
-  //       console.log("this.playlistTracks", this.playlistTracks);
-  //       this.isLoading = false;
-  //     });
-  //   };
-  // }
-
-
 
 
 }

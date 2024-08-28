@@ -220,28 +220,10 @@ export class PlaylistDetailsComponent implements OnInit {
           this.showGraph = true;
         }, 2000);
 
-        console.log('data', this.data);
+        // console.log('data', this.data);
       });
     };
   }
-
-
-  // getAudioFeatures(trackId: string, trackName: string) {
-  //   this.audioFeatures = [];
-  //   this.currentTrackName = trackName;
-  //   //this.spotifyAuthService.refreshSpotifyAccessToken();
-  //   this.spotifyService.getSpotifyAudioFeaturesUrl(trackId).subscribe((res) => {
-  //     if (res.statusCode === 200) {
-  //       var featuresUrl = res.payload;
-  //       const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-  //       this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-  //         this.audioFeatures.push(res);
-  //         this.showAudioFeatures = true;
-  //       })
-
-  //     }
-  //   });
-  // }
 
   formatTrackDuration(durationMs: number) {
     return Constants.formatDuration(durationMs);
@@ -259,7 +241,7 @@ export class PlaylistDetailsComponent implements OnInit {
   tableReordered(){
     this.showGraph = false;
     const documentStyle = getComputedStyle(document.documentElement);
-
+// To reset data
     this.data = {
       labels: ['0:00:00'],
       datasets: [
