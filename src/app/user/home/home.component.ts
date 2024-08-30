@@ -277,7 +277,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       const matchedTracks = tracks.filter(track => {
         const trackStartDate = new Date(track.start_time).getTime();
-        return trackStartDate >= activityStartDate && trackStartDate <= activityEndDate;
+        return trackStartDate >= activityStartDate || trackStartDate <= activityEndDate;
       });
       result.push({ activity, tracks: matchedTracks });
     });
