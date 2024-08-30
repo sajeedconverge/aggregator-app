@@ -1,9 +1,11 @@
 @if(isLoading) {
 <app-progress-bar></app-progress-bar>
 }
+<p-confirmDialog />
 <!-- Playlist Tracks List -->
 <div class="palylist_table" *ngIf=" !showAudioFeatures">
-    <p-table [value]="playlistTracks" [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered()">
+    <p-table [value]="playlistTracks" [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered()"
+        (onSort)="tableReordered()">
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <h3>Tracks</h3>
@@ -11,8 +13,10 @@
                 <div>
                     <label class="m-2 pb-2">Show Graph</label>
                     <p-inputSwitch [(ngModel)]="showGraph" class="mr-2" />
-                    <p-button class="mr-2" severity="warning" (click)="updatePlaylist()">Save changes</p-button>
-                    <p-button class="mr-2" severity="success">Save as new</p-button>
+                    <p-button class="mr-2" severity="warning" (click)="confirmUpdatePlaylist()" icon="pi pi-play-circle"
+                        iconPos="right" label="Save changes"></p-button>
+                    <p-button class="mr-2" severity="success" icon="pi pi-play-circle" iconPos="right"
+                        label="Save as new" (onClick)="plNameVisible=true"></p-button>
                     <p-button (click)="backToPlaylists()">Back</p-button>
                 </div>
 
@@ -92,7 +96,7 @@
 </div>
 
 <!-- Audio Features -->
-<div class="" *ngIf="showAudioFeatures">
+<!-- <div class="" *ngIf="showAudioFeatures">
     <p-table [value]="audioFeatures" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }">
         <ng-template pTemplate="caption">
 
@@ -115,8 +119,6 @@
                 <th>Valence</th>
                 <th>Tempo</th>
                 <th>Duration</th>
-                <!-- <th>Track Href</th>
-                <th>Analysis Url</th> -->
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-audioFeature>
@@ -131,9 +133,21 @@
                 <td>{{ audioFeature.valence }}</td>
                 <td>{{ audioFeature.tempo }}</td>
                 <td>{{ formatTrackDuration(audioFeature.duration_ms) }}</td>
-                <!-- <td>{{ audioFeature.track_href }}</td>
-                <td>{{ audioFeature.analysis_url }}</td> -->
             </tr>
         </ng-template>
     </p-table>
-</div>
+</div> -->
+
+
+<p-dialog header="Create New Playlist" [modal]="true" [draggable]="false" [(visible)]="plNameVisible" [style]="{ width: '25rem' }">
+    <span class="p-text-secondary block mb-5">Enter name for new playlist.</span>
+    <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">Playlist Name</label>
+        <input pInputText id="username" class="flex-auto" [(ngModel)]="playlistName" />
+    </div>
+    
+    <div class="flex justify-content-end gap-2">
+        <p-button label="Cancel" severity="secondary" (onClick)="plNameVisible = false" />
+        <p-button label="Save" (onClick)="createNewPlaylist()" />
+    </div>
+</p-dialog>

@@ -115,9 +115,10 @@ export class PlaylistComponent implements OnInit {
     })
   }
 
-  getPlayListTracks(url: string, playlistName: string) {
+  getPlayListTracks(url: string, playlistName: string,id:string) {
     sessionStorage.setItem('playlist-items-url' , url);
     sessionStorage.setItem('playlist-name' , playlistName);
+    sessionStorage.setItem('playlist-id' , id);
     this.router.navigate(['/spotify/playlist-details'])
   }
 

@@ -12,7 +12,17 @@ import { HttpHeaders } from '@angular/common/http';
 import { ChartModule } from 'primeng/chart';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule } from '@angular/forms';
-import { log } from 'console';
+import { DialogModule } from 'primeng/dialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { InputTextModule } from 'primeng/inputtext';
+import { AuthService } from '../../user/shared/services/auth.service';
+
+
+
+
+
+
 
 @Component({
   selector: 'app-playlist-details',
@@ -25,10 +35,19 @@ import { log } from 'console';
     TableModule,
     ButtonModule,
     ChartModule,
-    InputSwitchModule
+    InputSwitchModule,
+    DialogModule,
+    ConfirmDialogModule,
+    InputTextModule
+
+
+
   ],
   templateUrl: './playlist-details.component.html',
-  styleUrl: './playlist-details.component.css'
+  styleUrl: './playlist-details.component.css',
+  providers: [
+    ConfirmationService
+  ]
 })
 export class PlaylistDetailsComponent implements OnInit {
   audioFeatures: any[] = [];
@@ -39,96 +58,72 @@ export class PlaylistDetailsComponent implements OnInit {
   checkInterval: any;
   isLoading: boolean = false;
   data: any;
-  options: any;
   showGraph: boolean = false;
   documentStyle = getComputedStyle(document.documentElement);
   textColor = this.documentStyle.getPropertyValue('--text-color');
   textColorSecondary = this.documentStyle.getPropertyValue('--text-color-secondary');
   surfaceBorder = this.documentStyle.getPropertyValue('--surface-border');
+  options: any = {
+    maintainAspectRatio: false,
+    aspectRatio: 0.6,
+    plugins: {
+      legend: {
+        labels: {
+          color: this.textColor
+        }
+      },
+
+      tooltip: {
+        callbacks: {
+          // Customize the label in the tooltip
+          label: function (context: any) {
+            return `(${context.dataset.tracks[context.parsed.x]}) - ${context.dataset.label}:${context.raw}`; // Customize label
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: this.textColorSecondary
+        },
+        grid: {
+          color: this.surfaceBorder,
+          drawBorder: false
+        }
+      },
+      y: {
+        ticks: {
+          color: this.textColorSecondary
+        },
+        grid: {
+          color: this.surfaceBorder,
+          drawBorder: false
+        }
+      }
+    }
+  };
+  plNameVisible: boolean = false;
+  playlistName: string = '';
+
+
+
 
 
   constructor(
     private spotifyService: SpotifyService,
     private spotifyAuthService: SpotifyAuthorizationService,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService,
+    private authService: AuthService
   ) {
     this.fetchThirdPartyDetails();
     this.startCheckingToken();
   }
 
   ngOnInit(): void {
-    
 
-    // this.data = {
-    //   labels: ['0:00:00'],
-    //   datasets: [
-    //     {
-    //       label: 'Tempo',
-    //       data: [0],
-    //       fill: false,
-    //       borderColor: this.documentStyle.getPropertyValue('--blue-500'),
-    //       tension: 0.4,
-    //       tracks: [],
-    //       colors: [],  // Add an array to store color information
-    //       segment: {
-    //         borderColor: (ctx: any) => this.getSegmentColor(ctx, 0)  // Pass dataset index to getSegmentColor
-    //       }
-    //     },
-    //     {
-    //       label: 'Loudness',
-    //       data: [0],
-    //       fill: false,
-    //       borderColor: this.documentStyle.getPropertyValue('--orange-500'),
-    //       tension: 0.4,
-    //       tracks: [],
-    //       colors: [],  // Add an array to store color information
-    //       segment: {
-    //         borderColor: (ctx: any) => this.getSegmentColor(ctx, 1)  // Pass dataset index to getSegmentColor
-    //       }
-    //     }
-    //   ]
-    // };
-
-    this.options = {
-      maintainAspectRatio: false,
-      aspectRatio: 0.6,
-      plugins: {
-        legend: {
-          labels: {
-            color: this.textColor
-          }
-        },
-
-        tooltip: {
-          callbacks: {
-            // Customize the label in the tooltip
-            label: function (context: any) {
-              return `(${context.dataset.tracks[context.parsed.x]}) - ${context.dataset.label}:${context.raw}`; // Customize label
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: this.textColorSecondary
-          },
-          grid: {
-            color: this.surfaceBorder,
-            drawBorder: false
-          }
-        },
-        y: {
-          ticks: {
-            color: this.textColorSecondary
-          },
-          grid: {
-            color: this.surfaceBorder,
-            drawBorder: false
-          }
-        }
-      }
-    };
   }
 
   getSegmentColor(ctx: any, datasetIndex: number) {
@@ -188,7 +183,6 @@ export class PlaylistDetailsComponent implements OnInit {
       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {
         this.playlistTracks = resp.items;
 
-
         // To assign Audio Features to the track
         this.playlistTracks.forEach((pltrack) => {
           pltrack.color = Constants.generateRandomPrimeNGColor();
@@ -214,67 +208,7 @@ export class PlaylistDetailsComponent implements OnInit {
           });
         });
 
-        this.data = {
-          labels: ['0:00:00'],
-          datasets: [
-            {
-              label: 'Tempo',
-              data: [0],
-              fill: false,
-              borderColor: this.documentStyle.getPropertyValue('--blue-500'),
-              tension: 0.4,
-              tracks: [],
-              colors: [],  // Add an array to store color information
-              segment: {
-                borderColor: (ctx: any) => this.getSegmentColor(ctx, 0)  // Pass dataset index to getSegmentColor
-              }
-            },
-            {
-              label: 'Loudness',
-              data: [0],
-              fill: false,
-              borderColor: this.documentStyle.getPropertyValue('--orange-500'),
-              tension: 0.4,
-              tracks: [],
-              colors: [],  // Add an array to store color information
-              segment: {
-                borderColor: (ctx: any) => this.getSegmentColor(ctx, 1)  // Pass dataset index to getSegmentColor
-              }
-            }
-          ]
-        };
-
-        console.log('original', this.playlistTracks);
-        var durationSum = 0;
-        setTimeout(() => {
-          
-          this.playlistTracks.forEach(pltrack => {
-            pltrack.audioAnalysis.sections.forEach((section: any) => {
-              durationSum = durationSum + ((section.duration) * 1000);
-              //duration
-              this.data.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
-              //tempo
-              this.data.datasets[0].data.push(section.tempo);
-              this.data.datasets[0].tracks.push(pltrack.track.name);
-              this.data.datasets[0].colors.push(pltrack.color);
-              //loudness
-              this.data.datasets[1].data.push(section.loudness);
-              this.data.datasets[1].tracks.push(pltrack.track.name);
-              this.data.datasets[1].colors.push(pltrack.color);
-
-
-            });
-          });
-
-          
-
-          console.log('data',this.data);
-          
-          this.isLoading = false;
-          this.showGraph = true;
-        }, 2000);
-
-        // console.log('data', this.data);
+        this.generateChart(this.playlistTracks);
       });
     };
   }
@@ -288,11 +222,44 @@ export class PlaylistDetailsComponent implements OnInit {
     this.router.navigate(['/spotify/playlists'])
   }
 
+  confirmUpdatePlaylist() {
+    this.confirmationService.confirm({
+      //target: event.target as EventTarget,
+      message: 'Are you sure that you want to proceed?',
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptIcon: "none",
+      rejectIcon: "none",
+      rejectButtonStyleClass: "p-button-text",
+      accept: () => {
+        this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' });
+        this.updatePlaylist();
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+      }
+    });
+  }
   updatePlaylist() {
-    console.log('Reordered', this.playlistTracks);
+    //console.log('Reordered', this.playlistTracks);
+    var playlistId = sessionStorage.getItem('playlist-id') || '';
+    this.spotifyService.getPlaylistOpsUrl(playlistId).subscribe((res) => {
+      if (res.statusCode === 200) {
+        var opsUrl = res.payload;
+        console.log(opsUrl);
+
+
+      }
+    })
   }
 
   tableReordered() {
+    console.log('Reordered', this.playlistTracks);
+    this.generateChart(this.playlistTracks);
+  }
+
+  generateChart(playlistTracks: any[]) {
+    this.isLoading = true;
     this.showGraph = false;
     // To reset data
     this.data = {
@@ -324,11 +291,9 @@ export class PlaylistDetailsComponent implements OnInit {
         }
       ]
     };
-    console.log('Reordered', this.playlistTracks);
-
     var durationSum = 0;
     setTimeout(() => {
-      this.playlistTracks.forEach(pltrack => {
+      playlistTracks.forEach(pltrack => {
         pltrack.audioAnalysis.sections.forEach((section: any) => {
           durationSum = durationSum + ((section.duration) * 1000);
           //duration
@@ -343,7 +308,57 @@ export class PlaylistDetailsComponent implements OnInit {
           this.data.datasets[1].colors.push(pltrack.color);
         });
       });
+      this.isLoading = false;
       this.showGraph = true;
-    }, 2000);
+      console.log('data', this.data);
+    }, 3000);
   }
+
+  createNewPlaylist() {
+    var userId = this.authService.getUserIdFromToken();
+    this.spotifyService.getSpotifyUser(userId).subscribe((mapRes) => {
+      if (mapRes.statusCode === 200) {
+        console.log(mapRes);
+        var spotifyUserId = mapRes.payload.spotifyUserId
+        this.spotifyService.getCreateNewPlaylistUrl(spotifyUserId).subscribe((urlRes) => {
+          if (urlRes.statusCode === 200) {
+            var playlistUrl = urlRes.payload;
+          };
+        });
+      }
+    })
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
