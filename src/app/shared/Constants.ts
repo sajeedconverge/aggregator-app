@@ -4,8 +4,8 @@ import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "..
 
 export class Constants {
 
-    public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
-    //public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
+    //public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
+    public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     public static spotifySettings: SpotifySettings = {
         clientId: "",
@@ -78,23 +78,6 @@ export class Constants {
         return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 
     }
-
-    // public static transformSeconds(value: number): string {
-    //     // Convert seconds to an integer
-    //     const totalSeconds = Math.floor(value);
-
-    //     // Calculate hours, minutes, and seconds
-    //     const hours = Math.floor(totalSeconds / 3600);
-    //     const minutes = Math.floor((totalSeconds % 3600) / 60);
-    //     const seconds = totalSeconds % 60;
-
-    //     // Format the time as H:MM:SS
-    //     return `${hours}:${this.padZero(minutes)}:${this.padZero(seconds)}`;
-    // }
-
-    // public static padZero(num: number): string {
-    //     return num < 10 ? `0${num}` : `${num}`;
-    // }
 
     //To combine time stream and distance streams data and crete a timestampped data array 
     public static processStreams(activityStartTime: string, distanceStream: any, timeStream: any): any[] {
@@ -293,6 +276,21 @@ export class Constants {
     }
 
 
+    public static generateRandomPrimeNGColor(): string {
+        const primeNGColors = [
+            '--blue-200','--blue-400','--blue-600','--blue-800',
+            '--red-200','--red-400','--red-600','--red-800',
+            '--purple-200','--purple-400','--purple-600','--purple-800',
+            '--teal-200','--teal-400','--teal-600','--teal-800',
+            '--surface-400','--surface-600',
+            '--indigo-200','--indigo-400','--indigo-600','--indigo-800',
+            '--green-200','--green-400','--green-600','--green-800',
+            '--orange-200','--orange-400','--orange-600','--orange-800',
+        ];
+        const randomIndex =
+                Math.floor(Math.random() * primeNGColors.length);
+        return primeNGColors[randomIndex];
+    }
 
 
 

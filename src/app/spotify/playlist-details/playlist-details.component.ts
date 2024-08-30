@@ -12,6 +12,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { ChartModule } from 'primeng/chart';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule } from '@angular/forms';
+import { log } from 'console';
 
 @Component({
   selector: 'app-playlist-details',
@@ -40,7 +41,10 @@ export class PlaylistDetailsComponent implements OnInit {
   data: any;
   options: any;
   showGraph: boolean = false;
-
+  documentStyle = getComputedStyle(document.documentElement);
+  textColor = this.documentStyle.getPropertyValue('--text-color');
+  textColorSecondary = this.documentStyle.getPropertyValue('--text-color-secondary');
+  surfaceBorder = this.documentStyle.getPropertyValue('--surface-border');
 
 
   constructor(
@@ -53,44 +57,37 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-color');
-    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+    
 
-    this.data = {
-      labels: ['0:00:00'],
-      datasets: [
-        {
-          label: 'Tempo',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--blue-500'),
-          tension: 0.4
-        },
-        {
-          label: 'Mode',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--pink-500'),
-          tension: 0.4
-        },
-        {
-          label: 'Key',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--teal-500'),
-          tension: 0.4
-        },
-        {
-          label: 'Loudness',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--orange-500'),
-          tension: 0.4
-        }
-      ]
-    };
+    // this.data = {
+    //   labels: ['0:00:00'],
+    //   datasets: [
+    //     {
+    //       label: 'Tempo',
+    //       data: [0],
+    //       fill: false,
+    //       borderColor: this.documentStyle.getPropertyValue('--blue-500'),
+    //       tension: 0.4,
+    //       tracks: [],
+    //       colors: [],  // Add an array to store color information
+    //       segment: {
+    //         borderColor: (ctx: any) => this.getSegmentColor(ctx, 0)  // Pass dataset index to getSegmentColor
+    //       }
+    //     },
+    //     {
+    //       label: 'Loudness',
+    //       data: [0],
+    //       fill: false,
+    //       borderColor: this.documentStyle.getPropertyValue('--orange-500'),
+    //       tension: 0.4,
+    //       tracks: [],
+    //       colors: [],  // Add an array to store color information
+    //       segment: {
+    //         borderColor: (ctx: any) => this.getSegmentColor(ctx, 1)  // Pass dataset index to getSegmentColor
+    //       }
+    //     }
+    //   ]
+    // };
 
     this.options = {
       maintainAspectRatio: false,
@@ -98,31 +95,49 @@ export class PlaylistDetailsComponent implements OnInit {
       plugins: {
         legend: {
           labels: {
-            color: textColor
+            color: this.textColor
           }
-        }
+        },
+
+        tooltip: {
+          callbacks: {
+            // Customize the label in the tooltip
+            label: function (context: any) {
+              return `(${context.dataset.tracks[context.parsed.x]}) - ${context.dataset.label}:${context.raw}`; // Customize label
+            },
+          },
+        },
       },
       scales: {
         x: {
           ticks: {
-            color: textColorSecondary
+            color: this.textColorSecondary
           },
           grid: {
-            color: surfaceBorder,
+            color: this.surfaceBorder,
             drawBorder: false
           }
         },
         y: {
           ticks: {
-            color: textColorSecondary
+            color: this.textColorSecondary
           },
           grid: {
-            color: surfaceBorder,
+            color: this.surfaceBorder,
             drawBorder: false
           }
         }
       }
     };
+  }
+
+  getSegmentColor(ctx: any, datasetIndex: number) {
+    const { p0 } = ctx;
+    const index = p0.parsed.x;  // Index of the current data point
+    const color = this.data.datasets[datasetIndex].colors[index];  // Get color for the segment
+
+    //return color ;  // Default color if not set
+    return this.documentStyle.getPropertyValue(color);
   }
 
   ngOnDestroy(): void {
@@ -176,6 +191,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
         // To assign Audio Features to the track
         this.playlistTracks.forEach((pltrack) => {
+          pltrack.color = Constants.generateRandomPrimeNGColor();
           this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
             if (res.statusCode === 200) {
               var featuresUrl = res.payload;
@@ -198,24 +214,62 @@ export class PlaylistDetailsComponent implements OnInit {
           });
         });
 
+        this.data = {
+          labels: ['0:00:00'],
+          datasets: [
+            {
+              label: 'Tempo',
+              data: [0],
+              fill: false,
+              borderColor: this.documentStyle.getPropertyValue('--blue-500'),
+              tension: 0.4,
+              tracks: [],
+              colors: [],  // Add an array to store color information
+              segment: {
+                borderColor: (ctx: any) => this.getSegmentColor(ctx, 0)  // Pass dataset index to getSegmentColor
+              }
+            },
+            {
+              label: 'Loudness',
+              data: [0],
+              fill: false,
+              borderColor: this.documentStyle.getPropertyValue('--orange-500'),
+              tension: 0.4,
+              tracks: [],
+              colors: [],  // Add an array to store color information
+              segment: {
+                borderColor: (ctx: any) => this.getSegmentColor(ctx, 1)  // Pass dataset index to getSegmentColor
+              }
+            }
+          ]
+        };
+
         console.log('original', this.playlistTracks);
         var durationSum = 0;
         setTimeout(() => {
+          
           this.playlistTracks.forEach(pltrack => {
             pltrack.audioAnalysis.sections.forEach((section: any) => {
               durationSum = durationSum + ((section.duration) * 1000);
               //duration
-              this.data.labels.push(`${pltrack?.track.name} ${Constants.formatMilliseconds(durationSum)}`);
+              this.data.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
               //tempo
               this.data.datasets[0].data.push(section.tempo);
-              //mode
-              this.data.datasets[1].data.push(section.mode);
-              //key
-              this.data.datasets[2].data.push(section.key);
+              this.data.datasets[0].tracks.push(pltrack.track.name);
+              this.data.datasets[0].colors.push(pltrack.color);
               //loudness
-              this.data.datasets[3].data.push(section.loudness);
+              this.data.datasets[1].data.push(section.loudness);
+              this.data.datasets[1].tracks.push(pltrack.track.name);
+              this.data.datasets[1].colors.push(pltrack.color);
+
+
             });
           });
+
+          
+
+          console.log('data',this.data);
+          
           this.isLoading = false;
           this.showGraph = true;
         }, 2000);
@@ -238,10 +292,9 @@ export class PlaylistDetailsComponent implements OnInit {
     console.log('Reordered', this.playlistTracks);
   }
 
-  tableReordered(){
+  tableReordered() {
     this.showGraph = false;
-    const documentStyle = getComputedStyle(document.documentElement);
-// To reset data
+    // To reset data
     this.data = {
       labels: ['0:00:00'],
       datasets: [
@@ -249,52 +302,48 @@ export class PlaylistDetailsComponent implements OnInit {
           label: 'Tempo',
           data: [0],
           fill: false,
-          borderColor: documentStyle.getPropertyValue('--blue-500'),
-          tension: 0.4
-        },
-        {
-          label: 'Mode',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--pink-500'),
-          tension: 0.4
-        },
-        {
-          label: 'Key',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--teal-500'),
-          tension: 0.4
+          borderColor: this.documentStyle.getPropertyValue('--blue-500'),
+          tension: 0.4,
+          tracks: [],
+          colors: [],  // Add an array to store color information
+          segment: {
+            borderColor: (ctx: any) => this.getSegmentColor(ctx, 0)  // Pass dataset index to getSegmentColor
+          }
         },
         {
           label: 'Loudness',
           data: [0],
           fill: false,
-          borderColor: documentStyle.getPropertyValue('--orange-500'),
-          tension: 0.4
+          borderColor: this.documentStyle.getPropertyValue('--orange-500'),
+          tension: 0.4,
+          tracks: [],
+          colors: [],  // Add an array to store color information
+          segment: {
+            borderColor: (ctx: any) => this.getSegmentColor(ctx, 1)  // Pass dataset index to getSegmentColor
+          }
         }
       ]
     };
     console.log('Reordered', this.playlistTracks);
-    
+
     var durationSum = 0;
-        setTimeout(() => {
-          this.playlistTracks.forEach(pltrack => {
-            pltrack.audioAnalysis.sections.forEach((section: any) => {
-              durationSum = durationSum + ((section.duration) * 1000);
-              //duration
-              this.data.labels.push(`${pltrack?.track.name} ${Constants.formatMilliseconds(durationSum)}`);
-              //tempo
-              this.data.datasets[0].data.push(section.tempo);
-              //mode
-              this.data.datasets[1].data.push(section.mode);
-              //key
-              this.data.datasets[2].data.push(section.key);
-              //loudness
-              this.data.datasets[3].data.push(section.loudness);
-            });
-          });
-          this.showGraph = true;
-        }, 2000);
+    setTimeout(() => {
+      this.playlistTracks.forEach(pltrack => {
+        pltrack.audioAnalysis.sections.forEach((section: any) => {
+          durationSum = durationSum + ((section.duration) * 1000);
+          //duration
+          this.data.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
+          //tempo
+          this.data.datasets[0].data.push(section.tempo);
+          this.data.datasets[0].tracks.push(pltrack.track.name);
+          this.data.datasets[0].colors.push(pltrack.color);
+          //loudness
+          this.data.datasets[1].data.push(section.loudness);
+          this.data.datasets[1].tracks.push(pltrack.track.name);
+          this.data.datasets[1].colors.push(pltrack.color);
+        });
+      });
+      this.showGraph = true;
+    }, 2000);
   }
 }
