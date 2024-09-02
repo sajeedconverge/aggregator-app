@@ -27,7 +27,7 @@
 
         @for(playlist of userPlaylists; track playlist.name) {
         <div class="col-3 all_list_grid p-3 justify-content-center"
-            (click)="getPlayListTracks(playlist.tracks.href,playlist.name,playlist.id)">
+            (click)="getPlayListTracks(playlist.tracks.href,playlist.name,playlist.id,playlist.snapshot_id)">
             <div class="all_listgrid_inner">
 
                 @if (playlist.images===null) {

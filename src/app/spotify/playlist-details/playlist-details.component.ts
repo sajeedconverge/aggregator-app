@@ -105,8 +105,8 @@ export class PlaylistDetailsComponent implements OnInit {
   };
   plNameVisible: boolean = false;
   playlistName: string = '';
-
-
+  originalTracks: string[] = [];
+  reOrderedTracks: string[] = [];
 
 
 
@@ -182,6 +182,10 @@ export class PlaylistDetailsComponent implements OnInit {
       this.isLoading = true;
       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {
         this.playlistTracks = resp.items;
+        this.playlistTracks.forEach(plTrack => {
+          this.originalTracks.push(plTrack.track.id)
+        });
+        console.log('this.originalTracks', this.originalTracks);
 
         // To assign Audio Features to the track
         this.playlistTracks.forEach((pltrack) => {
@@ -232,30 +236,70 @@ export class PlaylistDetailsComponent implements OnInit {
       rejectIcon: "none",
       rejectButtonStyleClass: "p-button-text",
       accept: () => {
-        this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' });
+        //this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' });
         this.updatePlaylist();
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        // this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
       }
     });
   }
   updatePlaylist() {
-    //console.log('Reordered', this.playlistTracks);
+    this.isLoading=true;
     var playlistId = sessionStorage.getItem('playlist-id') || '';
     this.spotifyService.getPlaylistOpsUrl(playlistId).subscribe((res) => {
       if (res.statusCode === 200) {
         var opsUrl = res.payload;
-        console.log(opsUrl);
+        //console.log(opsUrl);
+        let removeItemsBody: any = {
+          tracks: [],
+          snapshot_id: sessionStorage.getItem('playlist-snapshot-id')
+        };
+        this.originalTracks.forEach(trackId => {
+          let bodyItem = {
+            uri: `spotify:track:${trackId}`
+          };
+          removeItemsBody.tracks.push(bodyItem);
+        });
+        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+        debugger;
+        this.spotifyService.SpotifyCommonDeleteApi(opsUrl, removeItemsBody,spotifyAccessToken).subscribe((removeItemsRes) => {
+          
+          //Code to add new items to the playlist
+          let plOpsBody: any = {
+            uris: [],
+            position: 0
+          };
+          if (this.reOrderedTracks.length != 0) {
+            this.reOrderedTracks.forEach(trackId => {
+              plOpsBody.uris.push(`spotify:track:${trackId}`)
+            });
+          } else {
+            this.originalTracks.forEach(trackId => {
+              plOpsBody.uris.push(`spotify:track:${trackId}`)
+            });
+          }
+          this.spotifyService.SpotifyCommonPostApi(opsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
+           
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Changes updated successfully.' });
+            this.router.navigate(['/spotify/playlists']);
+          })
 
+
+        })
 
       }
     })
   }
 
   tableReordered() {
+    this.reOrderedTracks = [];
     console.log('Reordered', this.playlistTracks);
     this.generateChart(this.playlistTracks);
+    this.playlistTracks.forEach(plTrack => {
+      this.reOrderedTracks.push(plTrack.track.id)
+    });
+    console.log('this.reOrderedTracks', this.reOrderedTracks);
   }
 
   generateChart(playlistTracks: any[]) {
@@ -315,6 +359,8 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   createNewPlaylist() {
+    this.plNameVisible = false;
+    this.isLoading = true;
     var userId = this.authService.getUserIdFromToken();
     this.spotifyService.getSpotifyUser(userId).subscribe((mapRes) => {
       if (mapRes.statusCode === 200) {
@@ -323,6 +369,40 @@ export class PlaylistDetailsComponent implements OnInit {
         this.spotifyService.getCreateNewPlaylistUrl(spotifyUserId).subscribe((urlRes) => {
           if (urlRes.statusCode === 200) {
             var playlistUrl = urlRes.payload;
+            let body: any = {
+              name: this.playlistName,
+              description: "",
+              public: false
+            };
+            const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+            this.spotifyService.SpotifyCommonPostApi(playlistUrl, body, spotifyAccessToken).subscribe((npResponse) => {
+              var newPlaylistId = npResponse.id;
+              //to push the existing items to the new playlist
+              this.spotifyService.getPlaylistOpsUrl(newPlaylistId).subscribe(ploResponse => {
+                if (ploResponse.statusCode === 200) {
+                  let plOpsUrl = ploResponse.payload;
+                  let plOpsBody: any = {
+                    uris: [],
+                    position: 0
+                  };
+                  if (this.reOrderedTracks.length != 0) {
+                    this.reOrderedTracks.forEach(trackId => {
+                      plOpsBody.uris.push(`spotify:track:${trackId}`)
+                    });
+                  } else {
+                    this.originalTracks.forEach(trackId => {
+                      plOpsBody.uris.push(`spotify:track:${trackId}`)
+                    });
+                  }
+                  this.spotifyService.SpotifyCommonPostApi(plOpsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
+                    console.log(addedItemsResponse);
+                    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'New playlist created successfully.' });
+                    this.router.navigate(['/spotify/playlists']);
+                  })
+                };
+              });
+
+            });
           };
         });
       }

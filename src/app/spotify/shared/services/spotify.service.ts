@@ -119,11 +119,17 @@ export class SpotifyService {
   SpotifyCommonGetApi(url: string, token: string): Observable<any> {
     return this.http.get<any>(url, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
   }
-  SpotifyCommonPutApi(url: string,body:any, token: string): Observable<any> {
-    return this.http.put<any>(url,body, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
+  SpotifyCommonPutApi(url: string, body: any, token: string): Observable<any> {
+    return this.http.put<any>(url, body, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
   }
-  SpotifyCommonPostApi(url: string,body:any, token: string): Observable<any> {
-    return this.http.post<any>(url,body, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
+  SpotifyCommonPostApi(url: string, body: any, token: string): Observable<any> {
+    return this.http.post<any>(url, body, { headers: this.headers.set('Authorization', `Bearer ${token}`) });
+  }
+  SpotifyCommonDeleteApi(url: string, body: any, token: string): Observable<any> {
+    return this.http.delete<any>(url, {
+      headers: this.headers.set('Authorization', `Bearer ${token}`),
+      body: body
+    });
   }
 
 
