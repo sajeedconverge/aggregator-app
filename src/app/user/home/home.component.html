@@ -88,7 +88,7 @@
                     <p-button label="Save" severity="success" [disabled]="isADSaved" (click)="saveActivityDetails()"
                         icon="pi pi-save" iconPos="right" />
 
-                    <p-button (click)="showDetails=false && isADSaved=false" class="ml-2">Back</p-button>
+                    <p-button (click)="fetchActivitiesFromDb()" class="ml-2">Back</p-button>
                 </div>
             </div>
 

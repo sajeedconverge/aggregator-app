@@ -213,10 +213,10 @@ export class HomeComponent implements OnInit, OnDestroy {
           const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
           if (!stravaAccessToken) {
             this.showAudioFeatures = true;
-           this.messageService.add({ severity: 'warn', summary: 'Failure', detail: 'Details of the Activity is not saved and the Strava is not linked.' });
+            this.messageService.add({ severity: 'warn', summary: 'Failure', detail: 'Details of the Activity is not saved and the Strava is not linked.' });
             this.isLoading = false;
           };
-
+          // debugger;
           if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
             this.getRecentlyPlayedAudio(activityTime, activityUrl, spotifyAccessToken, stravaAccessToken);
           } else {
@@ -250,7 +250,9 @@ export class HomeComponent implements OnInit, OnDestroy {
             //track.end_time = Constants.getTrackEndTime(track.played_at, track.track.duration_ms);
           });
           console.log("this.recentAudio", this.recentAudio);
-
+          //to filter out the activities with no tracks
+          // console.log("the last recentAudio", this.recentAudio[(this.recentAudio.length) - 1]);
+          this.athleteActivities = this.athleteActivities.filter(activity => activity.end_date >= this.recentAudio[(this.recentAudio.length) - 1].start_time);
           //to pair the activity and song
           if (stravaAccessToken.length > 0 && Constants.stravaSettings.clientId !== 0) {
             this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
@@ -272,13 +274,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   pairItems(activities: any[], tracks: any[]) {
     const result: { activity: any, tracks: any[] }[] = [];
     activities.forEach(activity => {
-      const activityStartDate = new Date(activity.start_date).getTime();
-      const activityEndDate = new Date(activity.end_date).getTime();
+      //const activityStartDate = new Date(activity.start_date).getTime();
+      //const activityEndDate = new Date(activity.end_date).getTime();
 
-      const matchedTracks = tracks.filter(track => {
-        const trackStartDate = new Date(track.start_time).getTime();
-        return trackStartDate >= activityStartDate || trackStartDate <= activityEndDate;
-      });
+      // const matchedTracks = tracks.filter(track => {
+      //   const trackStartDate = new Date(track.start_time).getTime();
+      //   return trackStartDate >= activityStartDate || trackStartDate <= activityEndDate;
+      // });
+
+      const matchedTracks = Constants.assignRecentAudioToActivity(activity, this.recentAudio);
+      //console.log('matchedTracks2', matchedTracks);
+
       result.push({ activity, tracks: matchedTracks });
     });
 
@@ -382,7 +388,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               // for (let index = (startDistObject?.index || 0); index < (endDistObject?.index || 0); index++) {
               //   movingTimeMs += mappedStream[index].duration_increment_ms;
               // };
-              movingTimeMs = (endDistObject?.duration_increment_ms)-(startDistObject?.duration_increment_ms)
+              movingTimeMs = (endDistObject?.duration_increment_ms) - (startDistObject?.duration_increment_ms)
 
               track.moving_time = Constants.formatDuration(Math.min(movingTimeMs, track.track.duration_ms));
               //track.moving_time = Constants.formatDuration(movingTimeMs);
@@ -390,8 +396,8 @@ export class HomeComponent implements OnInit, OnDestroy {
               var hoursTime = (Math.min(movingTimeMs, track.track.duration_ms)) / (1000 * 60 * 60);
               track.speed = (track.distance / (hoursTime));
 
-              track.pace = (track.speed>0) ? (1000 / ((track.distance*1000)/(Math.min(movingTimeMs/1000, track.track.duration_ms/1000)))):0;
-              track.pace = Constants.formatDuration(track.pace*1000);
+              track.pace = (track.speed > 0) ? (1000 / ((track.distance * 1000) / (Math.min(movingTimeMs / 1000, track.track.duration_ms / 1000)))) : 0;
+              track.pace = Constants.formatDuration(track.pace * 1000);
             });
 
 
@@ -424,6 +430,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.spotifyService.postTrack(PostTrackRequest).subscribe((postTrackResponse) => {
         if (postTrackResponse.statusCode === 200) {
           console.log("track added successfully.");
+
         }
       });
 
@@ -436,6 +443,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
     this.stravaService.postActivityDetail(activityDetailRequest).subscribe((adResponse) => {
       if (adResponse.statusCode === 200) {
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Activity details saved successfully.' });
         console.log("actvity detail added successfully.");
         this.isADSaved = true;
         this.isLoading = false;
@@ -450,23 +458,52 @@ export class HomeComponent implements OnInit, OnDestroy {
 
 
   fetchActivitiesFromDb() {
+    this.showDetails = false;
+    this.isADSaved = false;
+
     this.isLoading = true;
-    this.stravaService.getAllActivities().subscribe((actResponse) => {
-      if (actResponse.statusCode === 200) {
-        actResponse.payload.forEach((activity: any) => {
-          activity.jsonData.isSaved = true; //Boolean value to differenciate that it is from db
-          this.athleteActivities.push(activity.jsonData)
-        });
-        this.athleteActivities.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
-        //console.log(actResponse);
-        console.log("db fetched activities", this.athleteActivities);
+    var unfilteredActivites: any[] = [];
+    setTimeout(() => {
+      this.stravaService.getAllActivities().subscribe((actResponse) => {
+        if (actResponse.statusCode === 200) {
+          this.isLoading = true;
+          actResponse.payload.forEach((activity: any) => {
+            activity.jsonData.isSaved = true; //Boolean value to differenciate that it is from db
+            unfilteredActivites.push(activity.jsonData)
+          });
+          unfilteredActivites.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
+          //console.log(actResponse);
+          let lastActivityTime = unfilteredActivites[(unfilteredActivites.length) - 1].start_date;
+          this.spotifyService.getSpotifyRecentlyPlayedUrl(lastActivityTime).subscribe((rpRes) => {
+            if (rpRes.statusCode === 200) {
+              this.isLoading = true;
+              var recentlyPlayedUrl = rpRes.payload;
+              const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+              this.spotifyService.SpotifyCommonGetApi(recentlyPlayedUrl, spotifyAccessToken).subscribe((audioResponse) => {
+                this.recentAudio = audioResponse.items;
+                //To calculate track start time
+                this.recentAudio.forEach(track => {
+                  track.start_time = Constants.getTrackStartTime(track.played_at, track.track.duration_ms);
+                  //track.end_time = Constants.getTrackEndTime(track.played_at, track.track.duration_ms);
+                });
+                //console.log("this.recentAudio", this.recentAudio);
+                //to filter out the activities with no tracks
+                this.athleteActivities = unfilteredActivites.filter(activity => activity.end_date >= this.recentAudio[(this.recentAudio.length) - 1].start_time);
+              });
+            };
+            this.showData = true;
+            this.isLoading = false;
+          });
+          console.log("db fetched activities", this.athleteActivities);
 
-      } else if (actResponse.statusCode === 404) {
+        } else if (actResponse.statusCode === 404) {
+          this.showData = true;
+          this.isLoading = false;
+        };
 
-      };
-      this.showData = true;
-      this.isLoading = false;
-    });
+      });
+    }, 1500);
+
   }
 
   getSavedADAndPairAudio(activityId: number, activityTime: any) {
@@ -508,7 +545,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
   }
 
-  formatTrackDuration(durationMs:number){
+  formatTrackDuration(durationMs: number) {
     return Constants.formatDuration(durationMs);
   }
 

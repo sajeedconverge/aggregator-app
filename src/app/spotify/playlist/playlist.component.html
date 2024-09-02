@@ -18,15 +18,29 @@
         <div class="flex flex-1 playlist_pagetitle justify-content-center m-2 px-5 py-3">
             <h2>Playlists</h2>
         </div>
+        <div class="m-3 btn_grp_short">
+            <!-- <label>{{isGrid? 'Grid':'List'}}</label> -->
+            <!-- @if(isGrid){
+            <i class="pi pi-th-large"></i>
+            }@else{
+            <i class="pi pi-list"></i>
+            }
+            <p-inputSwitch [(ngModel)]="isGrid" /> -->
+
+            <p-buttonGroup class="btn-grp-custom">
+                <p-button  icon="pi pi-th-large" (onClick)="isGrid=true" [outlined]="!isGrid" />
+                <p-button  icon="pi pi-list" (onClick)="isGrid=false"  [outlined]="isGrid" />
+            </p-buttonGroup> 
+        </div>
     </div>
 </section>
 
-<!-- All Playlist section start -->
-<section class="allplaylist" *ngIf="!showTracks && !showAudioFeatures">
+<!-- All Playlist GRID section starts -->
+<section class="allplaylist" *ngIf="isGrid">
     <div class="grid m-0">
 
         @for(playlist of userPlaylists; track playlist.name) {
-        <div class="col-3 all_list_grid p-3 justify-content-center"
+        <div class="col-2 all_list_grid p-3 justify-content-center"
             (click)="getPlayListTracks(playlist.tracks.href,playlist.name,playlist.id,playlist.snapshot_id)">
             <div class="all_listgrid_inner">
 
@@ -35,22 +49,48 @@
                 }@else {
                 <img [src]="playlist?.images[0].url">
                 }
-                <h3>{{playlist.name}}</h3>
+                <h4>{{playlist.name}}</h4>
             </div>
         </div>
         }
 
     </div>
 </section>
-<!-- All Playlist section end -->
+<!-- All Playlist GRID section ends -->
 
+<!-- All Playlist LIST section starts -->
+<section class="allplaylist" *ngIf="!isGrid">
+    <p-table [value]="userPlaylists" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template pTemplate="header">
+            <tr>
+                <th> </th>
+                <th>Playlist Name</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-playlist>
+            <tr>
+                <td>
+                    @if (playlist.images===null) {
+                    <img src="images/defaultPlaylistImage.png"
+                        (click)="getPlayListTracks(playlist.tracks.href,playlist.name,playlist.id,playlist.snapshot_id)"
+                        class="playlist-img-tb">
+                    }@else {
+                    <img [src]="playlist?.images[0].url" class="playlist-img-tb"
+                        (click)="getPlayListTracks(playlist.tracks.href,playlist.name,playlist.id,playlist.snapshot_id)">
+                    }
+                </td>
+                <td>
 
-<!-- <ng-container *ngIf="showTracks">
-    <app-playlist-details [playlistTracks]="playlistTracks" [currentPlayListName]="currentPlayListName"
-    (closeEvent)="closePlaylistDetails($event)"></app-playlist-details>
-</ng-container> -->
+                    <p-button class="anchor_btn" [label]="playlist.name"
+                        (click)="getPlayListTracks(playlist.tracks.href,playlist.name,playlist.id,playlist.snapshot_id)"
+                        [link]="true" />
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
 
-
+</section>
+<!-- All Playlist LIST section ends -->
 
 
 

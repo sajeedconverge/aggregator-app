@@ -187,32 +187,36 @@ export class PlaylistDetailsComponent implements OnInit {
         });
         console.log('this.originalTracks', this.originalTracks);
 
-        // To assign Audio Features to the track
-        this.playlistTracks.forEach((pltrack) => {
-          pltrack.color = Constants.generateRandomPrimeNGColor();
-          this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
-            if (res.statusCode === 200) {
-              var featuresUrl = res.payload;
-              const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-              this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-                pltrack.audioFeatures = res;
+        if (this.playlistTracks.length > 0) {
+          // To assign Audio Features to the track
+          this.playlistTracks.forEach((pltrack) => {
+            pltrack.color = Constants.generateRandomPrimeNGColor();
+            this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
+              if (res.statusCode === 200) {
+                var featuresUrl = res.payload;
+                const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
+                  pltrack.audioFeatures = res;
 
-                this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
-                  if (res.statusCode === 200) {
-                    var analysisUrl = res.payload;
-                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                    this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                      pltrack.audioAnalysis = res;
-                    });
-                  }
+                  this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
+                    if (res.statusCode === 200) {
+                      var analysisUrl = res.payload;
+                      const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                      this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+                        pltrack.audioAnalysis = res;
+                      });
+                    }
+                  });
+
                 });
-
-              });
-            }
+              }
+            });
           });
-        });
-
-        this.generateChart(this.playlistTracks);
+          this.generateChart(this.playlistTracks);
+        } else {
+          this.showGraph = false;
+          this.isLoading = false;
+        }
       });
     };
   }
@@ -245,7 +249,7 @@ export class PlaylistDetailsComponent implements OnInit {
     });
   }
   updatePlaylist() {
-    this.isLoading=true;
+    this.isLoading = true;
     var playlistId = sessionStorage.getItem('playlist-id') || '';
     this.spotifyService.getPlaylistOpsUrl(playlistId).subscribe((res) => {
       if (res.statusCode === 200) {
@@ -262,9 +266,8 @@ export class PlaylistDetailsComponent implements OnInit {
           removeItemsBody.tracks.push(bodyItem);
         });
         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-        debugger;
-        this.spotifyService.SpotifyCommonDeleteApi(opsUrl, removeItemsBody,spotifyAccessToken).subscribe((removeItemsRes) => {
-          
+        this.spotifyService.SpotifyCommonDeleteApi(opsUrl, removeItemsBody, spotifyAccessToken).subscribe((removeItemsRes) => {
+
           //Code to add new items to the playlist
           let plOpsBody: any = {
             uris: [],
@@ -280,7 +283,7 @@ export class PlaylistDetailsComponent implements OnInit {
             });
           }
           this.spotifyService.SpotifyCommonPostApi(opsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
-           
+
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Changes updated successfully.' });
             this.router.navigate(['/spotify/playlists']);
           })
