@@ -117,7 +117,7 @@ export class StravaService {
       .pipe(
         map(response => {
           // Parse the jsonData property for each track
-          response.payload = response.payload.map((activityDetail: any) => {
+          response.payload = response.payload?.map((activityDetail: any) => {
             activityDetail.jsonData = Constants.convertToValidJson(activityDetail.jsonData);
             return activityDetail;
           });

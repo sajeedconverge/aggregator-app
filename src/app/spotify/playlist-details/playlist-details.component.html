@@ -4,7 +4,11 @@
 <p-confirmDialog />
 <!-- Playlist Tracks List -->
 <div class="palylist_table" *ngIf=" !showAudioFeatures">
-    <p-table [value]="playlistTracks" [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered()"
+    <p-table [value]="playlistTracks" 
+    [rows]="10"
+        [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="playlistTracks.length"
+        [paginator]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered()"
         (onSort)="tableSorted($event)">
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
