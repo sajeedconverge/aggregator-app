@@ -494,7 +494,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             this.showData = true;
             this.isLoading = false;
           });
-          console.log("db fetched activities", this.athleteActivities);
+          //console.log("db fetched activities", this.athleteActivities);
 
         } else if (actResponse.statusCode === 404) {
           this.showData = true;

@@ -185,7 +185,7 @@ export class PlaylistDetailsComponent implements OnInit {
         this.playlistTracks.forEach(plTrack => {
           this.originalTracks.push(plTrack.track.id)
         });
-        console.log('this.originalTracks', this.originalTracks);
+        //console.log('this.originalTracks', this.originalTracks);
 
         if (this.playlistTracks.length > 0) {
           // To assign Audio Features to the track
@@ -297,13 +297,53 @@ export class PlaylistDetailsComponent implements OnInit {
 
   tableReordered() {
     this.reOrderedTracks = [];
-    console.log('Reordered', this.playlistTracks);
+    //console.log('Reordered', this.playlistTracks);
     this.generateChart(this.playlistTracks);
     this.playlistTracks.forEach(plTrack => {
       this.reOrderedTracks.push(plTrack.track.id)
     });
-    console.log('this.reOrderedTracks', this.reOrderedTracks);
+    //console.log('this.reOrderedTracks', this.reOrderedTracks);
   }
+
+  tableSorted(event: any) {
+    let field = event.field;
+    let order = event.order;
+    this.reOrderedTracks = [];
+
+    const getFieldValue = (obj: any, field: string) => {
+      return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
+    };
+
+    this.playlistTracks.sort((a, b) => {
+      const valueA = getFieldValue(a, field);
+      const valueB = getFieldValue(b, field);
+      // Handling undefined values
+      if (valueA === undefined) return 1;  // Consider undefined as larger
+      if (valueB === undefined) return -1;
+      // Comparison logic based on field type
+      let comparison = 0;
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        // For strings, use localeCompare for proper alphabetical order
+        comparison = valueA.localeCompare(valueB);
+      } else if (typeof valueA === 'number' && typeof valueB === 'number') {
+        // For numbers, directly compare
+        comparison = valueA - valueB;
+      } else if (valueA < valueB) {
+        comparison = -1;
+      } else if (valueA > valueB) {
+        comparison = 1;
+      }
+      return comparison * order; // Apply the sort order: 1 for ascending, -1 for descending
+    });
+
+    //console.log('Sorted', this.playlistTracks);
+    this.generateChart(this.playlistTracks);
+    this.playlistTracks.forEach(plTrack => {
+      this.reOrderedTracks.push(plTrack.track.id)
+    });
+    //console.log('this.reOrderedTracks', this.reOrderedTracks);
+  }
+
 
   generateChart(playlistTracks: any[]) {
     this.isLoading = true;
@@ -357,7 +397,7 @@ export class PlaylistDetailsComponent implements OnInit {
       });
       this.isLoading = false;
       this.showGraph = true;
-      console.log('data', this.data);
+      //console.log('data', this.data);
     }, 3000);
   }
 
@@ -367,7 +407,7 @@ export class PlaylistDetailsComponent implements OnInit {
     var userId = this.authService.getUserIdFromToken();
     this.spotifyService.getSpotifyUser(userId).subscribe((mapRes) => {
       if (mapRes.statusCode === 200) {
-        console.log(mapRes);
+        //console.log(mapRes);
         var spotifyUserId = mapRes.payload.spotifyUserId
         this.spotifyService.getCreateNewPlaylistUrl(spotifyUserId).subscribe((urlRes) => {
           if (urlRes.statusCode === 200) {
@@ -398,7 +438,7 @@ export class PlaylistDetailsComponent implements OnInit {
                     });
                   }
                   this.spotifyService.SpotifyCommonPostApi(plOpsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
-                    console.log(addedItemsResponse);
+                    // console.log(addedItemsResponse);
                     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'New playlist created successfully.' });
                     this.router.navigate(['/spotify/playlists']);
                   })
@@ -413,7 +453,11 @@ export class PlaylistDetailsComponent implements OnInit {
 
   }
 
-
+  navigateToTrackDetails(trackName: string, trackId: string) {
+    sessionStorage.setItem('track-name', trackName);
+    sessionStorage.setItem('track-id', trackId);
+    this.router.navigate(['/spotify/audio-details']);
+  }
 
 
 

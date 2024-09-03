@@ -5,7 +5,7 @@
 <!-- Playlist Tracks List -->
 <div class="palylist_table" *ngIf=" !showAudioFeatures">
     <p-table [value]="playlistTracks" [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered()"
-        (onSort)="tableReordered()">
+        (onSort)="tableSorted($event)">
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <h3>Tracks</h3>
@@ -35,11 +35,11 @@
                 </th>
                 <th pSortableColumn="track.name">
                     Title
-                    <!-- <p-sortIcon field="track.name" /> -->
+                    <p-sortIcon field="track.name" />
                 </th>
                 <th pSortableColumn="track.artists[0].name">
                     Artist
-                    <!-- <p-sortIcon field="track.artists[0].name" /> -->
+                    <p-sortIcon field="track.artists[0].name" />
                 </th>
                 <th pSortableColumn="track.duration_ms">
                     Duration
@@ -71,7 +71,7 @@
                 <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
                 <td>
-                    <p-button class="anchor_btn" [label]="track.track.name" [link]="true" />
+                    <p-button class="anchor_btn" [label]="track.track.name" [link]="true" (onClick)="navigateToTrackDetails(track.track.name,track.track.id)" />
                     <!-- <p-button class="anchor_btn" (click)="getAudioFeatures(track.track.id, track.track.name)"
                         [label]="track.track.name" [link]="true" /> -->
                 </td>
