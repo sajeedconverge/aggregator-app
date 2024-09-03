@@ -11,20 +11,25 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { PlaylistDetailsComponent } from '../playlist-details/playlist-details.component';
 import { Router } from '@angular/router';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { FormsModule } from '@angular/forms';
+import { ButtonGroupModule } from 'primeng/buttongroup';
+
+
 
 @Component({
   selector: 'app-playlist',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ProgressBarComponent,
     MessagesModule,
     TableModule,
     ButtonModule,
     PlaylistDetailsComponent,
-
-
-
+    InputSwitchModule,
+    ButtonGroupModule
   ],
   templateUrl: './playlist.component.html',
   styleUrl: './playlist.component.css'
@@ -43,7 +48,7 @@ export class PlaylistComponent implements OnInit {
   showAudioFeatures: boolean = false;
   audioFeatures: any[] = [];
   currentTrackName: string = '';
-
+  isGrid: boolean = true;
 
 
 
@@ -107,7 +112,7 @@ export class PlaylistComponent implements OnInit {
         var playlistsUrl = res.payload;
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
-          //console.log(this.userPlaylists);
+          // console.log(this.userPlaylists);
 
         });
         this.isLoading = false;
@@ -115,9 +120,11 @@ export class PlaylistComponent implements OnInit {
     })
   }
 
-  getPlayListTracks(url: string, playlistName: string) {
+  getPlayListTracks(url: string, playlistName: string,id:string,snapShotId:string) {
     sessionStorage.setItem('playlist-items-url' , url);
     sessionStorage.setItem('playlist-name' , playlistName);
+    sessionStorage.setItem('playlist-id' , id);
+    sessionStorage.setItem('playlist-snapshot-id' , snapShotId);
     this.router.navigate(['/spotify/playlist-details'])
   }
 

@@ -12,6 +12,17 @@ import { HttpHeaders } from '@angular/common/http';
 import { ChartModule } from 'primeng/chart';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { InputTextModule } from 'primeng/inputtext';
+import { AuthService } from '../../user/shared/services/auth.service';
+
+
+
+
+
+
 
 @Component({
   selector: 'app-playlist-details',
@@ -24,10 +35,19 @@ import { FormsModule } from '@angular/forms';
     TableModule,
     ButtonModule,
     ChartModule,
-    InputSwitchModule
+    InputSwitchModule,
+    DialogModule,
+    ConfirmDialogModule,
+    InputTextModule
+
+
+
   ],
   templateUrl: './playlist-details.component.html',
-  styleUrl: './playlist-details.component.css'
+  styleUrl: './playlist-details.component.css',
+  providers: [
+    ConfirmationService
+  ]
 })
 export class PlaylistDetailsComponent implements OnInit {
   audioFeatures: any[] = [];
@@ -38,91 +58,81 @@ export class PlaylistDetailsComponent implements OnInit {
   checkInterval: any;
   isLoading: boolean = false;
   data: any;
-  options: any;
   showGraph: boolean = false;
+  documentStyle = getComputedStyle(document.documentElement);
+  textColor = this.documentStyle.getPropertyValue('--text-color');
+  textColorSecondary = this.documentStyle.getPropertyValue('--text-color-secondary');
+  surfaceBorder = this.documentStyle.getPropertyValue('--surface-border');
+  options: any = {
+    maintainAspectRatio: false,
+    aspectRatio: 0.6,
+    plugins: {
+      legend: {
+        labels: {
+          color: this.textColor
+        }
+      },
+
+      tooltip: {
+        callbacks: {
+          // Customize the label in the tooltip
+          label: function (context: any) {
+            return `(${context.dataset.tracks[context.parsed.x]}) - ${context.dataset.label}:${context.raw}`; // Customize label
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: this.textColorSecondary
+        },
+        grid: {
+          color: this.surfaceBorder,
+          drawBorder: false
+        }
+      },
+      y: {
+        ticks: {
+          color: this.textColorSecondary
+        },
+        grid: {
+          color: this.surfaceBorder,
+          drawBorder: false
+        }
+      }
+    }
+  };
+  plNameVisible: boolean = false;
+  playlistName: string = '';
+  originalTracks: string[] = [];
+  reOrderedTracks: string[] = [];
 
 
 
   constructor(
     private spotifyService: SpotifyService,
     private spotifyAuthService: SpotifyAuthorizationService,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService,
+    private authService: AuthService
   ) {
     this.fetchThirdPartyDetails();
     this.startCheckingToken();
   }
 
   ngOnInit(): void {
-    const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-color');
-    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-    this.data = {
-      labels: ['0:00:00'],
-      datasets: [
-        {
-          label: 'Tempo',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--blue-500'),
-          tension: 0.4
-        },
-        {
-          label: 'Mode',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--pink-500'),
-          tension: 0.4
-        },
-        {
-          label: 'Key',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--teal-500'),
-          tension: 0.4
-        },
-        {
-          label: 'Loudness',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--orange-500'),
-          tension: 0.4
-        }
-      ]
-    };
+  }
 
-    this.options = {
-      maintainAspectRatio: false,
-      aspectRatio: 0.6,
-      plugins: {
-        legend: {
-          labels: {
-            color: textColor
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: textColorSecondary
-          },
-          grid: {
-            color: surfaceBorder,
-            drawBorder: false
-          }
-        },
-        y: {
-          ticks: {
-            color: textColorSecondary
-          },
-          grid: {
-            color: surfaceBorder,
-            drawBorder: false
-          }
-        }
-      }
-    };
+  getSegmentColor(ctx: any, datasetIndex: number) {
+    const { p0 } = ctx;
+    const index = p0.parsed.x;  // Index of the current data point
+    const color = this.data.datasets[datasetIndex].colors[index];  // Get color for the segment
+
+    //return color ;  // Default color if not set
+    return this.documentStyle.getPropertyValue(color);
   }
 
   ngOnDestroy(): void {
@@ -172,55 +182,41 @@ export class PlaylistDetailsComponent implements OnInit {
       this.isLoading = true;
       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {
         this.playlistTracks = resp.items;
-
-
-        // To assign Audio Features to the track
-        this.playlistTracks.forEach((pltrack) => {
-          this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
-            if (res.statusCode === 200) {
-              var featuresUrl = res.payload;
-              const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-              this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-                pltrack.audioFeatures = res;
-
-                this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
-                  if (res.statusCode === 200) {
-                    var analysisUrl = res.payload;
-                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                    this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                      pltrack.audioAnalysis = res;
-                    });
-                  }
-                });
-
-              });
-            }
-          });
+        this.playlistTracks.forEach(plTrack => {
+          this.originalTracks.push(plTrack.track.id)
         });
+        //console.log('this.originalTracks', this.originalTracks);
 
-        console.log('original', this.playlistTracks);
-        var durationSum = 0;
-        setTimeout(() => {
-          this.playlistTracks.forEach(pltrack => {
-            pltrack.audioAnalysis.sections.forEach((section: any) => {
-              durationSum = durationSum + ((section.duration) * 1000);
-              //duration
-              this.data.labels.push(`${pltrack?.track.name} ${Constants.formatMilliseconds(durationSum)}`);
-              //tempo
-              this.data.datasets[0].data.push(section.tempo);
-              //mode
-              this.data.datasets[1].data.push(section.mode);
-              //key
-              this.data.datasets[2].data.push(section.key);
-              //loudness
-              this.data.datasets[3].data.push(section.loudness);
+        if (this.playlistTracks.length > 0) {
+          // To assign Audio Features to the track
+          this.playlistTracks.forEach((pltrack) => {
+            pltrack.color = Constants.generateRandomPrimeNGColor();
+            this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
+              if (res.statusCode === 200) {
+                var featuresUrl = res.payload;
+                const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
+                  pltrack.audioFeatures = res;
+
+                  this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
+                    if (res.statusCode === 200) {
+                      var analysisUrl = res.payload;
+                      const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                      this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+                        pltrack.audioAnalysis = res;
+                      });
+                    }
+                  });
+
+                });
+              }
             });
           });
+          this.generateChart(this.playlistTracks);
+        } else {
+          this.showGraph = false;
           this.isLoading = false;
-          this.showGraph = true;
-        }, 2000);
-
-        // console.log('data', this.data);
+        }
       });
     };
   }
@@ -234,14 +230,125 @@ export class PlaylistDetailsComponent implements OnInit {
     this.router.navigate(['/spotify/playlists'])
   }
 
+  confirmUpdatePlaylist() {
+    this.confirmationService.confirm({
+      //target: event.target as EventTarget,
+      message: 'Are you sure that you want to proceed?',
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptIcon: "none",
+      rejectIcon: "none",
+      rejectButtonStyleClass: "p-button-text",
+      accept: () => {
+        //this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' });
+        this.updatePlaylist();
+      },
+      reject: () => {
+        // this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+      }
+    });
+  }
   updatePlaylist() {
-    console.log('Reordered', this.playlistTracks);
+    this.isLoading = true;
+    var playlistId = sessionStorage.getItem('playlist-id') || '';
+    this.spotifyService.getPlaylistOpsUrl(playlistId).subscribe((res) => {
+      if (res.statusCode === 200) {
+        var opsUrl = res.payload;
+        //console.log(opsUrl);
+        let removeItemsBody: any = {
+          tracks: [],
+          snapshot_id: sessionStorage.getItem('playlist-snapshot-id')
+        };
+        this.originalTracks.forEach(trackId => {
+          let bodyItem = {
+            uri: `spotify:track:${trackId}`
+          };
+          removeItemsBody.tracks.push(bodyItem);
+        });
+        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+        this.spotifyService.SpotifyCommonDeleteApi(opsUrl, removeItemsBody, spotifyAccessToken).subscribe((removeItemsRes) => {
+
+          //Code to add new items to the playlist
+          let plOpsBody: any = {
+            uris: [],
+            position: 0
+          };
+          if (this.reOrderedTracks.length != 0) {
+            this.reOrderedTracks.forEach(trackId => {
+              plOpsBody.uris.push(`spotify:track:${trackId}`)
+            });
+          } else {
+            this.originalTracks.forEach(trackId => {
+              plOpsBody.uris.push(`spotify:track:${trackId}`)
+            });
+          }
+          this.spotifyService.SpotifyCommonPostApi(opsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
+
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Changes updated successfully.' });
+            this.router.navigate(['/spotify/playlists']);
+          })
+
+
+        })
+
+      }
+    })
   }
 
-  tableReordered(){
+  tableReordered() {
+    this.reOrderedTracks = [];
+    //console.log('Reordered', this.playlistTracks);
+    this.generateChart(this.playlistTracks);
+    this.playlistTracks.forEach(plTrack => {
+      this.reOrderedTracks.push(plTrack.track.id)
+    });
+    //console.log('this.reOrderedTracks', this.reOrderedTracks);
+  }
+
+  tableSorted(event: any) {
+    let field = event.field;
+    let order = event.order;
+    this.reOrderedTracks = [];
+
+    const getFieldValue = (obj: any, field: string) => {
+      return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
+    };
+
+    this.playlistTracks.sort((a, b) => {
+      const valueA = getFieldValue(a, field);
+      const valueB = getFieldValue(b, field);
+      // Handling undefined values
+      if (valueA === undefined) return 1;  // Consider undefined as larger
+      if (valueB === undefined) return -1;
+      // Comparison logic based on field type
+      let comparison = 0;
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        // For strings, use localeCompare for proper alphabetical order
+        comparison = valueA.localeCompare(valueB);
+      } else if (typeof valueA === 'number' && typeof valueB === 'number') {
+        // For numbers, directly compare
+        comparison = valueA - valueB;
+      } else if (valueA < valueB) {
+        comparison = -1;
+      } else if (valueA > valueB) {
+        comparison = 1;
+      }
+      return comparison * order; // Apply the sort order: 1 for ascending, -1 for descending
+    });
+
+    //console.log('Sorted', this.playlistTracks);
+    this.generateChart(this.playlistTracks);
+    this.playlistTracks.forEach(plTrack => {
+      this.reOrderedTracks.push(plTrack.track.id)
+    });
+    //console.log('this.reOrderedTracks', this.reOrderedTracks);
+  }
+
+
+  generateChart(playlistTracks: any[]) {
+    this.isLoading = true;
     this.showGraph = false;
-    const documentStyle = getComputedStyle(document.documentElement);
-// To reset data
+    // To reset data
     this.data = {
       labels: ['0:00:00'],
       datasets: [
@@ -249,52 +356,136 @@ export class PlaylistDetailsComponent implements OnInit {
           label: 'Tempo',
           data: [0],
           fill: false,
-          borderColor: documentStyle.getPropertyValue('--blue-500'),
-          tension: 0.4
-        },
-        {
-          label: 'Mode',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--pink-500'),
-          tension: 0.4
-        },
-        {
-          label: 'Key',
-          data: [0],
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--teal-500'),
-          tension: 0.4
+          borderColor: this.documentStyle.getPropertyValue('--blue-500'),
+          tension: 0.4,
+          tracks: [],
+          colors: [],  // Add an array to store color information
+          segment: {
+            borderColor: (ctx: any) => this.getSegmentColor(ctx, 0)  // Pass dataset index to getSegmentColor
+          }
         },
         {
           label: 'Loudness',
           data: [0],
           fill: false,
-          borderColor: documentStyle.getPropertyValue('--orange-500'),
-          tension: 0.4
+          borderColor: this.documentStyle.getPropertyValue('--orange-500'),
+          tension: 0.4,
+          tracks: [],
+          colors: [],  // Add an array to store color information
+          segment: {
+            borderColor: (ctx: any) => this.getSegmentColor(ctx, 1)  // Pass dataset index to getSegmentColor
+          }
         }
       ]
     };
-    console.log('Reordered', this.playlistTracks);
-    
     var durationSum = 0;
-        setTimeout(() => {
-          this.playlistTracks.forEach(pltrack => {
-            pltrack.audioAnalysis.sections.forEach((section: any) => {
-              durationSum = durationSum + ((section.duration) * 1000);
-              //duration
-              this.data.labels.push(`${pltrack?.track.name} ${Constants.formatMilliseconds(durationSum)}`);
-              //tempo
-              this.data.datasets[0].data.push(section.tempo);
-              //mode
-              this.data.datasets[1].data.push(section.mode);
-              //key
-              this.data.datasets[2].data.push(section.key);
-              //loudness
-              this.data.datasets[3].data.push(section.loudness);
-            });
-          });
-          this.showGraph = true;
-        }, 2000);
+    setTimeout(() => {
+      playlistTracks.forEach(pltrack => {
+        pltrack.audioAnalysis.sections.forEach((section: any) => {
+          durationSum = durationSum + ((section.duration) * 1000);
+          //duration
+          this.data.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
+          //tempo
+          this.data.datasets[0].data.push(section.tempo);
+          this.data.datasets[0].tracks.push(pltrack.track.name);
+          this.data.datasets[0].colors.push(pltrack.color);
+          //loudness
+          this.data.datasets[1].data.push(section.loudness);
+          this.data.datasets[1].tracks.push(pltrack.track.name);
+          this.data.datasets[1].colors.push(pltrack.color);
+        });
+      });
+      this.isLoading = false;
+      this.showGraph = true;
+      //console.log('data', this.data);
+    }, 3000);
   }
+
+  createNewPlaylist() {
+    this.plNameVisible = false;
+    this.isLoading = true;
+    var userId = this.authService.getUserIdFromToken();
+    this.spotifyService.getSpotifyUser(userId).subscribe((mapRes) => {
+      if (mapRes.statusCode === 200) {
+        //console.log(mapRes);
+        var spotifyUserId = mapRes.payload.spotifyUserId
+        this.spotifyService.getCreateNewPlaylistUrl(spotifyUserId).subscribe((urlRes) => {
+          if (urlRes.statusCode === 200) {
+            var playlistUrl = urlRes.payload;
+            let body: any = {
+              name: this.playlistName,
+              description: "",
+              public: false
+            };
+            const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+            this.spotifyService.SpotifyCommonPostApi(playlistUrl, body, spotifyAccessToken).subscribe((npResponse) => {
+              var newPlaylistId = npResponse.id;
+              //to push the existing items to the new playlist
+              this.spotifyService.getPlaylistOpsUrl(newPlaylistId).subscribe(ploResponse => {
+                if (ploResponse.statusCode === 200) {
+                  let plOpsUrl = ploResponse.payload;
+                  let plOpsBody: any = {
+                    uris: [],
+                    position: 0
+                  };
+                  if (this.reOrderedTracks.length != 0) {
+                    this.reOrderedTracks.forEach(trackId => {
+                      plOpsBody.uris.push(`spotify:track:${trackId}`)
+                    });
+                  } else {
+                    this.originalTracks.forEach(trackId => {
+                      plOpsBody.uris.push(`spotify:track:${trackId}`)
+                    });
+                  }
+                  this.spotifyService.SpotifyCommonPostApi(plOpsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
+                    // console.log(addedItemsResponse);
+                    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'New playlist created successfully.' });
+                    this.router.navigate(['/spotify/playlists']);
+                  })
+                };
+              });
+
+            });
+          };
+        });
+      }
+    })
+
+  }
+
+  navigateToTrackDetails(trackName: string, trackId: string) {
+    sessionStorage.setItem('track-name', trackName);
+    sessionStorage.setItem('track-id', trackId);
+    this.router.navigate(['/spotify/audio-details']);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

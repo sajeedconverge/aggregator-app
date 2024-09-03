@@ -43,6 +43,13 @@ export class AuthService {
     return decodedToken;
   }
 
+  getUserIdFromToken() {
+    const accessToken = sessionStorage.getItem('access-token') || '';
+    const payload = JSON.parse(atob(accessToken.split('.')[1]));
+    const userId = payload.id;
+    return userId;
+  }
+
   removeToken() {
     sessionStorage.clear();
   }

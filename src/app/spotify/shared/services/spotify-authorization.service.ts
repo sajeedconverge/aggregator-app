@@ -3,6 +3,7 @@ import { Constants } from '../../../shared/Constants';
 import { SpotifyService } from './spotify.service';
 import { AccountService } from '../../../user/shared/services/account.service';
 import { ProviderTokenRequest } from '../../../user/shared/models/user-models';
+import { AuthService } from '../../../user/shared/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,8 @@ export class SpotifyAuthorizationService {
 
   constructor(
     private spotifyService: SpotifyService,
-    private accountService: AccountService
+    private accountService: AccountService,
+    private authService: AuthService
   ) { }
 
 
@@ -58,6 +60,30 @@ export class SpotifyAuthorizationService {
     // Use the new URL to extract the authorization code and get the token
     const authCode = urlObj.searchParams.get('code');
     this.getSpotifyAccessToken(authCode);
+
+    //To get spotify user profile and store id in db
+    setTimeout(() => {
+      this.spotifyService.getUserProfileUrl().subscribe((urlRes) => {
+        if (urlRes.statusCode === 200) {
+          var profileUrl = urlRes.payload;
+          var token = sessionStorage.getItem('spotify-bearer-token') || '';
+          this.spotifyService.SpotifyCommonGetApi(profileUrl, token).subscribe((profileRes) => {
+            //console.log('profileRes', profileRes);
+            var spotifyUserId = profileRes.id;
+            var userId = this.authService.getUserIdFromToken();
+            //console.log('userId', userId);
+            this.spotifyService.mapSpotifyUser(userId, spotifyUserId).subscribe((mapRes) => {
+              if (mapRes.statusCode === 200) {
+                console.log('spotify User mapped successfully.');
+
+              }
+            })
+
+          })
+        }
+      })
+    }, 2000);
+
   }
 
   //#To get access token
