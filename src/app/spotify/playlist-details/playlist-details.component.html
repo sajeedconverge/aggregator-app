@@ -17,7 +17,7 @@
                 <div class="flex flex-row">
                     <div *ngIf="playlistTracks.length > 0">
                         <label class="m-2 pb-2">Show Graph</label>
-                        <p-inputSwitch [(ngModel)]="showGraph" class="mr-2" />
+                        <p-inputSwitch [(ngModel)]="showGraph" (onChange)="showGraphChanged()" class="mr-2" />
                         <p-button class="mr-2" severity="warning" (click)="confirmUpdatePlaylist()"
                             icon="pi pi-play-circle" iconPos="right" label="Save changes"></p-button>
                         <p-button class="mr-2" severity="success" icon="pi pi-play-circle" iconPos="right"
