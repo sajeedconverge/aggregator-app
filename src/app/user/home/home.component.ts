@@ -442,9 +442,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       jsonData: JSON.stringify(activityDetailJson)
     };
     this.stravaService.postActivityDetail(activityDetailRequest).subscribe((adResponse) => {
+      this.isLoading = true;
       if (adResponse.statusCode === 200) {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Activity details saved successfully.' });
         console.log("actvity detail added successfully.");
+        this.fetchActivitiesFromDb();
         this.isADSaved = true;
         this.isLoading = false;
       };
