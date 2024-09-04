@@ -37,3 +37,33 @@ export interface PairedTrackJsonObject {
     trackid:string
     track?:any
 }
+
+export interface PostTrackAnalysisRequest {
+    providerTrackId: string
+    trackAnalysisData: string
+}
+
+export interface TrackAnalysisJsonObject {
+    sections:any[]
+    track:any
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -488,7 +488,8 @@ export class HomeComponent implements OnInit, OnDestroy {
                 });
                 //console.log("this.recentAudio", this.recentAudio);
                 //to filter out the activities with no tracks
-                this.athleteActivities = unfilteredActivites.filter(activity => activity.end_date >= this.recentAudio[(this.recentAudio.length) - 1].start_time);
+                this.athleteActivities = unfilteredActivites;
+                //this.athleteActivities = unfilteredActivites.filter(activity => activity.end_date >= this.recentAudio[(this.recentAudio.length) - 1].start_time);
               });
             };
             this.showData = true;

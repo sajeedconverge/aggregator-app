@@ -4,7 +4,7 @@ import { map, Observable } from 'rxjs';
 import { Constants } from '../../../shared/Constants';
 import { ResponseModel } from '../../../shared/shared-models';
 import { SpotifyAuthorizationService } from './spotify-authorization.service';
-import { PostTrackRequest } from '../models/spotify-models';
+import { PostTrackAnalysisRequest, PostTrackRequest } from '../models/spotify-models';
 
 @Injectable({
   providedIn: 'root'
@@ -101,7 +101,22 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSpotifyUser?userId=${userId}`, { headers: this.headers });
   }
 
+  postTrackAnalysis(request: PostTrackAnalysisRequest): Observable<any> {
+    return this.http.post<any>(Constants.baseServerUrl + 'Spotify/PostTrackAnalysis', request, { headers: this.headers });
+  }
 
+  getTrackAnalysisById(providerId: string): Observable<any> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetTrackAnalysisByProviderId?providerId=${providerId}`, { headers: this.headers })
+      .pipe(
+        map(response => {
+          // Check if payload is an object and has jsonData
+          if (response.payload && typeof response.payload === 'object' && response.payload.analysisJsonData) {
+            response.payload.analysisJsonData = Constants.convertToValidJson(response.payload.analysisJsonData);
+          }
+          return response;
+        })
+      );
+  }
 
 
 

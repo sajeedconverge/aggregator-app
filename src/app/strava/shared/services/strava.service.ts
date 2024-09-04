@@ -112,7 +112,19 @@ export class StravaService {
       );
   }
 
-
+  getActivityDetailsByTrackId(trackId:string): Observable<any> {
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetActivityDetailsByTrackId?trackId=${trackId}`, { headers: this.headers })
+      .pipe(
+        map(response => {
+          // Parse the jsonData property for each track
+          response.payload = response.payload?.map((activityDetail: any) => {
+            activityDetail.jsonData = Constants.convertToValidJson(activityDetail.jsonData);
+            return activityDetail;
+          });
+          return response;
+        })
+      );
+  }
 
 
 

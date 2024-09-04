@@ -1,3 +1,48 @@
 @if(isLoading) {
 <app-progress-bar></app-progress-bar>
 }
+
+<div>
+    <p-table [value]="trackDetails">
+        <ng-template pTemplate="caption">
+            <div class="flex flex-row justify-content-between">
+                <h3>Audio Details</h3>
+                <h3>{{trackName}}</h3>
+                <div class="flex flex-row">
+
+                    <p-button (click)="backToTracks()">Back</p-button>
+                </div>
+            </div>
+            <div>
+                <p-chart type="line" [data]="data1" [options]="options1" *ngIf="showFeaturesGraph" />
+            </div>
+            <div>
+                <p-chart type="line" [data]="data2" [options]="options2" *ngIf="showPaceGraph" />
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Date</th>
+                <th>Distance</th>
+                <th>Pace</th>
+                <th>Speed</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-trackDetail >
+            <tr>
+                <td>{{trackDetail.start_time | date: 'dd-MMM-yyyy hh:mm:ss a'}}</td>
+                <td>{{ trackDetail?.distance | number:'1.2-2' }} km</td>
+                <td>{{ trackDetail?.pace }} /km</td>
+                <td>{{ trackDetail?.speed | number:'1.2-2'}} km/hr</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr class="">
+                <td colspan="10">No history found for the current audio track.</td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+
+
+</div>

@@ -17,6 +17,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '../../user/shared/services/auth.service';
+import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
 
 
 
@@ -182,6 +183,7 @@ export class PlaylistDetailsComponent implements OnInit {
       this.isLoading = true;
       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {
         this.playlistTracks = resp.items;
+        //debugger;
         this.playlistTracks.forEach(plTrack => {
           this.originalTracks.push(plTrack.track.id)
         });
@@ -191,33 +193,82 @@ export class PlaylistDetailsComponent implements OnInit {
           // To assign Audio Features to the track
           this.playlistTracks.forEach((pltrack) => {
             pltrack.color = Constants.generateRandomPrimeNGColor();
-            this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
-              if (res.statusCode === 200) {
-                var featuresUrl = res.payload;
-                const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-                  pltrack.audioFeatures = res;
+            //To get Track features from DB
+            this.spotifyService.getTrackById(pltrack.track.id).subscribe((dbTrackRes) => {
+              if (dbTrackRes.statusCode === 200) {
+                //console.log('track found', dbTrackRes.payload.jsonData.audio_features);
+                pltrack.audioFeatures = dbTrackRes.payload.jsonData.audio_features;
+              } else {
+                //console.log('track not found');
 
-                  this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
-                    if (res.statusCode === 200) {
-                      var analysisUrl = res.payload;
-                      const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                      this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                        pltrack.audioAnalysis = res;
+                //Add track to DB after fwetching it's features
+                this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
+                  if (res.statusCode === 200) {
+                    var featuresUrl = res.payload;
+                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                    this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
+                      pltrack.audioFeatures = res;
+                      //add track to db with it's features
+                      var trackData = pltrack.track;
+                      trackData.audio_features = pltrack.audioFeatures;
+                      var trackJson = Constants.typeCastTrackJson(trackData);
+                      var postTrackRequest: PostTrackRequest = {
+                        providerTrackId: pltrack.track.id,
+                        trackData: JSON.stringify(trackJson)
+                      };
+                      this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
+                        if (postTrackRes.statusCode === 200) {
+                          //console.log("track added successfully.", pltrack.track.name);
+                        };
                       });
-                    }
-                  });
-
+                    });
+                  };
                 });
-              }
+              };
+            });
+            //To get track analysis
+            this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
+              if (taRes.statusCode === 200) {
+                //console.log('track analysis found', taRes.payload.analysisJsonData);
+                pltrack.audioAnalysis = taRes.payload.analysisJsonData;
+              } else {
+                //console.log('track analysis not found');
+                //To fetch track analysis
+                this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
+                  if (res.statusCode === 200) {
+                    var analysisUrl = res.payload;
+                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                    this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+                      pltrack.audioAnalysis = res;
+                      //To add track analysis
+                      var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
+                      var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+                        providerTrackId: pltrack.track.id,
+                        trackAnalysisData: JSON.stringify(trackAnalysis)
+                      };
+                      this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
+                        if (postTrackAnalysisResponse.statusCode === 200) {
+                          //console.log("track analysis added successfully.");
+                        };
+                      });
+                    });
+                  };
+                });
+              };
             });
           });
-          this.generateChart(this.playlistTracks);
+          this.isLoading = false;
         } else {
           this.showGraph = false;
           this.isLoading = false;
         }
       });
+    };
+  }
+
+  showGraphChanged() {
+    if (this.showGraph) {
+      this.generateChart(this.playlistTracks);
     };
   }
 

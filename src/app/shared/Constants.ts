@@ -1,11 +1,11 @@
 import { HttpHeaders } from "@angular/common/http";
-import { PairedTrackJsonObject, SpotifySettings, TrackJsonObject } from "../spotify/shared/models/spotify-models";
+import { PairedTrackJsonObject, SpotifySettings, TrackAnalysisJsonObject, TrackJsonObject } from "../spotify/shared/models/spotify-models";
 import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "../strava/shared/models/strava-models";
 
 export class Constants {
 
-    public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
-    // public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
+    // public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
+    public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     public static spotifySettings: SpotifySettings = {
         clientId: "",
@@ -242,6 +242,14 @@ export class Constants {
         return trackJson
     }
 
+    public static typeCastTrackAnalysisJson(trackAnalysis: any): TrackAnalysisJsonObject {
+        var trackAnalysisJson: TrackAnalysisJsonObject = {
+            sections: trackAnalysis.sections,
+            track: trackAnalysis.track
+        };
+        return trackAnalysisJson
+    }
+
     public static typeCastPairedTrackJson(pairedTrack: any): PairedTrackJsonObject {
         var PairedTrackJson: PairedTrackJsonObject = {
             distance: pairedTrack.distance,
@@ -278,14 +286,14 @@ export class Constants {
 
     public static generateRandomPrimeNGColor(): string {
         const primeNGColors = [
-             '--blue-400', '--blue-600', '--blue-800',
-             '--red-400', '--red-600', '--red-800',
-             '--purple-400', '--purple-600', '--purple-800',
-             '--teal-400', '--teal-600', '--teal-800',
+            '--blue-400', '--blue-600', '--blue-800',
+            '--red-400', '--red-600', '--red-800',
+            '--purple-400', '--purple-600', '--purple-800',
+            '--teal-400', '--teal-600', '--teal-800',
             '--surface-400', '--surface-600',
-             '--indigo-400', '--indigo-600', '--indigo-800',
-             '--green-400', '--green-600', '--green-800',
-             '--orange-400', '--orange-600', '--orange-800',
+            '--indigo-400', '--indigo-600', '--indigo-800',
+            '--green-400', '--green-600', '--green-800',
+            '--orange-400', '--orange-600', '--orange-800',
         ];
         const randomIndex =
             Math.floor(Math.random() * primeNGColors.length);
