@@ -44,8 +44,39 @@ export class TrackDetailsComponent implements OnInit {
   textColor = this.documentStyle.getPropertyValue('--text-color');
   textColorSecondary = this.documentStyle.getPropertyValue('--text-color-secondary');
   surfaceBorder = this.documentStyle.getPropertyValue('--surface-border');
-  data1: any;
-  data2: any;
+  data1: any = {
+    labels: ['0:00:00'],
+    datasets: [
+      {
+        label: 'Tempo',
+        data: [0],
+        fill: false,
+        borderColor: this.documentStyle.getPropertyValue('--blue-500'),
+        tension: 0.4,
+
+      },
+      {
+        label: 'Loudness',
+        data: [0],
+        fill: false,
+        borderColor: this.documentStyle.getPropertyValue('--orange-500'),
+        tension: 0.4,
+
+      }
+    ]
+  };;
+  data2: any = {
+    labels: ['0:00:00'],
+    datasets: [
+      {
+        label: 'Pace',
+        data: [0],
+        fill: false,
+        borderColor: this.documentStyle.getPropertyValue('--red-500'),
+        tension: 0.4,
+      }
+    ]
+  };;
   options1: any = {
     maintainAspectRatio: false,
     aspectRatio: 0.6,
@@ -91,7 +122,7 @@ export class TrackDetailsComponent implements OnInit {
         callbacks: {
           // Customize the label in the tooltip
           label: function (context: any) {
-           // console.log('context',context);
+            // console.log('context',context);
             return `Pace - ${context.formattedValue} /km`; // Customize label
           },
         },
@@ -138,32 +169,16 @@ export class TrackDetailsComponent implements OnInit {
   }
 
   getTrackHistory() {
-    this.isLoading=true;
+    this.isLoading = true;
     this.stravaService.getActivityDetailsByTrackId(this.trackId).subscribe((historyResponse) => {
+      this.isLoading = true;
       if (historyResponse.statusCode === 200) {
         this.activityDetails = historyResponse.payload;
+
         this.activityDetails.forEach(ad => {
           ad.jsonData.audio.forEach((track: any) => {
             if (track.trackid === this.trackId) {
               this.trackDetails.push(track);
-              this.data2 = {
-                labels: ['0:00:00'],
-                datasets: [
-                  {
-                    label: 'Pace',
-                    data: [0],
-                    fill: false,
-                    borderColor: this.documentStyle.getPropertyValue('--red-500'),
-                    tension: 0.4,
-                  }
-                ]
-              };
-              // //to plot the pace chart
-              // //duration
-              // this.data2.labels.push(`${new Date(track.start_time)}`);
-              // //tempo
-              // this.data2.datasets[0].data.push(track.pace);
-
 
               // to plot the pace chart
               // Convert pace string to a numerical value for plotting
@@ -191,11 +206,11 @@ export class TrackDetailsComponent implements OnInit {
             }
           })
         });
-        this.showPaceGraph = true;
-        console.log('this.data2', this.data2);
 
-        console.log('this.trackDetails', this.trackDetails);
-        this.isLoading=false;
+        this.showPaceGraph = true;
+        //console.log('this.data2', this.data2);
+        //console.log('this.trackDetails', this.trackDetails);
+        this.isLoading = false;
       }
     });
   }
@@ -206,35 +221,16 @@ export class TrackDetailsComponent implements OnInit {
 
 
   getTrackAnalysis() {
-    this.isLoading=true;
+
     this.spotifyService.getSpotifyAudioAnalysisUrl(this.trackId).subscribe((urlRes) => {
+      this.isLoading = true;
       if (urlRes.statusCode === 200) {
         var analysisUrl = urlRes.payload;
         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
         this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((analysisResponse) => {
           this.trackAnalysis = analysisResponse;
           //console.log('this.trackAnalysis', this.trackAnalysis);
-          this.data1 = {
-            labels: ['0:00:00'],
-            datasets: [
-              {
-                label: 'Tempo',
-                data: [0],
-                fill: false,
-                borderColor: this.documentStyle.getPropertyValue('--blue-500'),
-                tension: 0.4,
 
-              },
-              {
-                label: 'Loudness',
-                data: [0],
-                fill: false,
-                borderColor: this.documentStyle.getPropertyValue('--orange-500'),
-                tension: 0.4,
-
-              }
-            ]
-          };
           var durationSum = 0;
           this.trackAnalysis.sections.forEach((section: any) => {
             durationSum = durationSum + ((section.duration) * 1000);
@@ -246,7 +242,7 @@ export class TrackDetailsComponent implements OnInit {
             this.data1.datasets[1].data.push(section.loudness);
           });
           this.showFeaturesGraph = true;
-          this.isLoading=false;
+          this.isLoading = false;
         });
       };
     });
