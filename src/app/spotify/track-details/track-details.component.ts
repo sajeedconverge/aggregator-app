@@ -14,6 +14,10 @@ import { StravaService } from '../../strava/shared/services/strava.service';
 import { SpotifyService } from '../shared/services/spotify.service';
 import { Router } from '@angular/router';
 import { Constants } from '../../shared/Constants';
+import { TooltipModule } from 'primeng/tooltip';
+
+
+
 
 @Component({
   selector: 'app-track-details',
@@ -29,7 +33,11 @@ import { Constants } from '../../shared/Constants';
     InputSwitchModule,
     DialogModule,
     ConfirmDialogModule,
-    InputTextModule
+    InputTextModule,
+    TooltipModule,
+
+
+    
   ],
   templateUrl: './track-details.component.html',
   styleUrl: './track-details.component.css'
@@ -207,7 +215,7 @@ export class TrackDetailsComponent implements OnInit {
           })
         });
 
-        this.showPaceGraph = true;
+        //this.showPaceGraph = true;
         //console.log('this.data2', this.data2);
         //console.log('this.trackDetails', this.trackDetails);
         this.isLoading = false;
@@ -241,7 +249,7 @@ export class TrackDetailsComponent implements OnInit {
             //loudness
             this.data1.datasets[1].data.push(section.loudness);
           });
-          this.showFeaturesGraph = true;
+          //this.showFeaturesGraph = true;
           this.isLoading = false;
         });
       };

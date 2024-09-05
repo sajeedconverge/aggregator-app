@@ -8,8 +8,25 @@
             <div class="flex flex-row justify-content-between">
                 <h3>Audio Details</h3>
                 <h3>{{trackName}}</h3>
-                <div class="flex flex-row">
-
+                <div class="flex flex-row ">
+                    <div>
+                        <label class="m-2 pb-2">
+                            <span class="material-symbols-outlined">
+                                equalizer
+                            </span>
+                        </label>
+                        <p-inputSwitch [(ngModel)]="showFeaturesGraph" class="mr-2" pTooltip="Tempo Map"
+                            tooltipPosition="bottom" />
+                    </div>
+                    <div *ngIf="trackDetails.length>0">
+                        <label class="m-2 pb-2">
+                            <span class="material-symbols-outlined">
+                                footprint
+                            </span>
+                        </label>
+                        <p-inputSwitch [(ngModel)]="showPaceGraph" class="mr-2" pTooltip="Pace History"
+                            tooltipPosition="bottom" />
+                    </div>
                     <p-button (click)="backToTracks()">Back</p-button>
                 </div>
             </div>
@@ -28,7 +45,7 @@
                 <th>Speed</th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-trackDetail >
+        <ng-template pTemplate="body" let-trackDetail>
             <tr>
                 <td>{{trackDetail.start_time | date: 'dd-MMM-yyyy hh:mm:ss a'}}</td>
                 <td>{{ trackDetail?.distance | number:'1.2-2' }} km</td>

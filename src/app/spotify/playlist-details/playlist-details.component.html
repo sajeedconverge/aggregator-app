@@ -4,20 +4,36 @@
 <p-confirmDialog />
 <!-- Playlist Tracks List -->
 <div class="palylist_table" *ngIf=" !showAudioFeatures">
-    <p-table [value]="playlistTracks" 
-    [rows]="10"
-        [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="playlistTracks.length"
-        [paginator]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-    [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered()"
-        (onSort)="tableSorted($event)">
+    <p-table [value]="playlistTracks" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+        [totalRecords]="playlistTracks.length" [paginator]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered()" (onSort)="tableSorted($event)">
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <h3>Tracks</h3>
                 <h3>{{currentPlayListName}}</h3>
                 <div class="flex flex-row">
-                    <div *ngIf="playlistTracks.length > 0">
-                        <label class="m-2 pb-2">Show Graph</label>
-                        <p-inputSwitch [(ngModel)]="showGraph" (onChange)="showGraphChanged()" class="mr-2" />
+                    <div class="flex flex-row" *ngIf="playlistTracks.length > 0">
+                        <div style="width: fit-content;">
+                            <!-- <label class="m-2 pb-2">Summary Graph</label> -->
+                            <label class="m-2 pb-2">
+                                <span class="material-symbols-outlined">
+                                    show_chart
+                                </span>
+                            </label>
+                            <p-inputSwitch [(ngModel)]="showSummaryGraph" (onChange)="showSummaryGraphChanged()"
+                                pTooltip="Summary Graph" tooltipPosition="bottom" class="mr-2" />
+                        </div>
+                        <div style="width: fit-content;">
+                            <!-- <label class="m-2 pb-2">Detailed Graph</label> -->
+                            <label class="m-2 pb-2">
+                                <span class="material-symbols-outlined">
+                                    monitoring
+                                </span>
+                            </label>
+                            <p-inputSwitch [(ngModel)]="showDetailedGraph" (onChange)="showGraphChanged()"
+                                pTooltip="Detailed Graph" tooltipPosition="bottom" class="mr-2" />
+                        </div>
                         <p-button class="mr-2" severity="warning" (click)="confirmUpdatePlaylist()"
                             icon="pi pi-play-circle" iconPos="right" label="Save changes"></p-button>
                         <p-button class="mr-2" severity="success" icon="pi pi-play-circle" iconPos="right"
@@ -27,7 +43,10 @@
                 </div>
             </div>
             <div>
-                <p-chart type="line" [data]="data" [options]="options" *ngIf="showGraph" />
+                <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" />
+            </div>
+            <div>
+                <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
             </div>
         </ng-template>
 
@@ -49,21 +68,21 @@
                     Duration
                     <p-sortIcon field="track.duration_ms" />
                 </th>
-                <th pSortableColumn="audioFeatures.tempo">
+                <th pSortableColumn="audio_features.tempo">
                     Tempo
-                    <p-sortIcon field="audioFeatures.tempo" />
+                    <p-sortIcon field="audio_features.tempo" />
                 </th>
-                <th pSortableColumn="audioFeatures.danceability">
+                <th pSortableColumn="audio_features.danceability">
                     Danceability
-                    <p-sortIcon field="audioFeatures.danceability" />
+                    <p-sortIcon field="audio_features.danceability" />
                 </th>
-                <th pSortableColumn="audioFeatures.energy">
+                <th pSortableColumn="audio_features.energy">
                     Energy
-                    <p-sortIcon field="audioFeatures.energy" />
+                    <p-sortIcon field="audio_features.energy" />
                 </th>
-                <th pSortableColumn="audioFeatures.loudness">
+                <th pSortableColumn="audio_features.loudness">
                     Loudness
-                    <p-sortIcon field="audioFeatures.loudness" />
+                    <p-sortIcon field="audio_features.loudness" />
                 </th>
             </tr>
         </ng-template>
@@ -75,16 +94,15 @@
                 <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
                 <td>
-                    <p-button class="anchor_btn" [label]="track.track.name" [link]="true" (onClick)="navigateToTrackDetails(track.track.name,track.track.id)" />
-                    <!-- <p-button class="anchor_btn" (click)="getAudioFeatures(track.track.id, track.track.name)"
-                        [label]="track.track.name" [link]="true" /> -->
+                    <p-button class="anchor_btn" [label]="track.track.name" [link]="true"
+                        (onClick)="navigateToTrackDetails(track.track.name,track.track.id)" />
                 </td>
                 <td>{{track.track.artists[0].name}}</td>
                 <td>{{ formatTrackDuration(track?.track.duration_ms) }}</td>
-                <td>{{ track?.audioFeatures?.tempo}}</td>
-                <td>{{ track?.audioFeatures?.danceability }}</td>
-                <td>{{ track?.audioFeatures?.energy }}</td>
-                <td>{{ track?.audioFeatures?.loudness }}</td>
+                <td>{{ track?.audio_features?.tempo}}</td>
+                <td>{{ track?.audio_features?.danceability }}</td>
+                <td>{{ track?.audio_features?.energy }}</td>
+                <td>{{ track?.audio_features?.loudness }}</td>
                 <!-- <td>
                     <p-button class="anchor_btn" (click)="openInSpotify(track.track.external_urls.spotify)"
                         label="Open in Spotify" [link]="true" />
@@ -100,48 +118,7 @@
 
 </div>
 
-<!-- Audio Features -->
-<!-- <div class="" *ngIf="showAudioFeatures">
-    <p-table [value]="audioFeatures" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }">
-        <ng-template pTemplate="caption">
 
-            <div class="flex flex-row justify-content-between">
-                <h3>Audio Features</h3>
-                <h3>{{currentTrackName}}</h3>
-                <p-button (click)="showAudioFeatures=false">Back</p-button>
-            </div>
-
-        </ng-template>
-        <ng-template pTemplate="header">
-            <tr>
-                <th>Danceability</th>
-                <th>Energy</th>
-                <th>Key </th>
-                <th>Loudness</th>
-                <th>Speechiness</th>
-                <th>Acousticness</th>
-                <th>Liveness</th>
-                <th>Valence</th>
-                <th>Tempo</th>
-                <th>Duration</th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-audioFeature>
-            <tr>
-                <td>{{ audioFeature.danceability }}</td>
-                <td>{{ audioFeature.energy }}</td>
-                <td>{{ audioFeature.key }}</td>
-                <td>{{ audioFeature.loudness }}</td>
-                <td>{{ audioFeature.speechiness }}</td>
-                <td>{{ audioFeature.acousticness }}</td>
-                <td>{{ audioFeature.liveness }}</td>
-                <td>{{ audioFeature.valence }}</td>
-                <td>{{ audioFeature.tempo }}</td>
-                <td>{{ formatTrackDuration(audioFeature.duration_ms) }}</td>
-            </tr>
-        </ng-template>
-    </p-table>
-</div> -->
 
 
 <p-dialog header="Create New Playlist" [modal]="true" [draggable]="false" [(visible)]="plNameVisible"
