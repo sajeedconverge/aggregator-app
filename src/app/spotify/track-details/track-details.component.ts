@@ -191,10 +191,11 @@ export class TrackDetailsComponent implements OnInit {
               // to plot the pace chart
               // Convert pace string to a numerical value for plotting
               const convertPaceToNumber = (pace: string): number => {
+                //debugger;
                 // Assuming pace format is "mm:ss" (minutes:seconds)
                 const parts = pace.split(':').map(part => parseInt(part, 10));
                 // Convert to total seconds
-                return (parts[0] * 60) + parts[1];
+                return (parts[0] * 60) + parts[1] + (parts[2] / 100);
               };
 
               // Add duration to labels
