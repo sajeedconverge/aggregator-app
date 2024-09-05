@@ -18,7 +18,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '../../user/shared/services/auth.service';
 import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
-
+import { TooltipModule } from 'primeng/tooltip';
 
 
 
@@ -39,8 +39,8 @@ import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spo
     InputSwitchModule,
     DialogModule,
     ConfirmDialogModule,
-    InputTextModule
-
+    InputTextModule,
+    TooltipModule,
 
 
   ],
@@ -51,7 +51,6 @@ import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spo
   ]
 })
 export class PlaylistDetailsComponent implements OnInit {
-  audioFeatures: any[] = [];
   playlistTracks: any[] = [];
   currentPlayListName: string = '';
   currentTrackName = '';
@@ -59,7 +58,9 @@ export class PlaylistDetailsComponent implements OnInit {
   checkInterval: any;
   isLoading: boolean = false;
   data: any;
-  showGraph: boolean = false;
+  data2: any;
+  showDetailedGraph: boolean = false;
+  showSummaryGraph: boolean = false;
   documentStyle = getComputedStyle(document.documentElement);
   textColor = this.documentStyle.getPropertyValue('--text-color');
   textColorSecondary = this.documentStyle.getPropertyValue('--text-color-secondary');
@@ -127,14 +128,15 @@ export class PlaylistDetailsComponent implements OnInit {
 
   }
 
-  getSegmentColor(ctx: any, datasetIndex: number) {
+  getSegmentColor(ctx: any, datasetIndex: number,data:any) {
     const { p0 } = ctx;
     const index = p0.parsed.x;  // Index of the current data point
-    const color = this.data.datasets[datasetIndex].colors[index];  // Get color for the segment
+    const color = data.datasets[datasetIndex].colors[index];  // Get color for the segment
 
     //return color ;  // Default color if not set
     return this.documentStyle.getPropertyValue(color);
   }
+  
 
   ngOnDestroy(): void {
     // Ensure to clear the interval if the component is destroyed
@@ -188,6 +190,7 @@ export class PlaylistDetailsComponent implements OnInit {
           this.originalTracks.push(plTrack.track.id)
         });
         //console.log('this.originalTracks', this.originalTracks);
+        //console.log('this.playlistTracks', this.playlistTracks);
 
         if (this.playlistTracks.length > 0) {
           // To assign Audio Features to the track
@@ -197,21 +200,19 @@ export class PlaylistDetailsComponent implements OnInit {
             this.spotifyService.getTrackById(pltrack.track.id).subscribe((dbTrackRes) => {
               if (dbTrackRes.statusCode === 200) {
                 //console.log('track found', dbTrackRes.payload.jsonData.audio_features);
-                pltrack.audioFeatures = dbTrackRes.payload.jsonData.audio_features;
+                pltrack.audio_features = dbTrackRes.payload.jsonData.audio_features;
               } else {
                 //console.log('track not found');
 
-                //Add track to DB after fwetching it's features
+                //Add track to DB after fetching it's features
                 this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
                   if (res.statusCode === 200) {
                     var featuresUrl = res.payload;
                     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
                     this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-                      pltrack.audioFeatures = res;
+                      pltrack.audio_features = res;
                       //add track to db with it's features
-                      var trackData = pltrack.track;
-                      trackData.audio_features = pltrack.audioFeatures;
-                      var trackJson = Constants.typeCastTrackJson(trackData);
+                      var trackJson = Constants.typeCastTrackJson(pltrack);
                       var postTrackRequest: PostTrackRequest = {
                         providerTrackId: pltrack.track.id,
                         trackData: JSON.stringify(trackJson)
@@ -259,7 +260,7 @@ export class PlaylistDetailsComponent implements OnInit {
           });
           this.isLoading = false;
         } else {
-          this.showGraph = false;
+          this.showDetailedGraph = false;
           this.isLoading = false;
         }
       });
@@ -267,9 +268,62 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   showGraphChanged() {
-    if (this.showGraph) {
+    if (this.showDetailedGraph) {
       this.generateChart(this.playlistTracks);
     };
+  }
+
+  showSummaryGraphChanged(){
+    if (this.showSummaryGraph) {
+      this.isLoading = true;
+      this.data2 = {
+        labels: ['0:00:00'],
+        datasets: [
+          {
+            label: 'Tempo',
+            data: [0],
+            fill: false,
+            borderColor: this.documentStyle.getPropertyValue('--blue-500'),
+            tension: 0.4,
+            tracks: [],
+            colors: [],  // Add an array to store color information
+            segment: {
+              borderColor: (ctx: any) => this.getSegmentColor(ctx, 0,this.data2)  // Pass dataset index to getSegmentColor
+            }
+          },
+          {
+            label: 'Loudness',
+            data: [0],
+            fill: false,
+            borderColor: this.documentStyle.getPropertyValue('--orange-500'),
+            tension: 0.4,
+            tracks: [],
+            colors: [],  // Add an array to store color information
+            segment: {
+              borderColor: (ctx: any) => this.getSegmentColor(ctx, 1,this.data2)  // Pass dataset index to getSegmentColor
+            }
+          }
+        ]
+      };
+      var durationSum = 0;
+      this.playlistTracks.forEach(pltrack => {
+        
+          durationSum = durationSum + ((pltrack.audio_features.duration_ms) );
+          //duration
+          this.data2.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
+          //tempo
+          this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
+          this.data2.datasets[0].tracks.push(pltrack.track.name);
+          this.data2.datasets[0].colors.push(pltrack.color);
+          //loudness
+          this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
+          this.data2.datasets[1].tracks.push(pltrack.track.name);
+          this.data2.datasets[1].colors.push(pltrack.color);
+        
+      });
+      //console.log('this.data2',this.data2);
+      this.isLoading = false;
+    }
   }
 
   formatTrackDuration(durationMs: number) {
@@ -398,7 +452,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
   generateChart(playlistTracks: any[]) {
     this.isLoading = true;
-    this.showGraph = false;
+    this.showDetailedGraph = false;
     // To reset data
     this.data = {
       labels: ['0:00:00'],
@@ -412,7 +466,7 @@ export class PlaylistDetailsComponent implements OnInit {
           tracks: [],
           colors: [],  // Add an array to store color information
           segment: {
-            borderColor: (ctx: any) => this.getSegmentColor(ctx, 0)  // Pass dataset index to getSegmentColor
+            borderColor: (ctx: any) => this.getSegmentColor(ctx, 0,this.data)  // Pass dataset index to getSegmentColor
           }
         },
         {
@@ -424,7 +478,7 @@ export class PlaylistDetailsComponent implements OnInit {
           tracks: [],
           colors: [],  // Add an array to store color information
           segment: {
-            borderColor: (ctx: any) => this.getSegmentColor(ctx, 1)  // Pass dataset index to getSegmentColor
+            borderColor: (ctx: any) => this.getSegmentColor(ctx, 1,this.data)  // Pass dataset index to getSegmentColor
           }
         }
       ]
@@ -447,7 +501,7 @@ export class PlaylistDetailsComponent implements OnInit {
         });
       });
       this.isLoading = false;
-      this.showGraph = true;
+      this.showDetailedGraph = true;
       //console.log('data', this.data);
     }, 3000);
   }
