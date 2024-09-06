@@ -61,6 +61,10 @@
                     Artist
                     <p-sortIcon field="artist" />
                 </th>
+                <th pSortableColumn="played_at">
+                    Played At
+                    <p-sortIcon field="played_at" />
+                </th>
                 <th pSortableColumn="track.duration_ms">
                     Duration
                     <p-sortIcon field="track.duration_ms" />
@@ -98,6 +102,7 @@
                         (onClick)="navigateToTrackDetails(track.track.name,track.track.id)" />
                 </td>
                 <td>{{track.track.artists[0].name}}</td>
+                <td>{{track.played_at | date: 'dd-MMM-yyyy hh:mm:ss a'}}</td>
                 <td>{{ formatTrackDuration(track?.track.duration_ms) }}</td>
                 <td>{{ track?.audio_features?.tempo}}</td>
                 <td>{{ track?.audio_features?.danceability }}</td>
@@ -120,17 +125,23 @@
 
 
 
-
 <p-dialog header="Create New Playlist" [modal]="true" [draggable]="false" [(visible)]="plNameVisible"
     [style]="{ width: '25rem' }">
     <span class="p-text-secondary block mb-5">Enter name for new playlist.</span>
     <div class="flex align-items-center gap-3 mb-3">
-        <label for="username" class="font-semibold w-6rem">Playlist Name</label>
-        <input pInputText id="username" class="flex-auto" [(ngModel)]="playlistName" />
+        <label for="playlistName" class="font-semibold w-6rem">Playlist Name</label>
+        <input pInputText id="playlistName" class="flex-auto" [(ngModel)]="playlistName" #playlistNameInput="ngModel"
+            required minlength="3" [pattern]="pattern"/>
+    </div>
+    <!-- Validation messages -->
+    <div *ngIf="playlistNameInput.invalid && (playlistNameInput.dirty || playlistNameInput.touched)" class="p-error">
+        <small *ngIf="playlistNameInput.errors?.['required']">Playlist name is required.</small>
+        <small *ngIf="playlistNameInput.errors?.['minlength']">Playlist name must be at least 3 characters long.</small>
+        <small *ngIf="playlistNameInput.errors?.['pattern']">Playlist name cannot be just empty spaces.</small>
     </div>
 
     <div class="flex justify-content-end gap-2">
         <p-button label="Cancel" severity="secondary" (onClick)="plNameVisible = false" />
-        <p-button label="Save" (onClick)="createNewPlaylist()" />
+        <p-button label="Save" (onClick)="createNewPlaylist()" [disabled]="playlistNameInput.invalid" />
     </div>
 </p-dialog>

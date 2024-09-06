@@ -97,7 +97,7 @@ export class AudioHistoryComponent implements OnInit {
       }
     }
   };
-
+  pattern = '\\S+.*';
 
   constructor(
     private spotifyService: SpotifyService,
@@ -122,10 +122,11 @@ export class AudioHistoryComponent implements OnInit {
     this.isLoading = true;
     this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(this.limit).subscribe((urlResponse) => {
       if (urlResponse.statusCode === 200) {
+        
         var recentAudioUrl = urlResponse.payload;
         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
         this.spotifyService.SpotifyCommonGetApi(recentAudioUrl, spotifyAccessToken).subscribe((audioResponse) => {
-
+          
           this.hisotryTracks = audioResponse.items;
           console.log('hisotryTracks', this.hisotryTracks);
 
@@ -155,6 +156,7 @@ export class AudioHistoryComponent implements OnInit {
             //To get track analysis
             this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
               if (taRes.statusCode === 200) {
+                
                 //console.log('track analysis found', taRes.payload.analysisJsonData);
                 pltrack.audioAnalysis = taRes.payload.analysisJsonData;
               } else {
@@ -172,7 +174,9 @@ export class AudioHistoryComponent implements OnInit {
               };
             });
           });
-          this.isLoading = false;
+          setTimeout(() => {
+            this.isLoading = false;
+          }, 5000);
         })
       };
     })
@@ -231,7 +235,7 @@ export class AudioHistoryComponent implements OnInit {
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
-            tracks: [],
+            tracks: [''],
             colors: [],  // Add an array to store color information
             segment: {
               borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
@@ -243,7 +247,7 @@ export class AudioHistoryComponent implements OnInit {
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
-            tracks: [],
+            tracks: [''],
             colors: [],  // Add an array to store color information
             segment: {
               borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
@@ -426,6 +430,7 @@ export class AudioHistoryComponent implements OnInit {
     this.router.navigate(['/spotify/audio-details']);
   }
 
+  
 
 
 }
