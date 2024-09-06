@@ -1,1 +1,136 @@
-<p>audio-history works!</p>
+@if(isLoading) {
+<app-progress-bar></app-progress-bar>
+}
+<p-confirmDialog />
+
+<div class="palylist_table">
+    <p-table [value]="hisotryTracks" [rows]="limit" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+        (onPage)="onPageChange($event)" [totalRecords]="hisotryTracks.length" [paginator]="true" paginatorPosition="top"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTrackIds" 
+        (onRowSelect)="rowSelectionEvent()">
+        <ng-template pTemplate="caption">
+            <div class="flex flex-row justify-content-between">
+                <div></div>
+                <h3>Recently Played</h3>
+                <div class="flex flex-row align-items-center" >
+                    <div style="width: fit-content;">
+                        <label class="mx-2">
+                            <span class="material-symbols-outlined">
+                                show_chart
+                            </span>
+                        </label>
+                        <p-inputSwitch [(ngModel)]="showSummaryGraph" (onChange)="showSummaryGraphChanged()"
+                            pTooltip="Summary Graph" tooltipPosition="bottom" class="mr-2" />
+                    </div>
+                    <div style="width: fit-content;">
+                        <label class="mx-2">
+                            <span class="material-symbols-outlined">
+                                monitoring
+                            </span>
+                        </label>
+                        <p-inputSwitch [(ngModel)]="showDetailedGraph" (onChange)="showGraphChanged()"
+                            pTooltip="Detailed Graph" tooltipPosition="bottom" class="mr-2" />
+                    </div>
+                    <p-button class="mr-2" severity="success" icon="pi pi-play-circle" iconPos="right"
+                        label="Save as new" (onClick)="plNameVisible=true"
+                        [disabled]="selectedTrackIds.length===0"></p-button>
+                </div>
+            </div>
+            <div>
+                <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" />
+            </div>
+            <div>
+                <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:80px">
+                </th>
+                <th style="width:80px">
+                </th>
+                <th style="width:80px">
+                </th>
+                <th pSortableColumn="track.name">
+                    Title
+                    <p-sortIcon field="track.name" />
+                </th>
+                <th pSortableColumn="artist">
+                    Artist
+                    <p-sortIcon field="artist" />
+                </th>
+                <th pSortableColumn="track.duration_ms">
+                    Duration
+                    <p-sortIcon field="track.duration_ms" />
+                </th>
+                <th pSortableColumn="audio_features.tempo">
+                    Tempo
+                    <p-sortIcon field="audio_features.tempo" />
+                </th>
+                <th pSortableColumn="audio_features.danceability">
+                    Danceability
+                    <p-sortIcon field="audio_features.danceability" />
+                </th>
+                <th pSortableColumn="audio_features.energy">
+                    Energy
+                    <p-sortIcon field="audio_features.energy" />
+                </th>
+                <th pSortableColumn="audio_features.loudness">
+                    Loudness
+                    <p-sortIcon field="audio_features.loudness" />
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-track let-index="rowIndex">
+            <tr [pReorderableRow]="index">
+                <td>
+                    <span class="pi pi-bars" pReorderableRowHandle></span>
+                </td>
+                <td>
+                    <p-tableCheckbox [value]="track.track.id" />
+                </td>
+                <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
+                </td>
+                <td>
+                    <p-button class="anchor_btn" [label]="track.track.name" [link]="true"
+                        (onClick)="navigateToTrackDetails(track.track.name,track.track.id)" />
+                </td>
+                <td>{{track.track.artists[0].name}}</td>
+                <td>{{ formatTrackDuration(track?.track.duration_ms) }}</td>
+                <td>{{ track?.audio_features?.tempo}}</td>
+                <td>{{ track?.audio_features?.danceability }}</td>
+                <td>{{ track?.audio_features?.energy }}</td>
+                <td>{{ track?.audio_features?.loudness }}</td>
+                <!-- <td>
+                    <p-button class="anchor_btn" (click)="openInSpotify(track.track.external_urls.spotify)"
+                        label="Open in Spotify" [link]="true" />
+                </td> -->
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr class="">
+                <td colspan="10">No tracks found in audio History.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+</div>
+
+
+
+
+<p-dialog header="Create New Playlist" [modal]="true" [draggable]="false" [(visible)]="plNameVisible"
+    [style]="{ width: '25rem' }">
+    <span class="p-text-secondary block mb-5">Enter name for new playlist.</span>
+    <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">Playlist Name</label>
+        <input pInputText id="username" class="flex-auto" [(ngModel)]="playlistName" />
+    </div>
+
+    <div class="flex justify-content-end gap-2">
+        <p-button label="Cancel" severity="secondary" (onClick)="plNameVisible = false" />
+        <p-button label="Save" (onClick)="createNewPlaylist()" />
+    </div>
+</p-dialog>

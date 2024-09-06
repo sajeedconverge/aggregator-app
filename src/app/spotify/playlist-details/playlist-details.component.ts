@@ -185,9 +185,9 @@ export class PlaylistDetailsComponent implements OnInit {
       this.isLoading = true;
       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {
         this.playlistTracks = resp.items;
-        //debugger;
-        this.playlistTracks.forEach(plTrack => {
-          this.originalTracks.push(plTrack.track.id)
+        this.playlistTracks.forEach(pltrack => {
+          pltrack.artist = pltrack.track?.artists[0]?.name;
+          this.originalTracks.push(pltrack.track.id)
         });
         //console.log('this.originalTracks', this.originalTracks);
         //console.log('this.playlistTracks', this.playlistTracks);

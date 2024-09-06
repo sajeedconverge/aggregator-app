@@ -142,7 +142,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           //this.athleteActivities = res;
           this.nonFilteredActivities = res;
           //To get fifty recently played songs
-          this.spotifyService.GetSpotifyRecentlyPlayedUrl(50).subscribe((response) => {
+          this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(50).subscribe((response) => {
             if (response.statusCode === 200) {
               this.spotifyService.SpotifyCommonGetApi(response.payload, this.spotifyAccessToken).subscribe((res) => {
                 if (res.items.length > 0) {
