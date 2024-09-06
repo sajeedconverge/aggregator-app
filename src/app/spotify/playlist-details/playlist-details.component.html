@@ -12,11 +12,11 @@
             <div class="flex flex-row justify-content-between">
                 <h3>Tracks</h3>
                 <h3>{{currentPlayListName}}</h3>
-                <div class="flex flex-row">
-                    <div class="flex flex-row" *ngIf="playlistTracks.length > 0">
+                <div class="flex flex-row align-items-center">
+                    <div class="flex flex-row align-items-center" *ngIf="playlistTracks.length > 0">
                         <div style="width: fit-content;">
                             <!-- <label class="m-2 pb-2">Summary Graph</label> -->
-                            <label class="m-2 pb-2">
+                            <label class="mx-2">
                                 <span class="material-symbols-outlined">
                                     show_chart
                                 </span>
@@ -26,7 +26,7 @@
                         </div>
                         <div style="width: fit-content;">
                             <!-- <label class="m-2 pb-2">Detailed Graph</label> -->
-                            <label class="m-2 pb-2">
+                            <label class="mx-2">
                                 <span class="material-symbols-outlined">
                                     monitoring
                                 </span>
