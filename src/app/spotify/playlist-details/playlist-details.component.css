@@ -1,0 +1,10 @@
+::ng-deep .btn-grp-custom button{
+    outline: none;
+    box-shadow: none;
+}
+
+.btn_grp_short{
+    position: absolute;
+    right: 0;
+    top: 20px;
+}

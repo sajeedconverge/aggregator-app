@@ -19,6 +19,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '../../user/shared/services/auth.service';
 import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
 import { TooltipModule } from 'primeng/tooltip';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 
 
@@ -41,6 +42,9 @@ import { TooltipModule } from 'primeng/tooltip';
     ConfirmDialogModule,
     InputTextModule,
     TooltipModule,
+    ButtonGroupModule,
+
+
 
 
   ],
@@ -189,7 +193,6 @@ export class PlaylistDetailsComponent implements OnInit {
           pltrack.artist = pltrack.track?.artists[0]?.name;
           this.originalTracks.push(pltrack.track.id)
         });
-        //console.log('this.originalTracks', this.originalTracks);
         //console.log('this.playlistTracks', this.playlistTracks);
 
         if (this.playlistTracks.length > 0) {
@@ -274,14 +277,16 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   showGraphChanged() {
+    this.showDetailedGraph=true;
+    this.showSummaryGraph=false;
     if (this.showDetailedGraph) {
       this.generateChart(this.playlistTracks, true);
-
     };
-
   }
 
   showSummaryGraphChanged() {
+    this.showSummaryGraph=true;
+    this.showDetailedGraph=false;
     if (this.showSummaryGraph) {
       this.isLoading = true;
       this.data2 = {
@@ -310,6 +315,30 @@ export class PlaylistDetailsComponent implements OnInit {
             segment: {
               borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
             }
+          },
+          {
+            label: 'Energy',
+            data: [0],
+            fill: false,
+            borderColor: this.documentStyle.getPropertyValue('--red-500'),
+            tension: 0.4,
+            tracks: [],
+            colors: [],  // Add an array to store color information
+            segment: {
+              borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
+            }
+          },
+          {
+            label: 'Danceability',
+            data: [0],
+            fill: false,
+            borderColor: this.documentStyle.getPropertyValue('--green-500'),
+            tension: 0.4,
+            tracks: [],
+            colors: [],  // Add an array to store color information
+            segment: {
+              borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
+            }
           }
         ]
       };
@@ -327,6 +356,14 @@ export class PlaylistDetailsComponent implements OnInit {
         this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
         this.data2.datasets[1].tracks.push(pltrack.track.name);
         this.data2.datasets[1].colors.push(pltrack.color);
+        //energy
+        this.data2.datasets[2].data.push(pltrack.audio_features.energy);
+        this.data2.datasets[2].tracks.push(pltrack.track.name);
+        this.data2.datasets[2].colors.push(pltrack.color);
+        //danceability
+        this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
+        this.data2.datasets[3].tracks.push(pltrack.track.name);
+        this.data2.datasets[3].colors.push(pltrack.color);
 
       });
       //console.log('this.data2',this.data2);
@@ -408,25 +445,26 @@ export class PlaylistDetailsComponent implements OnInit {
     })
   }
 
-  tableReordered() {
+  tableReordered(event: any) {
     this.reOrderedTracks = [];
-    this.showDetailedGraph=false;
-    this.showSummaryGraph=false;
-    //console.log('Reordered', this.playlistTracks);
+    this.showDetailedGraph = false;
+    this.showSummaryGraph = false;
+
+    // Remove the item from the drag index and insert it at the drop index
+    const movedItem = this.playlistTracks.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
+    this.playlistTracks.splice(event.dropIndex, 0, movedItem);  // Insert the moved item at dropIndex
 
     this.playlistTracks.forEach(plTrack => {
       this.reOrderedTracks.push(plTrack.track.id)
     });
-    //this.generateChart(this.playlistTracks);
-    //console.log('this.reOrderedTracks', this.reOrderedTracks);
   }
 
   tableSorted(event: any) {
     let field = event.field;
     let order = event.order;
     this.reOrderedTracks = [];
-    this.showDetailedGraph=false;
-    this.showSummaryGraph=false;
+    this.showDetailedGraph = false;
+    this.showSummaryGraph = false;
 
     const getFieldValue = (obj: any, field: string) => {
       return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
@@ -453,14 +491,9 @@ export class PlaylistDetailsComponent implements OnInit {
       }
       return comparison * order; // Apply the sort order: 1 for ascending, -1 for descending
     });
-
-    //console.log('Sorted', this.playlistTracks);
-
-    //this.generateChart(this.playlistTracks);
     this.playlistTracks.forEach(plTrack => {
       this.reOrderedTracks.push(plTrack.track.id)
     });
-    //console.log('this.reOrderedTracks', this.reOrderedTracks);
   }
 
 
@@ -518,7 +551,7 @@ export class PlaylistDetailsComponent implements OnInit {
         this.showDetailedGraph = true;
       };
       this.isLoading = false;
-      //console.log('data', this.data);
+      // console.log('data', this.data);
     }, 3000);
   }
 

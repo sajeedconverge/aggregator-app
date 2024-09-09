@@ -77,7 +77,7 @@
 
 
 <!-- Activity Details -->
-<div *ngIf="showDetails && !showAudioFeatures">
+<div *ngIf="showDetails && !showAudioFeatures" class="palylist_table">
     <p-table #dt2 [value]="pairedTracks" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }"
         [sortField]="'start_time'" [sortOrder]="1">
         <ng-template pTemplate="caption">

@@ -112,7 +112,7 @@ export class PlaylistComponent implements OnInit {
         var playlistsUrl = res.payload;
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
-          // console.log(this.userPlaylists);
+           console.log(this.userPlaylists);
 
         });
         this.isLoading = false;
