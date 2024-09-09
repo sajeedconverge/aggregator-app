@@ -322,7 +322,7 @@ export class PlaylistDetailsComponent implements OnInit {
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
-            tracks: [],
+            tracks: [''],
             colors: [],  // Add an array to store color information
             segment: {
               borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
@@ -334,7 +334,7 @@ export class PlaylistDetailsComponent implements OnInit {
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
-            tracks: [],
+            tracks: [''],
             colors: [],  // Add an array to store color information
             segment: {
               borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
@@ -510,7 +510,7 @@ export class PlaylistDetailsComponent implements OnInit {
           fill: false,
           borderColor: this.documentStyle.getPropertyValue('--blue-500'),
           tension: 0.4,
-          tracks: [],
+          tracks: [''],
           colors: [],  // Add an array to store color information
           segment: {
             borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data)  // Pass dataset index to getSegmentColor
@@ -522,7 +522,7 @@ export class PlaylistDetailsComponent implements OnInit {
           fill: false,
           borderColor: this.documentStyle.getPropertyValue('--orange-500'),
           tension: 0.4,
-          tracks: [],
+          tracks: [''],
           colors: [],  // Add an array to store color information
           segment: {
             borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data)  // Pass dataset index to getSegmentColor

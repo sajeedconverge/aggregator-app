@@ -196,6 +196,8 @@ export class AudioHistoryComponent implements OnInit {
   }
 
   onPageChange(event: any) {
+    this.showDetailedGraph = false;
+    this.showSummaryGraph = false;
     this.limit = event.rows;
     this.getRecentAudio();
   }
@@ -276,7 +278,7 @@ export class AudioHistoryComponent implements OnInit {
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
-            tracks: [],
+            tracks: [''],
             colors: [],  // Add an array to store color information
             segment: {
               borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
@@ -288,7 +290,7 @@ export class AudioHistoryComponent implements OnInit {
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
-            tracks: [],
+            tracks: [''],
             colors: [],  // Add an array to store color information
             segment: {
               borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
@@ -328,7 +330,7 @@ export class AudioHistoryComponent implements OnInit {
           this.data2.datasets[3].tracks.push(pltrack.track.name);
           this.data2.datasets[3].colors.push(pltrack.color);
         });
-        console.log('this.data2',this.data2);
+        console.log('this.data2', this.data2);
         this.isLoading = false;
       } else {
         this.hisotryTracks.forEach(pltrack => {
@@ -371,7 +373,7 @@ export class AudioHistoryComponent implements OnInit {
           fill: false,
           borderColor: this.documentStyle.getPropertyValue('--blue-500'),
           tension: 0.4,
-          tracks: [],
+          tracks: [''],
           colors: [],  // Add an array to store color information
           segment: {
             borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data)  // Pass dataset index to getSegmentColor
@@ -383,7 +385,7 @@ export class AudioHistoryComponent implements OnInit {
           fill: false,
           borderColor: this.documentStyle.getPropertyValue('--orange-500'),
           tension: 0.4,
-          tracks: [],
+          tracks: [''],
           colors: [],  // Add an array to store color information
           segment: {
             borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data)  // Pass dataset index to getSegmentColor
@@ -469,13 +471,13 @@ export class AudioHistoryComponent implements OnInit {
     this.showDetailedGraph = false;
     this.showSummaryGraph = false;
     this.selectedTracksList = [];
-    this.hisotryTracks.forEach(hTrack => {
-      this.selectedTracksList.push(hTrack);
-    });
-    this.selectedTracksList = Array.from(new Set(this.selectedTracksList));
-    // Use the table reference to update the selection
-
-
+    //managed condition selection and de-selection of all tracks at once
+    if (this.selectedTracksList.length != this.hisotryTracks.length) {
+      this.hisotryTracks.forEach(hTrack => {
+        this.selectedTracksList.push(hTrack);
+      });
+      this.selectedTracksList = Array.from(new Set(this.selectedTracksList));
+    }
   }
 
 
@@ -625,21 +627,7 @@ export class AudioHistoryComponent implements OnInit {
         };
       });
     });
-
-
   }
-
-
-
-
-
-
-
-
-
-
-
-
 
   navigateToTrackDetails(trackName: string, trackId: string) {
     sessionStorage.setItem('track-name', trackName);
