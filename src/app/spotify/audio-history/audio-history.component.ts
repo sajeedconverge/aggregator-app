@@ -679,7 +679,7 @@ export class AudioHistoryComponent implements OnInit {
           });
 
           this.spotifyService.SpotifyCommonPostApi(opsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
-            debugger;
+            
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Changes updated successfully.' });
             //this.router.navigate(['/spotify/playlists']);
             this.tracksListVisible = false;

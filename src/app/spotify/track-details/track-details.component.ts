@@ -37,7 +37,7 @@ import { TooltipModule } from 'primeng/tooltip';
     TooltipModule,
 
 
-    
+
   ],
   templateUrl: './track-details.component.html',
   styleUrl: './track-details.component.css'
@@ -230,31 +230,52 @@ export class TrackDetailsComponent implements OnInit {
 
 
   getTrackAnalysis() {
-
-    this.spotifyService.getSpotifyAudioAnalysisUrl(this.trackId).subscribe((urlRes) => {
-      this.isLoading = true;
-      if (urlRes.statusCode === 200) {
-        var analysisUrl = urlRes.payload;
-        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-        this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((analysisResponse) => {
-          this.trackAnalysis = analysisResponse;
-          //console.log('this.trackAnalysis', this.trackAnalysis);
-
-          var durationSum = 0;
-          this.trackAnalysis.sections.forEach((section: any) => {
-            durationSum = durationSum + ((section.duration) * 1000);
-            //duration
-            this.data1.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
-            //tempo
-            this.data1.datasets[0].data.push(section.tempo);
-            //loudness
-            this.data1.datasets[1].data.push(section.loudness);
-          });
-          //this.showFeaturesGraph = true;
-          this.isLoading = false;
+    this.spotifyService.getTrackAnalysisById(this.trackId).subscribe((taRes) => {
+      if (taRes.statusCode === 200) {
+        //console.log('track analysis found', taRes.payload.analysisJsonData);
+        this.trackAnalysis = taRes.payload.analysisJsonData;
+        //console.log('this.trackAnalysis', this.trackAnalysis);
+        var durationSum = 0;
+        this.trackAnalysis.sections.forEach((section: any) => {
+          durationSum = durationSum + ((section.duration) * 1000);
+          //duration
+          this.data1.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
+          //tempo
+          this.data1.datasets[0].data.push(section.tempo);
+          //loudness
+          this.data1.datasets[1].data.push(section.loudness);
+        });
+        //this.showFeaturesGraph = true;
+        this.isLoading = false;
+      } else {
+        //console.log('track analysis not found');
+        //To fetch track analysis
+        this.spotifyService.getSpotifyAudioAnalysisUrl(this.trackId).subscribe((urlRes) => {
+          this.isLoading = true;
+          if (urlRes.statusCode === 200) {
+            var analysisUrl = urlRes.payload;
+            const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+            this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((analysisResponse) => {
+              this.trackAnalysis = analysisResponse;
+              //console.log('this.trackAnalysis', this.trackAnalysis);
+              var durationSum = 0;
+              this.trackAnalysis.sections.forEach((section: any) => {
+                durationSum = durationSum + ((section.duration) * 1000);
+                //duration
+                this.data1.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
+                //tempo
+                this.data1.datasets[0].data.push(section.tempo);
+                //loudness
+                this.data1.datasets[1].data.push(section.loudness);
+              });
+              //this.showFeaturesGraph = true;
+              this.isLoading = false;
+            });
+          };
         });
       };
     });
+
   }
 
 

@@ -30,30 +30,17 @@
                                 </p-button>
                             </p-buttonGroup>
                         </div>
-                        <!-- <div style="width: fit-content;">
-                            <label class="mx-2">
-                                <span class="material-symbols-outlined">
-                                    show_chart
-                                </span>
-                            </label>
-                            <p-inputSwitch [(ngModel)]="showSummaryGraph" (onChange)="showSummaryGraphChanged()"
-                                pTooltip="Summary Graph" tooltipPosition="bottom" class="mr-2" />
-                        </div>
-                        <div style="width: fit-content;">
-                            <label class="mx-2">
-                                <span class="material-symbols-outlined">
-                                    monitoring
-                                </span>
-                            </label>
-                            <p-inputSwitch [(ngModel)]="showDetailedGraph" (onChange)="showGraphChanged()"
-                                pTooltip="Detailed Graph" tooltipPosition="bottom" class="mr-2" />
-                        </div> -->
                         <p-button class="mr-2" severity="warning" (click)="confirmUpdatePlaylist()"
-                            icon="pi pi-play-circle" iconPos="right" label="Save changes"></p-button>
-                        <p-button class="mr-2" severity="success" icon="pi pi-play-circle" iconPos="right"
-                            label="Save as new" (onClick)="plNameVisible=true"></p-button>
+                        icon="pi pi-save" pTooltip="Save changes" tooltipPosition="bottom" iconPos="right" ></p-button>
+
+                        <p-button class="mr-2" severity="success" icon="pi pi-save" iconPos="right"
+                             pTooltip="Save as new" tooltipPosition="bottom" (onClick)="plNameVisible=true"></p-button>
                     </div>
-                    <p-button (click)="backToPlaylists()">Back</p-button>
+                    <p-button (click)="backToPlaylists()" pTooltip="Back" tooltipPosition="bottom" size="small">
+                        <span class="material-symbols-outlined">
+                        undo
+                        </span>
+                    </p-button>
                 </div>
             </div>
             <div>

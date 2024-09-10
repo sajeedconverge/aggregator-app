@@ -19,6 +19,7 @@ import { AuthService } from '../shared/services/auth.service';
 import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
 import { ToastModule } from 'primeng/toast';
 import { BadgeModule } from 'primeng/badge';
+import { TooltipModule } from 'primeng/tooltip';
 
 
 @Component({
@@ -35,7 +36,8 @@ import { BadgeModule } from 'primeng/badge';
     ProgressBarComponent,
     MessagesModule,
     ToastModule,
-    BadgeModule
+    BadgeModule,
+    TooltipModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
