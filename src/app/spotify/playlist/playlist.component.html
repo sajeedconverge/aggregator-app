@@ -49,7 +49,7 @@
                 }@else {
                 <img [src]="playlist?.images[0].url">
                 }
-                <h4>{{playlist.name}}</h4>
+                <h4>{{playlist.name }} ({{playlist.tracks.total}}-Tracks)</h4>
             </div>
         </div>
         }
@@ -65,6 +65,7 @@
             <tr>
                 <th> </th>
                 <th>Playlist Name</th>
+                <th>Tracks</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-playlist>
@@ -84,6 +85,9 @@
                     <p-button class="anchor_btn" [label]="playlist.name"
                         (click)="getPlayListTracks(playlist.tracks.href,playlist.name,playlist.id,playlist.snapshot_id)"
                         [link]="true" />
+                </td>
+                <td>
+                    {{playlist.tracks.total}}
                 </td>
             </tr>
         </ng-template>

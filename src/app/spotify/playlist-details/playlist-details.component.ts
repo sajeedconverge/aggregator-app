@@ -19,6 +19,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '../../user/shared/services/auth.service';
 import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
 import { TooltipModule } from 'primeng/tooltip';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 
 
@@ -41,6 +42,9 @@ import { TooltipModule } from 'primeng/tooltip';
     ConfirmDialogModule,
     InputTextModule,
     TooltipModule,
+    ButtonGroupModule,
+
+
 
 
   ],
@@ -54,7 +58,6 @@ export class PlaylistDetailsComponent implements OnInit {
   playlistTracks: any[] = [];
   currentPlayListName: string = '';
   currentTrackName = '';
-  showAudioFeatures: boolean = false;
   checkInterval: any;
   isLoading: boolean = false;
   data: any;
@@ -109,7 +112,7 @@ export class PlaylistDetailsComponent implements OnInit {
   playlistName: string = '';
   originalTracks: string[] = [];
   reOrderedTracks: string[] = [];
-
+  pattern = '\\S+.*';
 
 
   constructor(
@@ -128,7 +131,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
   }
 
-  getSegmentColor(ctx: any, datasetIndex: number,data:any) {
+  getSegmentColor(ctx: any, datasetIndex: number, data: any) {
     const { p0 } = ctx;
     const index = p0.parsed.x;  // Index of the current data point
     const color = data.datasets[datasetIndex].colors[index];  // Get color for the segment
@@ -136,7 +139,7 @@ export class PlaylistDetailsComponent implements OnInit {
     //return color ;  // Default color if not set
     return this.documentStyle.getPropertyValue(color);
   }
-  
+
 
   ngOnDestroy(): void {
     // Ensure to clear the interval if the component is destroyed
@@ -173,7 +176,7 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   getPlayListTracks() {
-    // this.isLoading = true;
+    this.isLoading = true;
     this.playlistTracks = [];
     this.spotifyAuthService.refreshSpotifyAccessToken();
     var url = sessionStorage.getItem('playlist-items-url') || '';
@@ -182,15 +185,15 @@ export class PlaylistDetailsComponent implements OnInit {
     this.currentPlayListName = playlistName;
     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
     if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
-      this.isLoading = true;
+
       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {
+
         this.playlistTracks = resp.items;
-        //debugger;
-        this.playlistTracks.forEach(plTrack => {
-          this.originalTracks.push(plTrack.track.id)
+        this.playlistTracks.forEach(pltrack => {
+          pltrack.artist = pltrack.track?.artists[0]?.name;
+          this.originalTracks.push(pltrack.track.id)
         });
-        //console.log('this.originalTracks', this.originalTracks);
-        //console.log('this.playlistTracks', this.playlistTracks);
+        console.log('this.playlistTracks', this.playlistTracks);
 
         if (this.playlistTracks.length > 0) {
           // To assign Audio Features to the track
@@ -198,6 +201,7 @@ export class PlaylistDetailsComponent implements OnInit {
             pltrack.color = Constants.generateRandomPrimeNGColor();
             //To get Track features from DB
             this.spotifyService.getTrackById(pltrack.track.id).subscribe((dbTrackRes) => {
+
               if (dbTrackRes.statusCode === 200) {
                 //console.log('track found', dbTrackRes.payload.jsonData.audio_features);
                 pltrack.audio_features = dbTrackRes.payload.jsonData.audio_features;
@@ -229,9 +233,11 @@ export class PlaylistDetailsComponent implements OnInit {
             });
             //To get track analysis
             this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
+
               if (taRes.statusCode === 200) {
                 //console.log('track analysis found', taRes.payload.analysisJsonData);
                 pltrack.audioAnalysis = taRes.payload.analysisJsonData;
+
               } else {
                 //console.log('track analysis not found');
                 //To fetch track analysis
@@ -250,6 +256,7 @@ export class PlaylistDetailsComponent implements OnInit {
                       this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
                         if (postTrackAnalysisResponse.statusCode === 200) {
                           //console.log("track analysis added successfully.");
+
                         };
                       });
                     });
@@ -258,9 +265,11 @@ export class PlaylistDetailsComponent implements OnInit {
               };
             });
           });
-          this.isLoading = false;
+          setTimeout(() => {
+            this.isLoading = false;
+          }, 5000);
         } else {
-          this.showDetailedGraph = false;
+
           this.isLoading = false;
         }
       });
@@ -268,12 +277,16 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   showGraphChanged() {
+    this.showDetailedGraph = true;
+    this.showSummaryGraph = false;
     if (this.showDetailedGraph) {
-      this.generateChart(this.playlistTracks);
+      this.generateChart(this.playlistTracks, true);
     };
   }
 
-  showSummaryGraphChanged(){
+  showSummaryGraphChanged() {
+    this.showSummaryGraph = true;
+    this.showDetailedGraph = false;
     if (this.showSummaryGraph) {
       this.isLoading = true;
       this.data2 = {
@@ -285,10 +298,10 @@ export class PlaylistDetailsComponent implements OnInit {
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
-            tracks: [],
+            tracks: [''],
             colors: [],  // Add an array to store color information
             segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 0,this.data2)  // Pass dataset index to getSegmentColor
+              borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
             }
           },
           {
@@ -297,29 +310,61 @@ export class PlaylistDetailsComponent implements OnInit {
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
-            tracks: [],
+            tracks: [''],
             colors: [],  // Add an array to store color information
             segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 1,this.data2)  // Pass dataset index to getSegmentColor
+              borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
+            }
+          },
+          {
+            label: 'Energy',
+            data: [0],
+            fill: false,
+            borderColor: this.documentStyle.getPropertyValue('--red-500'),
+            tension: 0.4,
+            tracks: [''],
+            colors: [],  // Add an array to store color information
+            segment: {
+              borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
+            }
+          },
+          {
+            label: 'Danceability',
+            data: [0],
+            fill: false,
+            borderColor: this.documentStyle.getPropertyValue('--green-500'),
+            tension: 0.4,
+            tracks: [''],
+            colors: [],  // Add an array to store color information
+            segment: {
+              borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
             }
           }
         ]
       };
       var durationSum = 0;
       this.playlistTracks.forEach(pltrack => {
-        
-          durationSum = durationSum + ((pltrack.audio_features.duration_ms) );
-          //duration
-          this.data2.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
-          //tempo
-          this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
-          this.data2.datasets[0].tracks.push(pltrack.track.name);
-          this.data2.datasets[0].colors.push(pltrack.color);
-          //loudness
-          this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
-          this.data2.datasets[1].tracks.push(pltrack.track.name);
-          this.data2.datasets[1].colors.push(pltrack.color);
-        
+
+        durationSum = durationSum + ((pltrack.audio_features.duration_ms));
+        //duration
+        this.data2.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
+        //tempo
+        this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
+        this.data2.datasets[0].tracks.push(pltrack.track.name);
+        this.data2.datasets[0].colors.push(pltrack.color);
+        //loudness
+        this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
+        this.data2.datasets[1].tracks.push(pltrack.track.name);
+        this.data2.datasets[1].colors.push(pltrack.color);
+        //energy
+        this.data2.datasets[2].data.push(pltrack.audio_features.energy);
+        this.data2.datasets[2].tracks.push(pltrack.track.name);
+        this.data2.datasets[2].colors.push(pltrack.color);
+        //danceability
+        this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
+        this.data2.datasets[3].tracks.push(pltrack.track.name);
+        this.data2.datasets[3].colors.push(pltrack.color);
+
       });
       //console.log('this.data2',this.data2);
       this.isLoading = false;
@@ -386,34 +431,47 @@ export class PlaylistDetailsComponent implements OnInit {
             this.originalTracks.forEach(trackId => {
               plOpsBody.uris.push(`spotify:track:${trackId}`)
             });
-          }
+          };
           this.spotifyService.SpotifyCommonPostApi(opsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
 
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Changes updated successfully.' });
             this.router.navigate(['/spotify/playlists']);
-          })
+          });
 
 
-        })
+        });
 
-      }
-    })
+      };
+    });
   }
 
-  tableReordered() {
+  tableReordered(event: any) {
     this.reOrderedTracks = [];
-    //console.log('Reordered', this.playlistTracks);
-    this.generateChart(this.playlistTracks);
+    this.showDetailedGraph = false;
+    this.showSummaryGraph = false;
+    // debugger;
+    //console.log('dragIndex :', event.dragIndex, 'dropIndex :', event.dropIndex)
+
+    // Remove the item from the drag index and insert it at the drop index
+    const movedItem = this.playlistTracks.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
+    this.playlistTracks.splice(event.dropIndex, 0, movedItem);  // Insert the moved item at dropIndex
+
+    // //temp code 
+    // var reOrderedTracks = this.playlistTracks.map(plTrack => { return plTrack.track.name });
+    // console.log(reOrderedTracks);
+    // ///////
+
     this.playlistTracks.forEach(plTrack => {
       this.reOrderedTracks.push(plTrack.track.id)
     });
-    //console.log('this.reOrderedTracks', this.reOrderedTracks);
   }
 
   tableSorted(event: any) {
     let field = event.field;
     let order = event.order;
     this.reOrderedTracks = [];
+    this.showDetailedGraph = false;
+    this.showSummaryGraph = false;
 
     const getFieldValue = (obj: any, field: string) => {
       return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
@@ -440,17 +498,17 @@ export class PlaylistDetailsComponent implements OnInit {
       }
       return comparison * order; // Apply the sort order: 1 for ascending, -1 for descending
     });
-
-    //console.log('Sorted', this.playlistTracks);
-    this.generateChart(this.playlistTracks);
     this.playlistTracks.forEach(plTrack => {
       this.reOrderedTracks.push(plTrack.track.id)
     });
-    //console.log('this.reOrderedTracks', this.reOrderedTracks);
+    // //temp code 
+    // var reOrderedTracks = this.playlistTracks.map(plTrack => { return plTrack.track.name });
+    // console.log(reOrderedTracks);
+    // ///////
   }
 
 
-  generateChart(playlistTracks: any[]) {
+  generateChart(playlistTracks: any[], showChartChanged: boolean = false) {
     this.isLoading = true;
     this.showDetailedGraph = false;
     // To reset data
@@ -463,10 +521,10 @@ export class PlaylistDetailsComponent implements OnInit {
           fill: false,
           borderColor: this.documentStyle.getPropertyValue('--blue-500'),
           tension: 0.4,
-          tracks: [],
+          tracks: [''],
           colors: [],  // Add an array to store color information
           segment: {
-            borderColor: (ctx: any) => this.getSegmentColor(ctx, 0,this.data)  // Pass dataset index to getSegmentColor
+            borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data)  // Pass dataset index to getSegmentColor
           }
         },
         {
@@ -475,10 +533,10 @@ export class PlaylistDetailsComponent implements OnInit {
           fill: false,
           borderColor: this.documentStyle.getPropertyValue('--orange-500'),
           tension: 0.4,
-          tracks: [],
+          tracks: [''],
           colors: [],  // Add an array to store color information
           segment: {
-            borderColor: (ctx: any) => this.getSegmentColor(ctx, 1,this.data)  // Pass dataset index to getSegmentColor
+            borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data)  // Pass dataset index to getSegmentColor
           }
         }
       ]
@@ -500,9 +558,11 @@ export class PlaylistDetailsComponent implements OnInit {
           this.data.datasets[1].colors.push(pltrack.color);
         });
       });
+      if (showChartChanged) {
+        this.showDetailedGraph = true;
+      };
       this.isLoading = false;
-      this.showDetailedGraph = true;
-      //console.log('data', this.data);
+      // console.log('data', this.data);
     }, 3000);
   }
 
@@ -563,18 +623,6 @@ export class PlaylistDetailsComponent implements OnInit {
     sessionStorage.setItem('track-id', trackId);
     this.router.navigate(['/spotify/audio-details']);
   }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

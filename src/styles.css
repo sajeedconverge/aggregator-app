@@ -60,7 +60,37 @@ body{
 }
 .anchor_btn button{
     padding: 0px;
+    text-align: left;
 }
 .anchor_btn button:focus{
     box-shadow: none;
 }
+
+::ng-deep .btn-grp-custom button{
+    outline: none;
+    box-shadow: none;
+}
+
+.btn_grp_short{
+    position: absolute;
+    right: 0;
+    top: 20px;
+}
+.playlist_pagetitle_section{
+    position: relative;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

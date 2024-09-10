@@ -112,7 +112,7 @@ export class PlaylistComponent implements OnInit {
         var playlistsUrl = res.payload;
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
-          // console.log(this.userPlaylists);
+          //  console.log(this.userPlaylists);
 
         });
         this.isLoading = false;
@@ -120,11 +120,11 @@ export class PlaylistComponent implements OnInit {
     })
   }
 
-  getPlayListTracks(url: string, playlistName: string,id:string,snapShotId:string) {
-    sessionStorage.setItem('playlist-items-url' , url);
-    sessionStorage.setItem('playlist-name' , playlistName);
-    sessionStorage.setItem('playlist-id' , id);
-    sessionStorage.setItem('playlist-snapshot-id' , snapShotId);
+  getPlayListTracks(url: string, playlistName: string, id: string, snapShotId: string) {
+    sessionStorage.setItem('playlist-items-url', url);
+    sessionStorage.setItem('playlist-name', playlistName);
+    sessionStorage.setItem('playlist-id', id);
+    sessionStorage.setItem('playlist-snapshot-id', snapShotId);
     this.router.navigate(['/spotify/playlist-details'])
   }
 

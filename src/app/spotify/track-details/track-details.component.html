@@ -8,9 +8,9 @@
             <div class="flex flex-row justify-content-between">
                 <h3>Audio Details</h3>
                 <h3>{{trackName}}</h3>
-                <div class="flex flex-row ">
+                <div class="flex flex-row align-items-center">
                     <div>
-                        <label class="m-2 pb-2">
+                        <label class="mx-2">
                             <span class="material-symbols-outlined">
                                 equalizer
                             </span>
@@ -19,7 +19,7 @@
                             tooltipPosition="bottom" />
                     </div>
                     <div *ngIf="trackDetails.length>0">
-                        <label class="m-2 pb-2">
+                        <label class="mx-2">
                             <span class="material-symbols-outlined">
                                 footprint
                             </span>
@@ -27,7 +27,7 @@
                         <p-inputSwitch [(ngModel)]="showPaceGraph" class="mr-2" pTooltip="Pace History"
                             tooltipPosition="bottom" />
                     </div>
-                    <p-button (click)="backToTracks()">Back</p-button>
+                    <!-- <p-button (click)="backToTracks()">Back</p-button> -->
                 </div>
             </div>
             <div>

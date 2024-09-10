@@ -19,6 +19,7 @@ import { AuthService } from '../shared/services/auth.service';
 import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
 import { ToastModule } from 'primeng/toast';
 import { BadgeModule } from 'primeng/badge';
+import { TooltipModule } from 'primeng/tooltip';
 
 
 @Component({
@@ -35,7 +36,8 @@ import { BadgeModule } from 'primeng/badge';
     ProgressBarComponent,
     MessagesModule,
     ToastModule,
-    BadgeModule
+    BadgeModule,
+    TooltipModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -142,7 +144,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           //this.athleteActivities = res;
           this.nonFilteredActivities = res;
           //To get fifty recently played songs
-          this.spotifyService.GetSpotifyRecentlyPlayedFiftyUrl().subscribe((response) => {
+          this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(50).subscribe((response) => {
             if (response.statusCode === 200) {
               this.spotifyService.SpotifyCommonGetApi(response.payload, this.spotifyAccessToken).subscribe((res) => {
                 if (res.items.length > 0) {

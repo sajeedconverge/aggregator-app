@@ -16,6 +16,8 @@ import { StravaAuthorizationService } from './strava/shared/services/strava-auth
 import { SpotifyAuthorizationService } from './spotify/shared/services/spotify-authorization.service';
 import { ProviderTokenRequest } from './user/shared/models/user-models';
 import { AccountService } from './user/shared/services/account.service';
+import { RippleModule } from 'primeng/ripple';
+import { StyleClassModule } from 'primeng/styleclass';
 
 @Component({
   selector: 'app-root',
@@ -30,7 +32,9 @@ import { AccountService } from './user/shared/services/account.service';
     InputSwitchModule,
     FormsModule,
     ReactiveFormsModule,
-    SigninComponent
+    SigninComponent,
+    RippleModule, 
+    StyleClassModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
