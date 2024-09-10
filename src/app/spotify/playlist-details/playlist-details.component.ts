@@ -431,18 +431,18 @@ export class PlaylistDetailsComponent implements OnInit {
             this.originalTracks.forEach(trackId => {
               plOpsBody.uris.push(`spotify:track:${trackId}`)
             });
-          }
+          };
           this.spotifyService.SpotifyCommonPostApi(opsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
 
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Changes updated successfully.' });
             this.router.navigate(['/spotify/playlists']);
-          })
+          });
 
 
-        })
+        });
 
-      }
-    })
+      };
+    });
   }
 
   tableReordered(event: any) {

@@ -106,9 +106,9 @@ export class AudioHistoryComponent implements OnInit {
   pattern = '\\S+.*';
   reOrderedTracks: string[] = [];
   @ViewChild('tableRef') tableRef!: Table;
-
-
-
+  tracksListVisible: boolean = false;
+  selectedPlaylist: any;
+  userPlaylists: any[] = [];
 
 
 
@@ -117,7 +117,8 @@ export class AudioHistoryComponent implements OnInit {
     private spotifyAuthService: SpotifyAuthorizationService,
     private router: Router,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private confirmationService: ConfirmationService,
   ) {
     this.spotifyAuthService.refreshSpotifyAccessToken();
     this.getRecentAudio()
@@ -238,6 +239,12 @@ export class AudioHistoryComponent implements OnInit {
       }
 
     };
+  }
+
+  navigateToTrackDetails(trackName: string, trackId: string) {
+    sessionStorage.setItem('track-name', trackName);
+    sessionStorage.setItem('track-id', trackId);
+    this.router.navigate(['/spotify/audio-details']);
   }
 
   showSummaryGraphChanged() {
@@ -480,21 +487,6 @@ export class AudioHistoryComponent implements OnInit {
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   createNewPlaylist() {
     this.plNameVisible = false;
     this.isLoading = true;
@@ -540,13 +532,11 @@ export class AudioHistoryComponent implements OnInit {
 
                 };
               });
-
             });
           };
         });
       }
     })
-
   }
 
   saveSelectedTracks() {
@@ -629,11 +619,93 @@ export class AudioHistoryComponent implements OnInit {
     });
   }
 
-  navigateToTrackDetails(trackName: string, trackId: string) {
-    sessionStorage.setItem('track-name', trackName);
-    sessionStorage.setItem('track-id', trackId);
-    this.router.navigate(['/spotify/audio-details']);
+  addTracksToExistingPlaylist() {
+    this.tracksListVisible = true;
+    this.isLoading = true;
+    this.spotifyAuthService.refreshSpotifyAccessToken();
+    //this.spotifyAuthService.checkExpiryAndRefreshToken();
+    this.spotifyService.getCurrentUserPlaylistsUrl().subscribe((res) => {
+      if (res.statusCode === 200) {
+        var playlistsUrl = res.payload;
+        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+        this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
+          this.userPlaylists = playlistResponse.items;
+          console.log(this.userPlaylists);
+        });
+        this.isLoading = false;
+      }
+    })
+
+
+
   }
+
+  confirmUpdatePlaylist() {
+    this.confirmationService.confirm({
+      //target: event.target as EventTarget,
+      message: 'Are you sure that you want to proceed?',
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptIcon: "none",
+      rejectIcon: "none",
+      rejectButtonStyleClass: "p-button-text",
+      accept: () => {
+        //this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' });
+        this.updatePlaylist();
+      },
+      reject: () => {
+        // this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+      }
+    });
+  }
+
+  updatePlaylist() {
+    console.log('selectedPlaylist', this.selectedPlaylist);
+    if (this.selectedPlaylist != null) {
+      this.spotifyService.getPlaylistOpsUrl(this.selectedPlaylist.id).subscribe((res) => {
+        if (res.statusCode === 200) {
+          var opsUrl = res.payload;
+          const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+          //Code to add new items to the playlist
+          let plOpsBody: any = {
+            uris: [],
+            position: this.selectedPlaylist.tracks.total
+          };
+          //to store all the selected tracks in db
+          this.saveSelectedTracks();
+
+          this.selectedTracksList.forEach(selectedTrack => {
+            plOpsBody.uris.push(`spotify:track:${selectedTrack.track.id}`)
+          });
+
+          this.spotifyService.SpotifyCommonPostApi(opsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
+            debugger;
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Changes updated successfully.' });
+            //this.router.navigate(['/spotify/playlists']);
+            this.tracksListVisible = false;
+            this.selectedTracksList = [];
+          });
+        };
+      });
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
