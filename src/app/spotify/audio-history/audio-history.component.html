@@ -35,16 +35,20 @@
                         [disabled]="selectedTracksList.length===0" icon="pi pi-save" iconPos="right"
                         pTooltip="Add tracks to existing playlist" tooltipPosition="bottom"></p-button>
 
-                    <p-button class="mr-2" severity="success" icon="pi pi-save" iconPos="right"
-                        pTooltip="Save tracks as a new playlist" tooltipPosition="bottom" (onClick)="plNameVisible=true"
-                        [disabled]="selectedTracksList.length===0"></p-button>
+                    <p-button class="mr-2" severity="success" size="small" pTooltip="Save tracks as a new playlist"
+                        tooltipPosition="bottom" (onClick)="plNameVisible=true"
+                        [disabled]="selectedTracksList.length===0">
+                        <span class="material-symbols-outlined">
+                            playlist_add
+                        </span>
+                    </p-button>
                 </div>
             </div>
             <div>
                 <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" />
             </div>
-            <div>
-                <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
+            <div><p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
+
             </div>
         </ng-template>
 

@@ -219,36 +219,8 @@ export class AudioHistoryComponent implements OnInit {
     return this.documentStyle.getPropertyValue(color);
   }
 
-  showGraphChanged() {
-    this.showDetailedGraph = true;
-    this.showSummaryGraph = false;
-    if (this.showDetailedGraph) {
-      if (this.selectedTracksList.length > 0) {
-        //this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
-        var selectedTracks = this.hisotryTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
-        selectedTracks = selectedTracks.reduce((acc, current) => {
-          const x = acc.find((item: any) => item.track.id === current.track.id);
-          if (!x) {
-            acc.push(current);
-          }
-          return acc;
-        }, []);
-        this.generateChart(selectedTracks);
-      } else {
-        this.generateChart(this.hisotryTracks);
-      }
-
-    };
-  }
-
-  navigateToTrackDetails(trackName: string, trackId: string) {
-    sessionStorage.setItem('track-name', trackName);
-    sessionStorage.setItem('track-id', trackId);
-    this.router.navigate(['/spotify/audio-details']);
-  }
-
   showSummaryGraphChanged() {
-    this.showSummaryGraph = true;
+    this.showSummaryGraph = !this.showSummaryGraph;
     this.showDetailedGraph = false;
     if (this.showSummaryGraph) {
       this.isLoading = true;
@@ -365,6 +337,34 @@ export class AudioHistoryComponent implements OnInit {
         this.isLoading = false;
       }
     }
+  }
+
+  showGraphChanged() {
+    this.showDetailedGraph = !this.showDetailedGraph;
+    this.showSummaryGraph = false;
+    if (this.showDetailedGraph) {
+      if (this.selectedTracksList.length > 0) {
+        //this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
+        var selectedTracks = this.hisotryTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+        selectedTracks = selectedTracks.reduce((acc, current) => {
+          const x = acc.find((item: any) => item.track.id === current.track.id);
+          if (!x) {
+            acc.push(current);
+          }
+          return acc;
+        }, []);
+        this.generateChart(selectedTracks);
+      } else {
+        this.generateChart(this.hisotryTracks);
+      }
+
+    };
+  }
+
+  navigateToTrackDetails(trackName: string, trackId: string) {
+    sessionStorage.setItem('track-name', trackName);
+    sessionStorage.setItem('track-id', trackId);
+    this.router.navigate(['/spotify/audio-details']);
   }
 
   generateChart(playlistTracks: any[]) {
