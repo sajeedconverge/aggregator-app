@@ -6,8 +6,8 @@
 <div class="palylist_table">
     <p-table [value]="hisotryTracks" [rows]="limit" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
         (onPage)="onPageChange($event)" [totalRecords]="hisotryTracks.length" [paginator]="true" paginatorPosition="top"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" sortField="added_at"
+        (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
         (onRowSelect)="rowSelectionEvent()" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)">
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
@@ -166,7 +166,7 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-playlist>
-                <tr [pSelectableRow]="playlist" (click)="confirmUpdatePlaylist()" >
+                <tr [pSelectableRow]="playlist" (click)="confirmUpdatePlaylist()">
                     <td>
                         @if (playlist.images===null) {
                         <img src="images/defaultPlaylistImage.png" class="exs-playlist-img-tb">

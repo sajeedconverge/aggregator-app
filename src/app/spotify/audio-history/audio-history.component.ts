@@ -341,23 +341,23 @@ export class AudioHistoryComponent implements OnInit {
         this.isLoading = false;
       } else {
         this.hisotryTracks.forEach(pltrack => {
-          durationSum = durationSum + ((pltrack.audio_features.duration_ms));
+          durationSum = durationSum + ((pltrack.audio_features?.duration_ms));
           //duration
           this.data2.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
           //tempo
-          this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
+          this.data2.datasets[0].data.push(pltrack.audio_features?.tempo);
           this.data2.datasets[0].tracks.push(pltrack.track.name);
           this.data2.datasets[0].colors.push(pltrack.color);
           //loudness
-          this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
+          this.data2.datasets[1].data.push(pltrack.audio_features?.loudness);
           this.data2.datasets[1].tracks.push(pltrack.track.name);
           this.data2.datasets[1].colors.push(pltrack.color);
           //energy
-          this.data2.datasets[2].data.push(pltrack.audio_features.energy);
+          this.data2.datasets[2].data.push(pltrack.audio_features?.energy);
           this.data2.datasets[2].tracks.push(pltrack.track.name);
           this.data2.datasets[2].colors.push(pltrack.color);
           //danceability
-          this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
+          this.data2.datasets[3].data.push(pltrack.audio_features?.danceability);
           this.data2.datasets[3].tracks.push(pltrack.track.name);
           this.data2.datasets[3].colors.push(pltrack.color);
         });
@@ -403,7 +403,7 @@ export class AudioHistoryComponent implements OnInit {
     var durationSum = 0;
     setTimeout(() => {
       playlistTracks.forEach(pltrack => {
-        pltrack.audioAnalysis.sections.forEach((section: any) => {
+        pltrack.audioAnalysis?.sections?.forEach((section: any) => {
           durationSum = durationSum + ((section.duration) * 1000);
           //duration
           this.data.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
@@ -477,14 +477,18 @@ export class AudioHistoryComponent implements OnInit {
   selectAllClicked() {
     this.showDetailedGraph = false;
     this.showSummaryGraph = false;
-    this.selectedTracksList = [];
-    //managed condition selection and de-selection of all tracks at once
-    if (this.selectedTracksList.length != this.hisotryTracks.length) {
-      this.hisotryTracks.forEach(hTrack => {
-        this.selectedTracksList.push(hTrack);
-      });
-      this.selectedTracksList = Array.from(new Set(this.selectedTracksList));
-    }
+
+    //debugger;
+    ////managed condition selection and de-selection of all tracks at once
+    // if (this.selectedTracksList.length != this.hisotryTracks.length) {
+    //   this.selectedTracksList = [];
+    //   this.hisotryTracks.forEach(hTrack => {
+    //     this.selectedTracksList.push(hTrack);
+    //   });
+    //   this.selectedTracksList = Array.from(new Set(this.selectedTracksList));
+    // }else{
+    //   this.selectedTracksList = [];
+    // }
   }
 
   createNewPlaylist() {
@@ -679,7 +683,7 @@ export class AudioHistoryComponent implements OnInit {
           });
 
           this.spotifyService.SpotifyCommonPostApi(opsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
-            
+
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Changes updated successfully.' });
             //this.router.navigate(['/spotify/playlists']);
             this.tracksListVisible = false;

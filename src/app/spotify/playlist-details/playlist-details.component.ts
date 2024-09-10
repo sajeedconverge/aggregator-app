@@ -193,7 +193,7 @@ export class PlaylistDetailsComponent implements OnInit {
           pltrack.artist = pltrack.track?.artists[0]?.name;
           this.originalTracks.push(pltrack.track.id)
         });
-        //console.log('this.playlistTracks', this.playlistTracks);
+        console.log('this.playlistTracks', this.playlistTracks);
 
         if (this.playlistTracks.length > 0) {
           // To assign Audio Features to the track
@@ -277,16 +277,16 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   showGraphChanged() {
-    this.showDetailedGraph=true;
-    this.showSummaryGraph=false;
+    this.showDetailedGraph = true;
+    this.showSummaryGraph = false;
     if (this.showDetailedGraph) {
       this.generateChart(this.playlistTracks, true);
     };
   }
 
   showSummaryGraphChanged() {
-    this.showSummaryGraph=true;
-    this.showDetailedGraph=false;
+    this.showSummaryGraph = true;
+    this.showDetailedGraph = false;
     if (this.showSummaryGraph) {
       this.isLoading = true;
       this.data2 = {
@@ -449,10 +449,17 @@ export class PlaylistDetailsComponent implements OnInit {
     this.reOrderedTracks = [];
     this.showDetailedGraph = false;
     this.showSummaryGraph = false;
+    // debugger;
+    //console.log('dragIndex :', event.dragIndex, 'dropIndex :', event.dropIndex)
 
     // Remove the item from the drag index and insert it at the drop index
     const movedItem = this.playlistTracks.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
     this.playlistTracks.splice(event.dropIndex, 0, movedItem);  // Insert the moved item at dropIndex
+
+    // //temp code 
+    // var reOrderedTracks = this.playlistTracks.map(plTrack => { return plTrack.track.name });
+    // console.log(reOrderedTracks);
+    // ///////
 
     this.playlistTracks.forEach(plTrack => {
       this.reOrderedTracks.push(plTrack.track.id)
@@ -494,6 +501,10 @@ export class PlaylistDetailsComponent implements OnInit {
     this.playlistTracks.forEach(plTrack => {
       this.reOrderedTracks.push(plTrack.track.id)
     });
+    // //temp code 
+    // var reOrderedTracks = this.playlistTracks.map(plTrack => { return plTrack.track.name });
+    // console.log(reOrderedTracks);
+    // ///////
   }
 
 

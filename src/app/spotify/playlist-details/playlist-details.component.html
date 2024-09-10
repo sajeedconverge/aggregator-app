@@ -5,7 +5,7 @@
 <!-- Playlist Tracks List -->
 <div class="palylist_table">
     <p-table [value]="playlistTracks" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-        [totalRecords]="playlistTracks.length" [paginator]="true"
+        [totalRecords]="playlistTracks.length" [paginator]="true"  sortField="added_at" (sortOrder)="1"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)">
         <ng-template pTemplate="caption">
