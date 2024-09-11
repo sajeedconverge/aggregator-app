@@ -118,6 +118,14 @@ export class SpotifyService {
       );
   }
 
+  getLikedSongsUrl(): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetLikedSongsUrl`, { headers: this.headers });
+  }
+
+
+  
+
+
 
 
 

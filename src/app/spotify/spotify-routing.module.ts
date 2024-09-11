@@ -5,6 +5,7 @@ import { PlaylistDetailsComponent } from './playlist-details/playlist-details.co
 import { TrackDetailsComponent } from './track-details/track-details.component';
 import { AudioHistoryComponent } from './audio-history/audio-history.component';
 import { AudioLibraryComponent } from './audio-library/audio-library.component';
+import { LikedSongsComponent } from './liked-songs/liked-songs.component';
 
 const routes: Routes = [
   {
@@ -26,6 +27,10 @@ const routes: Routes = [
   {
     path: 'audio-library',
     component: AudioLibraryComponent
+  },
+  {
+    path: 'liked-songs',
+    component: LikedSongsComponent
   }
 ];
 
