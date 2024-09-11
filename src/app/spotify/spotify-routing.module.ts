@@ -4,6 +4,7 @@ import { PlaylistComponent } from './playlist/playlist.component';
 import { PlaylistDetailsComponent } from './playlist-details/playlist-details.component';
 import { TrackDetailsComponent } from './track-details/track-details.component';
 import { AudioHistoryComponent } from './audio-history/audio-history.component';
+import { AudioLibraryComponent } from './audio-library/audio-library.component';
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
   {
     path: 'audio-history',
     component: AudioHistoryComponent
+  },
+  {
+    path: 'audio-library',
+    component: AudioLibraryComponent
   }
 ];
 

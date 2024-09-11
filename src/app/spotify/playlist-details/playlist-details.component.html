@@ -5,7 +5,7 @@
 <!-- Playlist Tracks List -->
 <div class="palylist_table">
     <p-table [value]="playlistTracks" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-        [totalRecords]="playlistTracks.length" [paginator]="true"  sortField="added_at" (sortOrder)="1"
+        [totalRecords]="playlistTracks.length" [paginator]="true" sortField="added_at" (sortOrder)="1"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)">
         <ng-template pTemplate="caption">
@@ -30,15 +30,19 @@
                                 </p-button>
                             </p-buttonGroup>
                         </div>
-                        <p-button class="mr-2" severity="warning" (click)="confirmUpdatePlaylist()"
-                        icon="pi pi-save" pTooltip="Save changes" tooltipPosition="bottom" iconPos="right" ></p-button>
+                        <p-button class="mr-2" severity="warning" (click)="confirmUpdatePlaylist()" icon="pi pi-save"
+                            pTooltip="Save changes" tooltipPosition="bottom" iconPos="right"></p-button>
 
-                        <p-button class="mr-2" severity="success" icon="pi pi-save" iconPos="right"
-                             pTooltip="Save as new" tooltipPosition="bottom" (onClick)="plNameVisible=true"></p-button>
+                        <p-button class="mr-2" severity="success" size="small" pTooltip="Save as new"
+                            tooltipPosition="bottom" (onClick)="plNameVisible=true">
+                            <span class="material-symbols-outlined">
+                                playlist_add
+                            </span>
+                        </p-button>
                     </div>
                     <p-button (click)="backToPlaylists()" pTooltip="Back" tooltipPosition="bottom" size="small">
                         <span class="material-symbols-outlined">
-                        undo
+                            undo
                         </span>
                     </p-button>
                 </div>

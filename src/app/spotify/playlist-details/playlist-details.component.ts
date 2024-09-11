@@ -277,7 +277,7 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   showGraphChanged() {
-    this.showDetailedGraph = true;
+    this.showDetailedGraph = !this.showDetailedGraph;
     this.showSummaryGraph = false;
     if (this.showDetailedGraph) {
       this.generateChart(this.playlistTracks, true);
@@ -285,7 +285,7 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   showSummaryGraphChanged() {
-    this.showSummaryGraph = true;
+    this.showSummaryGraph = !this.showSummaryGraph;
     this.showDetailedGraph = false;
     if (this.showSummaryGraph) {
       this.isLoading = true;

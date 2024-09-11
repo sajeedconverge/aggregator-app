@@ -1,0 +1,5 @@
+
+::ng-deep .btn-grp-custom button{
+    outline: none;
+    box-shadow: none;
+}
