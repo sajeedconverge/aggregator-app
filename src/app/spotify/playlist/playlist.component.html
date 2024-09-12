@@ -20,9 +20,9 @@
         </div>
         <div class="m-3 btn_grp_short">
             <p-buttonGroup class="btn-grp-custom">
-                <p-button  icon="pi pi-th-large" (onClick)="isGrid=true" [outlined]="!isGrid" />
-                <p-button  icon="pi pi-list" (onClick)="isGrid=false"  [outlined]="isGrid" />
-            </p-buttonGroup> 
+                <p-button icon="pi pi-th-large" (onClick)="isGrid=true" [outlined]="!isGrid" />
+                <p-button icon="pi pi-list" (onClick)="isGrid=false" [outlined]="isGrid" />
+            </p-buttonGroup>
         </div>
     </div>
 </section>
@@ -80,8 +80,8 @@
                         (click)="getPlayListTracks(playlist.tracks.href,playlist.name,playlist.id,playlist.snapshot_id)"
                         [link]="true" />
                 </td>
-                <td>{{playlist.minTempo? playlist.minTempo : 0}}</td>
-                <td>{{playlist.maxTempo? playlist.maxTempo : 0}}</td>
+                <td>{{(playlist.minTempo? playlist.minTempo : 0) | round }}</td>
+                <td>{{(playlist.maxTempo? playlist.maxTempo : 0) | round }}</td>
                 <td>
                     {{playlist.tracks.total}}
                 </td>

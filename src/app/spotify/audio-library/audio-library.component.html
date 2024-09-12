@@ -8,8 +8,8 @@
         (onPage)="onPageChange($event)" [totalRecords]="audioTracks.length" [paginator]="true" paginatorPosition="top"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" sortField="added_at"
         (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
-        (onRowSelect)="rowSelectionEvent()" [lazy]="true"  (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta"
-         (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)" >
+        (onRowSelect)="rowSelectionEvent()" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)"
+        [lazy]="true" (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta">
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <div></div>
@@ -44,8 +44,8 @@
                         </span>
                     </p-button>
 
-                    <p-button  class="pr-2" [outlined]="true" icon="pi pi-filter-slash"
-                        (onClick)="clear(tableRef)" pTooltip="Clear filter(s)" tooltipPosition="bottom"/>
+                    <p-button class="pr-2" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear(tableRef)"
+                        pTooltip="Clear filter(s)" tooltipPosition="bottom" />
                 </div>
             </div>
             <div>
@@ -118,7 +118,7 @@
                 </td>
                 <td>{{track.artists[0].name}}</td>
                 <td>{{ formatTrackDuration(track?.duration_ms) }}</td>
-                <td>{{ track.audio_features?.tempo}}</td>
+                <td>{{ track.audio_features?.tempo | round}}</td>
                 <td>{{ track.audio_features?.danceability }}</td>
                 <td>{{ track.audio_features?.energy }}</td>
                 <td>{{ track.audio_features?.loudness }}</td>

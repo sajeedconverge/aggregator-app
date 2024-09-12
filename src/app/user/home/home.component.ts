@@ -20,6 +20,7 @@ import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/mo
 import { ToastModule } from 'primeng/toast';
 import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
+import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 
 
 @Component({
@@ -37,7 +38,8 @@ import { TooltipModule } from 'primeng/tooltip';
     MessagesModule,
     ToastModule,
     BadgeModule,
-    TooltipModule
+    TooltipModule,
+    RoundPipe
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',

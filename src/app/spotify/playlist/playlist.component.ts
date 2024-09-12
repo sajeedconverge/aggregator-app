@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule } from '@angular/forms';
 import { ButtonGroupModule } from 'primeng/buttongroup';
+import { RoundPipe } from "../../shared/common-pipes/round.pipe";
 
 
 
@@ -29,7 +30,9 @@ import { ButtonGroupModule } from 'primeng/buttongroup';
     ButtonModule,
     PlaylistDetailsComponent,
     InputSwitchModule,
-    ButtonGroupModule
+    ButtonGroupModule,
+    RoundPipe,
+
   ],
   templateUrl: './playlist.component.html',
   styleUrl: './playlist.component.css'
@@ -146,7 +149,7 @@ export class PlaylistComponent implements OnInit {
                   // Extracting the tempo values
                   const tempos = playlist.songs.map((song: any) => song.audio_features?.tempo);
                   // console.log('tempos', tempos);
-                  
+
                   // Finding the minimum and maximum tempo
                   playlist.minTempo = Math.min(...tempos);
                   playlist.maxTempo = Math.max(...tempos);

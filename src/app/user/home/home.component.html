@@ -126,7 +126,7 @@
                 <td>{{track.track?.artists[0]?.name}}</td>
                 <td>
                     <!-- first choice for saved track and second for track from api -->
-                    {{track.isSaved ? track.track?.audio_features?.tempo : track.audio_features?.tempo}}
+                    {{track.isSaved ? track.track?.audio_features?.tempo : track.audio_features?.tempo | round}}
                 </td>
                 <td>{{track.duration_mins}}</td>
                 <td>{{track.distance_start | number:'1.2-2'}} km</td>
@@ -184,7 +184,7 @@
                 <td>{{ audioFeature.acousticness }}</td>
                 <td>{{ audioFeature.liveness }}</td>
                 <td>{{ audioFeature.valence }}</td>
-                <td>{{ audioFeature.tempo }}</td>
+                <td>{{ audioFeature.tempo | round}}</td>
                 <td>{{ formatTrackDuration(audioFeature.duration_ms) }}</td>
                 <!-- <td>{{ audioFeature.track_href }}</td>
                 <td>{{ audioFeature.analysis_url }}</td> -->
