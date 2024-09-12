@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SpotifyService } from '../shared/services/spotify.service';
 import { SpotifyAuthorizationService } from '../shared/services/spotify-authorization.service';
 import { Constants } from '../../shared/Constants';
@@ -113,7 +113,7 @@ export class PlaylistDetailsComponent implements OnInit {
   originalTracks: string[] = [];
   reOrderedTracks: string[] = [];
   pattern = '\\S+.*';
-
+  nonSavedTrackIds: string[] = [];
 
   constructor(
     private spotifyService: SpotifyService,
@@ -193,7 +193,7 @@ export class PlaylistDetailsComponent implements OnInit {
           pltrack.artist = pltrack.track?.artists[0]?.name;
           this.originalTracks.push(pltrack.track.id)
         });
-        console.log('this.playlistTracks', this.playlistTracks);
+        // console.log('this.playlistTracks', this.playlistTracks);
 
         if (this.playlistTracks.length > 0) {
           // To assign Audio Features to the track
@@ -207,28 +207,28 @@ export class PlaylistDetailsComponent implements OnInit {
                 pltrack.audio_features = dbTrackRes.payload.jsonData.audio_features;
               } else {
                 //console.log('track not found');
-
-                //Add track to DB after fetching it's features
-                this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
-                  if (res.statusCode === 200) {
-                    var featuresUrl = res.payload;
-                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                    this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-                      pltrack.audio_features = res;
-                      //add track to db with it's features
-                      var trackJson = Constants.typeCastTrackJson(pltrack);
-                      var postTrackRequest: PostTrackRequest = {
-                        providerTrackId: pltrack.track.id,
-                        trackData: JSON.stringify(trackJson)
-                      };
-                      this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
-                        if (postTrackRes.statusCode === 200) {
-                          //console.log("track added successfully.", pltrack.track.name);
-                        };
-                      });
-                    });
-                  };
-                });
+                this.nonSavedTrackIds.push(pltrack.track.id);
+                // //Add track to DB after fetching it's features
+                // this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
+                //   if (res.statusCode === 200) {
+                //     var featuresUrl = res.payload;
+                //     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                //     this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
+                //       pltrack.audio_features = res;
+                //       //add track to db with it's features
+                //       var trackJson = Constants.typeCastTrackJson(pltrack);
+                //       var postTrackRequest: PostTrackRequest = {
+                //         providerTrackId: pltrack.track.id,
+                //         trackData: JSON.stringify(trackJson)
+                //       };
+                //       this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
+                //         if (postTrackRes.statusCode === 200) {
+                //           //console.log("track added successfully.", pltrack.track.name);
+                //         };
+                //       });
+                //     });
+                //   };
+                // });
               };
             });
             //To get track analysis
@@ -266,6 +266,35 @@ export class PlaylistDetailsComponent implements OnInit {
             });
           });
           setTimeout(() => {
+            if (this.nonSavedTrackIds.length > 0) {
+              var severalIds = this.nonSavedTrackIds.join(',');
+              //console.log(severalIds);
+              this.spotifyService.getSeveralAudioFeaturesUrl(severalIds).subscribe((safUrlResponse) => {
+                if (safUrlResponse.statusCode === 200) {
+                  var safUrl = safUrlResponse.payload;
+                  this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
+                   
+                    safResponse.audio_features.forEach((audioFeature: any) => {
+                      var matchedSong = this.playlistTracks.find(song => song.track.id === audioFeature.id);
+                      matchedSong.audio_features = audioFeature;
+
+                      //add track to db with it's features
+                      var trackJson = Constants.typeCastTrackJson(matchedSong);
+                      var postTrackRequest: PostTrackRequest = {
+                        providerTrackId: matchedSong.track.id,
+                        trackData: JSON.stringify(trackJson)
+                      };
+                      this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
+                        if (postTrackRes.statusCode === 200) {
+                          // console.log("track added successfully.", matchedSong.track.name);
+                        };
+                      });
+
+                    });
+                  });
+                };
+              });
+            };
             this.isLoading = false;
           }, 5000);
         } else {

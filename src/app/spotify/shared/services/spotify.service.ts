@@ -122,6 +122,19 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetLikedSongsUrl`, { headers: this.headers });
   }
 
+  getSeveralAudioFeaturesUrl(ids: string): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSeveralAudioFeaturesUrl?ids=${ids}`, { headers: this.headers });
+  }
+
+
+
+
+
+
+
+
+
+
 
   
 

@@ -1,0 +1,10 @@
+.exs-playlist-img-tb{
+    height: 50px ;
+    width: 50px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+::ng-deep .btn-grp-custom button{
+    outline: none;
+    box-shadow: none;
+}

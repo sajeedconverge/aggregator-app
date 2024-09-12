@@ -109,7 +109,7 @@ export class AudioHistoryComponent implements OnInit {
   tracksListVisible: boolean = false;
   selectedPlaylist: any;
   userPlaylists: any[] = [];
-
+  nonSavedTrackIds: string[] = [];
 
 
   constructor(
@@ -155,16 +155,18 @@ export class AudioHistoryComponent implements OnInit {
                 pltrack.audio_features = dbTrackRes.payload.jsonData.audio_features;
               } else {
                 //console.log('track not found');
-                this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
-                  if (res.statusCode === 200) {
-                    var featuresUrl = res.payload;
-                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                    this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-                      pltrack.audio_features = res;
+                this.nonSavedTrackIds.push(pltrack.track.id);
 
-                    });
-                  };
-                });
+                // this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
+                //   if (res.statusCode === 200) {
+                //     var featuresUrl = res.payload;
+                //     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                //     this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
+                //       pltrack.audio_features = res;
+
+                //     });
+                //   };
+                // });
               };
             });
             //To get track analysis
@@ -189,6 +191,22 @@ export class AudioHistoryComponent implements OnInit {
             });
           });
           setTimeout(() => {
+            if (this.nonSavedTrackIds.length > 0) {
+              var severalIds = this.nonSavedTrackIds.join(',');
+              //console.log(severalIds);
+              this.spotifyService.getSeveralAudioFeaturesUrl(severalIds).subscribe((safUrlResponse) => {
+                if (safUrlResponse.statusCode === 200) {
+                  var safUrl = safUrlResponse.payload;
+                  this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
+                   
+                    safResponse.audio_features.forEach((audioFeature: any) => {
+                      var matchedSong = this.hisotryTracks.find(song => song.track.id === audioFeature.id);
+                      matchedSong.audio_features = audioFeature;
+                    });
+                  });
+                };
+              });
+            };
             this.isLoading = false;
           }, 5000);
         })
@@ -637,11 +655,8 @@ export class AudioHistoryComponent implements OnInit {
           console.log(this.userPlaylists);
         });
         this.isLoading = false;
-      }
-    })
-
-
-
+      };
+    });
   }
 
   confirmUpdatePlaylist() {
