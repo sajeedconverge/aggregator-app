@@ -2,53 +2,54 @@
 <app-progress-bar></app-progress-bar>
 }
 <p-confirmDialog />
-
+<!-- liked songs List -->
 <div class="palylist_table">
-    <p-table [value]="hisotryTracks" [rows]="limit" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-        (onPage)="onPageChange($event)" [totalRecords]="hisotryTracks.length" [paginator]="true" paginatorPosition="top"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" sortField="added_at"
-        (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
-        (onRowSelect)="rowSelectionEvent()" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)">
+    <p-table [value]="likedSongs" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+        [totalRecords]="likedSongs.length" [paginator]="true" sortField="added_at" (sortOrder)="1"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedTracksList"
+        [tableStyle]="{'min-width': '60rem'}" (onRowSelect)="rowSelectionEvent()" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)">
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <div></div>
-                <h3>Recently Played</h3>
+                <h3>Liked Songs</h3>
                 <div class="flex flex-row align-items-center">
-                    <div class="flex flex-row align-items-center">
-                        <p-buttonGroup class="pr-3 btn-grp-custom">
-                            <p-button [outlined]="!showSummaryGraph" size="small" (onClick)="showSummaryGraphChanged()"
-                                pTooltip="Summary Graph" tooltipPosition="bottom">
-                                <span class="material-symbols-outlined">
-                                    show_chart
-                                </span>
-                            </p-button>
-                            <p-button [outlined]="!showDetailedGraph" size="small" (onClick)="showGraphChanged()"
-                                pTooltip="Detailed Graph" tooltipPosition="bottom">
-                                <span class="material-symbols-outlined">
-                                    monitoring
-                                </span>
-                            </p-button>
-                        </p-buttonGroup>
+                    <div class="flex flex-row align-items-center" *ngIf="likedSongs.length > 0">
+                        <div class="pr-3 ">
+                            <p-buttonGroup class="btn-grp-custom">
+                                <p-button [outlined]="!showSummaryGraph" (onClick)="showSummaryGraphChanged()"
+                                    size="small" pTooltip="Summary Graph" tooltipPosition="bottom">
+                                    <span class="material-symbols-outlined">
+                                        show_chart
+                                    </span>
+                                </p-button>
+                                <p-button [outlined]="!showDetailedGraph" size="small" (onClick)="showGraphChanged()"
+                                    pTooltip="Detailed Graph" tooltipPosition="bottom">
+                                    <span class="material-symbols-outlined">
+                                        monitoring
+                                    </span>
+                                </p-button>
+                            </p-buttonGroup>
+                        </div>
+
+                        <p-button class="mr-2" severity="warning" (onClick)="addTracksToExistingPlaylist()"
+                            [disabled]="selectedTracksList.length===0" icon="pi pi-save" iconPos="right"
+                            pTooltip="Add tracks to existing playlist" tooltipPosition="bottom"></p-button>
+
+                        <p-button class="mr-2" severity="success" size="small" pTooltip="Save tracks as a new playlist"
+                            [disabled]="selectedTracksList.length===0" tooltipPosition="bottom"
+                            (onClick)="plNameVisible=true">
+                            <span class="material-symbols-outlined">
+                                playlist_add
+                            </span>
+                        </p-button>
                     </div>
-
-                    <p-button class="mr-2" severity="warning" (onClick)="addTracksToExistingPlaylist()"
-                        [disabled]="selectedTracksList.length===0" icon="pi pi-save" iconPos="right"
-                        pTooltip="Add tracks to existing playlist" tooltipPosition="bottom"></p-button>
-
-                    <p-button class="mr-2" severity="success" size="small" pTooltip="Save tracks as a new playlist"
-                        tooltipPosition="bottom" (onClick)="plNameVisible=true"
-                        [disabled]="selectedTracksList.length===0">
-                        <span class="material-symbols-outlined">
-                            playlist_add
-                        </span>
-                    </p-button>
                 </div>
             </div>
             <div>
                 <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" />
             </div>
-            <div><p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
-
+            <div>
+                <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
             </div>
         </ng-template>
 
@@ -57,7 +58,7 @@
                 <th style="width:80px">
                 </th>
                 <th style="width: 4rem">
-                    <p-tableHeaderCheckbox (click)="selectAllClicked()" />
+                    <p-tableHeaderCheckbox (click)="rowSelectionEvent()" />
                 </th>
                 <th style="width:80px">
                 </th>
@@ -68,10 +69,6 @@
                 <th pSortableColumn="artist">
                     Artist
                     <p-sortIcon field="artist" />
-                </th>
-                <th pSortableColumn="played_at">
-                    Played At
-                    <p-sortIcon field="played_at" />
                 </th>
                 <th pSortableColumn="track.duration_ms">
                     Duration
@@ -110,17 +107,20 @@
                         (onClick)="navigateToTrackDetails(track.track.name,track.track.id)" />
                 </td>
                 <td>{{track.track.artists[0].name}}</td>
-                <td>{{track.played_at | date: 'dd-MMM-yyyy hh:mm:ss a'}}</td>
                 <td>{{ formatTrackDuration(track?.track.duration_ms) }}</td>
                 <td>{{ track?.audio_features?.tempo}}</td>
                 <td>{{ track?.audio_features?.danceability }}</td>
                 <td>{{ track?.audio_features?.energy }}</td>
                 <td>{{ track?.audio_features?.loudness }}</td>
+                <!-- <td>
+                        <p-button class="anchor_btn" (click)="openInSpotify(track.track.external_urls.spotify)"
+                            label="Open in Spotify" [link]="true" />
+                    </td> -->
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <tr class="">
-                <td colspan="12">No tracks found in audio History.</td>
+                <td colspan="10">No tracks found in the current playlist.</td>
             </tr>
         </ng-template>
     </p-table>
@@ -128,7 +128,8 @@
 </div>
 
 
-<!-- Dialog for saving tracks as a new playlist -->
+
+
 <p-dialog header="Create New Playlist" [modal]="true" [draggable]="false" [(visible)]="plNameVisible" [closable]="false"
     [style]="{ width: '25rem' }">
     <span class="p-text-secondary block mb-5">Enter name for new playlist.</span>
@@ -150,7 +151,6 @@
         <p-button label="Save" (onClick)="createNewPlaylist()" [disabled]="playlistNameInput.invalid" />
     </div>
 </p-dialog>
-
 
 <!-- Dialog for adding tracks to existing playlist -->
 <p-dialog header="Add Tracks to existing Playlist" [modal]="true" [draggable]="false" [(visible)]="tracksListVisible"

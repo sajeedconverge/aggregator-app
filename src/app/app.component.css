@@ -31,3 +31,9 @@
   color: #fff;
   padding-right: 10px;
  }
+ ::ng-deep .custom_link_switch .p-ink{
+  height: auto !important;
+  width:auto !important;
+  top:unset !important;
+  left: unset !important
+ }
