@@ -84,7 +84,6 @@ export class AppComponent implements OnInit {
       this.spotifyLinked = this.authService.isSpotifyLinked();
       this.stravaLinked = this.authService.isStravaLinked();
     };
-    this.fetchThirdPartyDetails();
   }
 
   get dark() {
@@ -154,23 +153,6 @@ export class AppComponent implements OnInit {
     };
   }
 
-  //refresh third party details
-  fetchThirdPartyDetails() {
-    this.spotifyService.getSpotifyData().subscribe((res) => {
-      if (res.statusCode === 200) {
-        Constants.spotifySettings = res.payload;
-        Constants.spotifyHeader = new HttpHeaders({
-          //'Authorization': 'Basic ' + btoa('a3470aef0a5e4ca5bcb06600c262f026' + ':' + '25e7aab330324d8ba368c08e7b4a5800'),
-          'Authorization': 'Basic ' + btoa(Constants.spotifySettings.clientId + ':' + Constants.spotifySettings.clientSecret),
-          'Content-Type': 'application/x-www-form-urlencoded',
-        });
-      };
-    });
-    this.stravaService.getStravaData().subscribe((res) => {
-      if (res.statusCode === 200) {
-        Constants.stravaSettings = res.payload;
-      }
-    });
-  }
+  
 
 }

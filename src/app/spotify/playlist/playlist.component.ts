@@ -126,36 +126,44 @@ export class PlaylistComponent implements OnInit {
 
   assignPlaylistProperties() {
     this.userPlaylists.forEach(playlist => {
+      //debugger;
       var tracksUrl = playlist.tracks.href;
       const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
       this.spotifyService.SpotifyCommonGetApi(tracksUrl, spotifyAccessToken).subscribe((tracksResponse) => {
-        //console.log(playlist.name, tracksResponse.items);
+
+        //console.log(playlist.name, 'songs :', tracksResponse.items);
+        // debugger;
         playlist.songs = tracksResponse.items;
         playlist.duration_ms = 0;
         playlist.songs.forEach((t: any) => { playlist.duration_ms += t.track.duration_ms });
         playlist.duration_ms = Constants.formatMilliseconds(playlist.duration_ms);
         //console.log('total duration :', playlist.duration_ms)
         var severalIds: string = playlist.songs.map((t: any) => t.track.id).join(',');
+        //console.log(playlist.name, 'severalIds :', severalIds);
 
         if (playlist.songs.length > 0) {
+
           this.spotifyService.getSeveralAudioFeaturesUrl(severalIds).subscribe((safUrlResponse) => {
             if (safUrlResponse.statusCode === 200) {
               var safUrl = safUrlResponse.payload;
               this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
+                // debugger;
+                // console.log(playlist.name, safResponse.audio_features);
 
-                safResponse.audio_features.forEach((audioFeature: any) => {
-                  var matchedSong = playlist.songs.find((song: any) => song.track.id === audioFeature.id);
-                  matchedSong.audio_features = audioFeature;
-                  // Extracting the tempo values
-                  const tempos = playlist.songs.map((song: any) => song.audio_features?.tempo);
-                  // console.log('tempos', tempos);
 
-                  // Finding the minimum and maximum tempo
-                  playlist.minTempo = Math.min(...tempos);
-                  playlist.maxTempo = Math.max(...tempos);
-
+                playlist.songs.forEach((song: any) => {
+                  var matchedFeature = safResponse.audio_features.find((feature: any) => song.track.id === feature.id);
+                  song.audio_features = matchedFeature;
 
                 });
+                var tempos = [];
+                tempos = playlist.songs.map((song: any) => song.audio_features?.tempo);
+                // console.log(playlist.name, 'tempos', tempos);
+                // Finding the minimum and maximum tempo
+                playlist.minTempo = Math.min(...tempos);
+                playlist.maxTempo = Math.max(...tempos);
+
+
               });
             };
           });
