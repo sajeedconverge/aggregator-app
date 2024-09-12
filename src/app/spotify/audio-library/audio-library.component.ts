@@ -19,6 +19,7 @@ import { AuthService } from '../../user/shared/services/auth.service';
 import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
 import { SpotifyAuthorizationService } from '../shared/services/spotify-authorization.service';
 import { SpotifyService } from '../shared/services/spotify.service';
+import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 
 @Component({
   selector: 'app-audio-library',
@@ -37,7 +38,10 @@ import { SpotifyService } from '../shared/services/spotify.service';
     InputTextModule,
     TooltipModule,
     ButtonGroupModule,
+    RoundPipe,
 
+
+    
   ],
   templateUrl: './audio-library.component.html',
   styleUrl: './audio-library.component.css',
@@ -138,7 +142,7 @@ export class AudioLibraryComponent implements OnInit {
         this.audioTracks = tracksResponse.payload.map((pltrack: any) => {
           pltrack.jsonData.artist = pltrack.jsonData.artists[0].name
           pltrack.jsonData.color = Constants.generateRandomPrimeNGColor();
-          pltrack.jsonData.duration=Constants.formatMilliseconds(pltrack.jsonData.duration_ms);
+          pltrack.jsonData.duration = Constants.formatMilliseconds(pltrack.jsonData.duration_ms);
           return pltrack.jsonData
         });
         console.log('this.audioTracks', this.audioTracks);
@@ -701,7 +705,7 @@ export class AudioLibraryComponent implements OnInit {
 
   clear(table: Table) {
     table.sortField = 'name';
-    table.sortOrder= 1;
+    table.sortOrder = 1;
     table.clear();
   }
 

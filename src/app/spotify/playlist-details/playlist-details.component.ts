@@ -20,6 +20,7 @@ import { AuthService } from '../../user/shared/services/auth.service';
 import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonGroupModule } from 'primeng/buttongroup';
+import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 
 
 
@@ -43,7 +44,7 @@ import { ButtonGroupModule } from 'primeng/buttongroup';
     InputTextModule,
     TooltipModule,
     ButtonGroupModule,
-
+    RoundPipe
 
 
 

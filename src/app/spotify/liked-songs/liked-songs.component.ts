@@ -20,6 +20,7 @@ import { AuthService } from '../../user/shared/services/auth.service';
 import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
 import { SpotifyAuthorizationService } from '../shared/services/spotify-authorization.service';
 import { SpotifyService } from '../shared/services/spotify.service';
+import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 
 @Component({
   selector: 'app-liked-songs',
@@ -38,7 +39,7 @@ import { SpotifyService } from '../shared/services/spotify.service';
     InputTextModule,
     TooltipModule,
     ButtonGroupModule,
-
+    RoundPipe
 
 
   ],

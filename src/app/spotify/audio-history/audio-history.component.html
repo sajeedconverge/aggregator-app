@@ -112,7 +112,7 @@
                 <td>{{track.track.artists[0].name}}</td>
                 <td>{{track.played_at | date: 'dd-MMM-yyyy hh:mm:ss a'}}</td>
                 <td>{{ formatTrackDuration(track?.track.duration_ms) }}</td>
-                <td>{{ track?.audio_features?.tempo}}</td>
+                <td>{{ track?.audio_features?.tempo | round}}</td>
                 <td>{{ track?.audio_features?.danceability }}</td>
                 <td>{{ track?.audio_features?.energy }}</td>
                 <td>{{ track?.audio_features?.loudness }}</td>

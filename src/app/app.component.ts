@@ -18,6 +18,10 @@ import { ProviderTokenRequest } from './user/shared/models/user-models';
 import { AccountService } from './user/shared/services/account.service';
 import { RippleModule } from 'primeng/ripple';
 import { StyleClassModule } from 'primeng/styleclass';
+import { Constants } from './shared/Constants';
+import { HttpHeaders } from '@angular/common/http';
+import { StravaService } from './strava/shared/services/strava.service';
+import { SpotifyService } from './spotify/shared/services/spotify.service';
 
 @Component({
   selector: 'app-root',
@@ -33,7 +37,7 @@ import { StyleClassModule } from 'primeng/styleclass';
     FormsModule,
     ReactiveFormsModule,
     SigninComponent,
-    RippleModule, 
+    RippleModule,
     StyleClassModule
   ],
   templateUrl: './app.component.html',
@@ -55,7 +59,9 @@ export class AppComponent implements OnInit {
     private socialAuthService: SocialAuthService,
     private stravaAuthService: StravaAuthorizationService,
     private spotifyAuthService: SpotifyAuthorizationService,
-    private accountService: AccountService
+    private accountService: AccountService,
+    private stravaService: StravaService,
+    private spotifyService: SpotifyService,
   ) { }
 
   ngOnInit(): void {
@@ -78,6 +84,7 @@ export class AppComponent implements OnInit {
       this.spotifyLinked = this.authService.isSpotifyLinked();
       this.stravaLinked = this.authService.isStravaLinked();
     };
+    this.fetchThirdPartyDetails();
   }
 
   get dark() {
@@ -145,6 +152,25 @@ export class AppComponent implements OnInit {
         };
       })
     };
+  }
+
+  //refresh third party details
+  fetchThirdPartyDetails() {
+    this.spotifyService.getSpotifyData().subscribe((res) => {
+      if (res.statusCode === 200) {
+        Constants.spotifySettings = res.payload;
+        Constants.spotifyHeader = new HttpHeaders({
+          //'Authorization': 'Basic ' + btoa('a3470aef0a5e4ca5bcb06600c262f026' + ':' + '25e7aab330324d8ba368c08e7b4a5800'),
+          'Authorization': 'Basic ' + btoa(Constants.spotifySettings.clientId + ':' + Constants.spotifySettings.clientSecret),
+          'Content-Type': 'application/x-www-form-urlencoded',
+        });
+      };
+    });
+    this.stravaService.getStravaData().subscribe((res) => {
+      if (res.statusCode === 200) {
+        Constants.stravaSettings = res.payload;
+      }
+    });
   }
 
 }

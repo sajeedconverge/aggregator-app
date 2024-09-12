@@ -19,6 +19,7 @@ import { SpotifyAuthorizationService } from '../shared/services/spotify-authoriz
 import { Constants } from '../../shared/Constants';
 import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
 import { ButtonGroupModule } from 'primeng/buttongroup';
+import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 
 @Component({
   selector: 'app-audio-history',
@@ -37,7 +38,7 @@ import { ButtonGroupModule } from 'primeng/buttongroup';
     InputTextModule,
     TooltipModule,
     ButtonGroupModule,
-
+    RoundPipe
 
 
 
@@ -198,7 +199,7 @@ export class AudioHistoryComponent implements OnInit {
                 if (safUrlResponse.statusCode === 200) {
                   var safUrl = safUrlResponse.payload;
                   this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
-                   
+
                     safResponse.audio_features.forEach((audioFeature: any) => {
                       var matchedSong = this.hisotryTracks.find(song => song.track.id === audioFeature.id);
                       matchedSong.audio_features = audioFeature;
