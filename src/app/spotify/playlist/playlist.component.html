@@ -19,14 +19,6 @@
             <h2>Playlists</h2>
         </div>
         <div class="m-3 btn_grp_short">
-            <!-- <label>{{isGrid? 'Grid':'List'}}</label> -->
-            <!-- @if(isGrid){
-            <i class="pi pi-th-large"></i>
-            }@else{
-            <i class="pi pi-list"></i>
-            }
-            <p-inputSwitch [(ngModel)]="isGrid" /> -->
-
             <p-buttonGroup class="btn-grp-custom">
                 <p-button  icon="pi pi-th-large" (onClick)="isGrid=true" [outlined]="!isGrid" />
                 <p-button  icon="pi pi-list" (onClick)="isGrid=false"  [outlined]="isGrid" />
@@ -49,7 +41,7 @@
                 }@else {
                 <img [src]="playlist?.images[0].url">
                 }
-                <h4>{{playlist.name }} ({{playlist.tracks.total}}-Tracks)</h4>
+                <h4>{{playlist.name }}</h4>
             </div>
         </div>
         }
@@ -65,7 +57,10 @@
             <tr>
                 <th> </th>
                 <th>Playlist Name</th>
+                <th>Min Tempo</th>
+                <th>Max Tempo</th>
                 <th>Tracks</th>
+                <th>Total Duration</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-playlist>
@@ -81,14 +76,16 @@
                     }
                 </td>
                 <td>
-
                     <p-button class="anchor_btn" [label]="playlist.name"
                         (click)="getPlayListTracks(playlist.tracks.href,playlist.name,playlist.id,playlist.snapshot_id)"
                         [link]="true" />
                 </td>
+                <td>{{playlist.minTempo? playlist.minTempo : 0}}</td>
+                <td>{{playlist.maxTempo? playlist.maxTempo : 0}}</td>
                 <td>
                     {{playlist.tracks.total}}
                 </td>
+                <td>{{playlist.duration_ms}}</td>
             </tr>
         </ng-template>
     </p-table>
