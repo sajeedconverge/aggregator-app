@@ -1,11 +1,11 @@
 import { HttpHeaders } from "@angular/common/http";
-import { PairedTrackJsonObject, SpotifySettings, TrackAnalysisJsonObject, TrackJsonObject } from "../spotify/shared/models/spotify-models";
+import { AnalysisTrackDetail, PairedTrackJsonObject, SpotifySettings, TrackAnalysisJsonObject, TrackJsonObject } from "../spotify/shared/models/spotify-models";
 import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "../strava/shared/models/strava-models";
 
 export class Constants {
 
-    // public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
-    public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
+    public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
+    // public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     public static spotifySettings: SpotifySettings = {
         clientId: "",
@@ -242,10 +242,30 @@ export class Constants {
         return trackJson
     }
 
-    public static typeCastTrackAnalysisJson(trackAnalysis: any): TrackAnalysisJsonObject {
+    public static typeCastTrackAnalysisJson(trackAnalysis: {sections:any[],track :AnalysisTrackDetail}): TrackAnalysisJsonObject {
         var trackAnalysisJson: TrackAnalysisJsonObject = {
             sections: trackAnalysis.sections,
-            track: trackAnalysis.track
+            //track: trackAnalysis.track
+            track: {
+                num_samples: trackAnalysis.track.num_samples,
+                duration:  trackAnalysis.track.duration,
+                sample_md5:  trackAnalysis.track.sample_md5,
+                offset_seconds:  trackAnalysis.track.offset_seconds, 
+                window_seconds:  trackAnalysis.track.window_seconds, 
+                analysis_sample_rate: trackAnalysis.track.analysis_sample_rate,
+                analysis_channels:  trackAnalysis.track.analysis_channels,
+                end_of_fade_in:  trackAnalysis.track.end_of_fade_in,
+                start_of_fade_out:  trackAnalysis.track.start_of_fade_out,
+                loudness:  trackAnalysis.track.loudness,
+                tempo:  trackAnalysis.track.tempo,
+                tempo_confidence:  trackAnalysis.track.tempo_confidence,
+                time_signature:  trackAnalysis.track.time_signature,
+                time_signature_confidence:  trackAnalysis.track.time_signature_confidence,
+                key:  trackAnalysis.track.key,
+                key_confidence:  trackAnalysis.track.key_confidence,
+                mode:  trackAnalysis.track.mode,
+                mode_confidence: trackAnalysis.track.mode_confidence
+            }
         };
         return trackAnalysisJson
     }
@@ -300,7 +320,7 @@ export class Constants {
         return primeNGColors[randomIndex];
     }
 
-    
+
 
 
 

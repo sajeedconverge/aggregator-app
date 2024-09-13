@@ -249,6 +249,7 @@ export class PlaylistDetailsComponent implements OnInit {
                     this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
                       pltrack.audioAnalysis = res;
                       //To add track analysis
+                      debugger;
                       var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
                       var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
                         providerTrackId: pltrack.track.id,

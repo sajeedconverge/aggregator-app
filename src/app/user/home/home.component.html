@@ -104,8 +104,8 @@
                 <th>End Time</th>
                 <th>Name</th>
                 <th>Artist </th>
-                <th>eBPM</th>
-                <th>Duration</th>
+                <th>Tempo</th>
+                <!-- <th>Duration</th> -->
                 <th>Distance Start</th>
                 <th>Distance End</th>
                 <th>Distance</th>
@@ -126,9 +126,9 @@
                 <td>{{track.track?.artists[0]?.name}}</td>
                 <td>
                     <!-- first choice for saved track and second for track from api -->
-                    {{track.isSaved ? track.track?.audio_features?.tempo : track.audio_features?.tempo | round}}
+                    {{track.isSaved ? (track.track?.audio_features?.tempo | round) : (track.audio_features?.tempo | round)}}
                 </td>
-                <td>{{track.duration_mins}}</td>
+                <!-- <td>{{track.duration_mins}}</td> -->
                 <td>{{track.distance_start | number:'1.2-2'}} km</td>
                 <td>{{track.distance_end | number:'1.2-2'}} km</td>
                 <td>{{track.distance | number:'1.2-2' }} km</td>
@@ -168,7 +168,7 @@
                 <th>Acousticness</th>
                 <th>Liveness</th>
                 <th>Valence</th>
-                <th>eBPM</th>
+                <th>Tempo</th>
                 <th>Duration</th>
                 <!-- <th>Track Href</th>
                 <th>Analysis Url</th> -->

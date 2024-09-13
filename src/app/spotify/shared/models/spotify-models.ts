@@ -20,22 +20,22 @@ export interface TrackJsonObject {
     popularity: number
     type: string
     uri: string
-    audio_features:any
+    audio_features: any
 }
 
 export interface PairedTrackJsonObject {
     //providerTrackId
-    distance:number
-    distance_end:number
-    distance_start:number
-    duration_mins:any
-    moving_time:number
-    pace:number
-    played_at:any
-    speed:any
-    start_time:any
-    trackid:string
-    track?:any
+    distance: number
+    distance_end: number
+    distance_start: number
+    duration_mins: any
+    moving_time: number
+    pace: number
+    played_at: any
+    speed: any
+    start_time: any
+    trackid: string
+    track?: any
 }
 
 export interface PostTrackAnalysisRequest {
@@ -44,12 +44,31 @@ export interface PostTrackAnalysisRequest {
 }
 
 export interface TrackAnalysisJsonObject {
-    sections:any[]
-    track:any
+    sections: any[]
+    track: AnalysisTrackDetail
 }
 
 
-
+export interface AnalysisTrackDetail {
+    num_samples: number,
+    duration: number,
+    sample_md5: string,
+    offset_seconds: number,
+    window_seconds: number,
+    analysis_sample_rate: number,
+    analysis_channels: number,
+    end_of_fade_in: number,
+    start_of_fade_out: number,
+    loudness: number,
+    tempo: number,
+    tempo_confidence: number,
+    time_signature: number,
+    time_signature_confidence: number,
+    key: number,
+    key_confidence: number,
+    mode: number,
+    mode_confidence: number,
+}
 
 
 
