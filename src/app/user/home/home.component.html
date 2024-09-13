@@ -22,10 +22,10 @@
             <div class="flex justify-content-between">
                 <h2>Activities</h2>
                 <div>
-                    <p-button  severity="info" (click)="FetchActivitiesFromStrava()"
-                        icon="pi pi-file-import" iconPos="right" pTooltip="Fetch activities" tooltipPosition="bottom"/>
-                    <p-button  class="ml-2" [outlined]="true" icon="pi pi-filter-slash"
-                        (onClick)="clear(dt1)" pTooltip="Clear sorting(s)" tooltipPosition="bottom"/>
+                    <p-button severity="info" (click)="FetchActivitiesFromStrava()" icon="pi pi-file-import"
+                        iconPos="right" pTooltip="Fetch activities" tooltipPosition="bottom" />
+                    <p-button class="ml-2" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear(dt1)"
+                        pTooltip="Clear sorting(s)" tooltipPosition="bottom" />
                 </div>
             </div>
         </ng-template>
@@ -85,8 +85,8 @@
             <div class="flex flex-row justify-content-between">
                 <h3>Activity Details</h3>
                 <div>
-                    <p-button pTooltip="Save" tooltipPosition="bottom" severity="success" [disabled]="isADSaved" (click)="saveActivityDetails()"
-                        icon="pi pi-save" iconPos="right" />
+                    <p-button pTooltip="Save" tooltipPosition="bottom" severity="success" [disabled]="isADSaved"
+                        (click)="saveActivityDetails()" icon="pi pi-save" iconPos="right" />
 
                     <p-button (click)="fetchActivitiesFromDb()" class="ml-2" pTooltip="Back" tooltipPosition="bottom"
                         size="small" pTooltip="Back" tooltipPosition="bottom">
@@ -119,14 +119,15 @@
                 <td>{{track.start_time | date: 'hh:mm:ss a'}}</td>
                 <td>{{track.played_at | date: 'hh:mm:ss a'}}</td>
                 <td>
-                    <p-button class="anchor_btn" [disabled]="track?.track?.id===''"
+                    <p-button class="anchor_btn" [disabled]="track?.track?.name==='No Track'"
                         (click)="getAudioFeatures(track.track?.id,track.isSaved)" [label]="track.track?.name"
                         [link]="true" />
                 </td>
                 <td>{{track.track?.artists[0]?.name}}</td>
                 <td>
                     <!-- first choice for saved track and second for track from api -->
-                    {{track.isSaved ? (track.track?.audio_features?.tempo | round) : (track.audio_features?.tempo | round)}}
+                    {{track.isSaved ? (track.track?.audio_features?.tempo | round) : (track.audio_features?.tempo |
+                    round)}}
                 </td>
                 <!-- <td>{{track.duration_mins}}</td> -->
                 <td>{{track.distance_start | number:'1.2-2'}} km</td>
@@ -150,11 +151,10 @@
 
             <div class="flex flex-row justify-content-between">
                 <h3>Audio Features</h3>
-                <p-button (click)="showAudioFeatures=false" pTooltip="Back" tooltipPosition="bottom"
-                size="small">
-                <span class="material-symbols-outlined">
-                    undo
-                </span></p-button>
+                <p-button (click)="showAudioFeatures=false" pTooltip="Back" tooltipPosition="bottom" size="small">
+                    <span class="material-symbols-outlined">
+                        undo
+                    </span></p-button>
             </div>
 
         </ng-template>

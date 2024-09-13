@@ -70,9 +70,21 @@ export interface AnalysisTrackDetail {
     mode_confidence: number,
 }
 
-
-
-
+export interface TrackMetricRequest{
+    id: string
+    userId: string
+    providerActivityId: number
+    providerTrackId: string
+    distance: number
+    distance_start: number
+    distance_end: number
+    duration_mins: string
+    moving_time: string
+    pace: string
+    played_at: string
+    speed: number
+    start_time: string
+  }
 
 
 
