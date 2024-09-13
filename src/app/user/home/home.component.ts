@@ -16,7 +16,7 @@ import { Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { PostActivityDetailRequest, PostActivityRequest } from '../../strava/shared/models/strava-models';
 import { AuthService } from '../shared/services/auth.service';
-import { PairedTrackJsonObject, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
+import { PairedTrackJsonObject, PostTrackRequest, TrackMetricRequest } from '../../spotify/shared/models/spotify-models';
 import { ToastModule } from 'primeng/toast';
 import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
@@ -278,15 +278,42 @@ export class HomeComponent implements OnInit, OnDestroy {
   pairItems(activities: any[], tracks: any[]) {
     const result: { activity: any, tracks: any[] }[] = [];
     activities.forEach(activity => {
-      //const activityStartDate = new Date(activity.start_date).getTime();
-      //const activityEndDate = new Date(activity.end_date).getTime();
+      var matchedTracks = Constants.assignRecentAudioToActivity(activity, this.recentAudio);
 
-      // const matchedTracks = tracks.filter(track => {
-      //   const trackStartDate = new Date(track.start_time).getTime();
-      //   return trackStartDate >= activityStartDate || trackStartDate <= activityEndDate;
-      // });
+      matchedTracks = matchedTracks.sort((a, b) =>
+        new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+      );
+      //To enter the no audio items for time gap greater than 5 seconds
+      for (let index = 0; index < matchedTracks.length; index++) {
+        const currentTrackEndTime = new Date(matchedTracks[index].played_at);
+        const nextTrackStartTime = new Date(matchedTracks[index + 1]?.start_time);
+        const timeDifference = nextTrackStartTime.getTime() - currentTrackEndTime.getTime();
+        const differenceInSeconds = timeDifference / 1000;
+        if (differenceInSeconds > 5) {
+          //console.log('after song : ', matchedTracks[index]?.track.name, ' The difference is greater than 5 seconds.', differenceInSeconds);
+          var noTrackItem = {
+            start_time: matchedTracks[index].played_at,
+            played_at: matchedTracks[index + 1]?.start_time,
+            track: {
+              id: matchedTracks[index].played_at,
+              name: 'No Track',
+              audio_features: {
+                tempo: 'N/A'
+              },
+              artists: [
+                {
+                  name: 'N/A'
+                }
+              ],
+              duration_ms: timeDifference,
+            },
+            duration_mins : Constants.formatDuration(timeDifference)
+          }
+          //matchedTracks.push(noTrackItem);
+          matchedTracks.splice(index + 1, 0, noTrackItem);
+        };
+      };
 
-      const matchedTracks = Constants.assignRecentAudioToActivity(activity, this.recentAudio);
       //console.log('matchedTracks2', matchedTracks);
 
       result.push({ activity, tracks: matchedTracks });
@@ -437,7 +464,30 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         }
       });
+      //to add trackMetrics
+      //debugger;
+      var trackMetric: TrackMetricRequest = {
+        id: 'f46876c9-aa8d-42c3-b6a7-5892c2aa445d',
+        userId: 'f46876c9-aa8d-42c3-b6a7-5892c2aa445d',
+        providerActivityId: this.pairedResult[0].activity.id,
+        providerTrackId: pt.track.id,
+        distance: pt.distance,
+        distance_start: pt.distance_start,
+        distance_end: pt.distance_end,
+        duration_mins: pt.duration_mins,
+        moving_time: pt.moving_time,
+        pace: pt.pace,
+        played_at: pt.played_at,
+        speed: pt.speed,
+        start_time: pt.start_time,
+      };
+      
+      this.spotifyService.postTrackMetric(trackMetric).subscribe((postMetricResponse) => {
+        if (postMetricResponse.statusCode === 200) {
+          console.log('metric posted successfully.');
 
+        };
+      });
     });
     var activityDetailJson = Constants.typeCastActivityDetailJson(this.pairedResult[0].activity)
     activityDetailJson.audio = pairedTrackJsonArray;

@@ -4,7 +4,7 @@ import { map, Observable } from 'rxjs';
 import { Constants } from '../../../shared/Constants';
 import { ResponseModel } from '../../../shared/shared-models';
 import { SpotifyAuthorizationService } from './spotify-authorization.service';
-import { PostTrackAnalysisRequest, PostTrackRequest } from '../models/spotify-models';
+import { PostTrackAnalysisRequest, PostTrackRequest, TrackMetricRequest } from '../models/spotify-models';
 
 @Injectable({
   providedIn: 'root'
@@ -126,8 +126,13 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSeveralAudioFeaturesUrl?ids=${ids}`, { headers: this.headers });
   }
 
+  postTrackMetric(request: TrackMetricRequest): Observable<any> {
+    return this.http.post<any>(Constants.baseServerUrl + 'Spotify/PostTrackMetric', request, { headers: this.headers });
+  }
 
-
+  getTrackMetricsByTrackId(trackId:string): Observable<any> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetTrackMetricsByTrackId?trackId=${trackId}`, { headers: this.headers });
+  }
 
 
 
