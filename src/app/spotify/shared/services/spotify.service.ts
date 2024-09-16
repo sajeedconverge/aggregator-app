@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Constants } from '../../../shared/Constants';
@@ -42,7 +42,7 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetCurrentUserPlaylistsUrl`, { headers: this.headers });
   }
 
-  getSpotifyRecentlyPlayedLimitUrl(limit:number): Observable<ResponseModel> {
+  getSpotifyRecentlyPlayedLimitUrl(limit: number): Observable<ResponseModel> {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSpotifyRecentlyPlayedFiftyUrl?limit=${limit}`, { headers: this.headers });
   }
 
@@ -67,8 +67,8 @@ export class SpotifyService {
       );
   }
 
-  getAllTracks(): Observable<any> {
-    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetAllTracks`, { headers: this.headers })
+  getAllTracks(pageNumber:number,pageSize:number): Observable<any> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetAllTracks?pageNumber=${pageNumber}&pageSize=${pageSize}`, { headers: this.headers })
       .pipe(
         map(response => {
           // Parse the jsonData property for each track
@@ -130,18 +130,31 @@ export class SpotifyService {
     return this.http.post<any>(Constants.baseServerUrl + 'Spotify/PostTrackMetric', request, { headers: this.headers });
   }
 
-  getTrackMetricsByTrackId(trackId:string): Observable<any> {
+  getTrackMetricsByTrackId(trackId: string): Observable<any> {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetTrackMetricsByTrackId?trackId=${trackId}`, { headers: this.headers });
+  }
+
+  getMultipleTrackAnalysesByIds(providerIds: string[]): Observable<any> {
+    const params = new HttpParams().set('providerIds', providerIds.join(','));
+    return this.http.get<any>(`${Constants.baseServerUrl}Spotify/GetTrackAnalysesByProviderIds`, {
+      headers: this.headers,
+      params: params
+    })
+      .pipe(
+        map(response => {
+          // Parse the jsonData property for each track
+          response.payload = response.payload.map((trackAnalysis: any) => {
+            trackAnalysis.analysisJsonData = JSON.parse(trackAnalysis.analysisJsonData);
+            return trackAnalysis;
+          });
+          return response;
+        })
+      );
   }
 
 
 
 
-
-
-
-
-  
 
 
 

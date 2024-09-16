@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, FilterService, MessageService, SelectItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ChartModule } from 'primeng/chart';
@@ -41,7 +41,7 @@ import { RoundPipe } from '../../shared/common-pipes/round.pipe';
     RoundPipe,
 
 
-    
+
   ],
   templateUrl: './audio-library.component.html',
   styleUrl: './audio-library.component.css',
@@ -55,7 +55,8 @@ export class AudioLibraryComponent implements OnInit {
   playlistName: string = '';
   selectedTracksList: any[] = [];
   audioTracks: any[] = [];
-  limit: number = 10;
+  pageSize: number = 10;
+  pageNumber: number = 1;
   showSummaryGraph: boolean = false;
   showDetailedGraph: boolean = false;
   documentStyle = getComputedStyle(document.documentElement);
@@ -113,8 +114,6 @@ export class AudioLibraryComponent implements OnInit {
   multiSortMeta!: any[];
 
 
-
-
   constructor(
     private spotifyService: SpotifyService,
     private spotifyAuthService: SpotifyAuthorizationService,
@@ -122,13 +121,14 @@ export class AudioLibraryComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     private confirmationService: ConfirmationService,
+    private filterService: FilterService,
+
   ) {
     //this.spotifyAuthService.refreshSpotifyAccessToken();
     this.getAllAudio()
   }
 
   ngOnInit(): void {
-
   }
 
   formatTrackDuration(durationMs: number) {
@@ -137,7 +137,7 @@ export class AudioLibraryComponent implements OnInit {
 
   getAllAudio() {
     this.isLoading = true;
-    this.spotifyService.getAllTracks().subscribe((tracksResponse) => {
+    this.spotifyService.getAllTracks(this.pageNumber,this.pageSize).subscribe((tracksResponse) => {
       if (tracksResponse.statusCode === 200) {
         this.audioTracks = tracksResponse.payload.map((pltrack: any) => {
           pltrack.jsonData.artist = pltrack.jsonData.artists[0].name
@@ -146,79 +146,27 @@ export class AudioLibraryComponent implements OnInit {
           return pltrack.jsonData
         });
         console.log('this.audioTracks', this.audioTracks);
+        //To fetch audio analysis for each track
+        var tracksIds = this.audioTracks.map(plTrack => { return plTrack.id });
+        console.log(tracksIds);
+
+        this.spotifyService.getMultipleTrackAnalysesByIds(tracksIds).subscribe((analysesResponse) => {
+          if (analysesResponse.statusCode === 200) {
+            console.log('multiple analyses', analysesResponse.payload);
+
+          };
+        })
 
         this.isLoading = false;
       }
     });
-
     this.isLoading = false;
-
-    // this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(this.limit).subscribe((urlResponse) => {
-    //   if (urlResponse.statusCode === 200) {
-
-    //     var recentAudioUrl = urlResponse.payload;
-    //     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-    //     this.spotifyService.SpotifyCommonGetApi(recentAudioUrl, spotifyAccessToken).subscribe((audioResponse) => {
-
-    //       this.audioTracks = audioResponse.items;
-    //       console.log('hisotryTracks', this.audioTracks);
-
-
-    //       this.audioTracks.forEach(pltrack => {
-    //         pltrack.artist = pltrack?.artists[0]?.name;
-    //         pltrack.color = Constants.generateRandomPrimeNGColor();
-    //         // audio features
-    //         this.spotifyService.getTrackById(pltrack.id).subscribe((dbTrackRes) => {
-    //           if (dbTrackRes.statusCode === 200) {
-    //             //console.log('track found', dbTrackRes.payload.jsonData.audio_features);
-    //             pltrack.audio_features = dbTrackRes.payload.jsonData.audio_features;
-    //           } else {
-    //             //console.log('track not found');
-    //             this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.id).subscribe((res) => {
-    //               if (res.statusCode === 200) {
-    //                 var featuresUrl = res.payload;
-    //                 const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-    //                 this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-    //                   pltrack.audio_features = res;
-
-    //                 });
-    //               };
-    //             });
-    //           };
-    //         });
-    //         //To get track analysis
-    //         this.spotifyService.getTrackAnalysisById(pltrack.id).subscribe((taRes) => {
-    //           if (taRes.statusCode === 200) {
-
-    //             //console.log('track analysis found', taRes.payload.analysisJsonData);
-    //             pltrack.audioAnalysis = taRes.payload.analysisJsonData;
-    //           } else {
-    //             //console.log('track analysis not found');
-    //             //To fetch track analysis
-    //             this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.id).subscribe((res) => {
-    //               if (res.statusCode === 200) {
-    //                 var analysisUrl = res.payload;
-    //                 const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-    //                 this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-    //                   pltrack.audioAnalysis = res;
-    //                 });
-    //               };
-    //             });
-    //           };
-    //         });
-    //       });
-    //       setTimeout(() => {
-    //         this.isLoading = false;
-    //       }, 5000);
-    //     })
-    //   };
-    // })
   }
 
   onPageChange(event: any) {
     this.showDetailedGraph = false;
     this.showSummaryGraph = false;
-    this.limit = event.rows;
+    this.pageSize = event.rows;
     this.getAllAudio();
   }
 
@@ -709,22 +657,16 @@ export class AudioLibraryComponent implements OnInit {
     table.clear();
   }
 
-  // tableFiltered(event:any) {
-  //   // (onFilter)="tableFiltered($event)"
-  //   console.log('tableFiltered :',event);
-  // }
-
   loadData(event: TableLazyLoadEvent) {
     //debugger;
-    // event.first = First row offset
-    // event.rows = Number of rows per page
-    // event.sortField = Field name to sort with
-    // event.sortOrder = Sort order as number, 1 for asc and -1 for desc
-    // event.filters = Filter metadata
     console.log('Lazy Load Event:', event);
     console.log('multi sort meta:', event.multiSortMeta);
-    // Load data here based on event parameters
+
+
+
+
   }
+
 
 
 

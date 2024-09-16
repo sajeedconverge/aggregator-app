@@ -4,9 +4,9 @@
 <p-confirmDialog />
 
 <div class="palylist_table">
-    <p-table [value]="audioTracks" [rows]="limit" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+    <p-table [value]="audioTracks" [rows]="pageSize" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
         (onPage)="onPageChange($event)" [totalRecords]="audioTracks.length" [paginator]="true" paginatorPosition="top"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" sortField="added_at"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" sortField="name"
         (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
         (onRowSelect)="rowSelectionEvent()" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)"
         [lazy]="true" (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta">
@@ -83,22 +83,23 @@
                 <th pSortableColumn="audio_features.tempo">
                     Tempo
                     <p-sortIcon field="audio_features.tempo" />
-                    <p-columnFilter type="numeric" field="audio_features.tempo" display="menu" />
+                    <p-columnFilter type="numeric" field="audio_features.tempo" display="menu" [showOperator]="false"  >
+                    </p-columnFilter>
                 </th>
                 <th pSortableColumn="audio_features.danceability">
                     Danceability
                     <p-sortIcon field="audio_features.danceability" />
-                    <p-columnFilter type="numeric" field="audio_features.danceability" display="menu" />
+                    <p-columnFilter type="numeric" field="audio_features.danceability" display="menu" [showOperator]="false"/>
                 </th>
                 <th pSortableColumn="audio_features.energy">
                     Energy
                     <p-sortIcon field="audio_features.energy" />
-                    <p-columnFilter type="numeric" field="audio_features.energy" display="menu" />
+                    <p-columnFilter type="numeric" field="audio_features.energy" display="menu" [showOperator]="false"/>
                 </th>
                 <th pSortableColumn="audio_features.loudness">
                     Loudness
                     <p-sortIcon field="audio_features.loudness" />
-                    <p-columnFilter type="numeric" field="audio_features.loudness" display="menu" />
+                    <p-columnFilter type="numeric" field="audio_features.loudness" display="menu" [showOperator]="false"/>
                 </th>
             </tr>
         </ng-template>
