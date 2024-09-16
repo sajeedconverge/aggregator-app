@@ -122,7 +122,7 @@ export class AudioLibraryComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     private confirmationService: ConfirmationService,
-    private title:Title
+    private title: Title
   ) {
     this.title.setTitle('AudioActive - Audio Library')
     //this.spotifyAuthService.refreshSpotifyAccessToken();
@@ -138,7 +138,7 @@ export class AudioLibraryComponent implements OnInit {
 
   getAllAudio() {
     this.isLoading = true;
-    this.spotifyService.getAllTracks(this.pageNumber,this.pageSize).subscribe((tracksResponse) => {
+    this.spotifyService.getAllTracks(this.pageNumber, this.pageSize).subscribe((tracksResponse) => {
       if (tracksResponse.statusCode === 200) {
         this.audioTracks = tracksResponse.payload.map((pltrack: any) => {
           pltrack.jsonData.artist = pltrack.jsonData.artists[0].name
@@ -150,10 +150,12 @@ export class AudioLibraryComponent implements OnInit {
         //To fetch audio analysis for each track
         var tracksIds = this.audioTracks.map(plTrack => { return plTrack.id });
         // console.log(tracksIds);
-
         this.spotifyService.getMultipleTrackAnalysesByIds(tracksIds).subscribe((analysesResponse) => {
           if (analysesResponse.statusCode === 200) {
-           // console.log('multiple analyses', analysesResponse.payload);
+             console.log('multiple analyses', analysesResponse.payload);
+            this.audioTracks.forEach(track=> {
+              track.audioAnalysis = analysesResponse.payload.find((analysis:any)=>analysis.providerTrackId===track?.id)?.analysisJsonData
+            })
 
           };
         })

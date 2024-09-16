@@ -63,7 +63,7 @@ export class PlaylistComponent implements OnInit {
     private router: Router,
     private title:Title
   ) {
-    this.title.setTitle('AudioActive - PLaylists')
+    this.title.setTitle('AudioActive - Playlists')
     this.spotifyAuthService.checkExpiryAndRefreshToken();
     this.startCheckingToken();
     this.fetchThirdPartyDetails();

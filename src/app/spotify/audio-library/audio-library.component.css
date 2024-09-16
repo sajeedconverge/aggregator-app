@@ -3,3 +3,10 @@
     outline: none;
     box-shadow: none;
 }
+
+.exs-playlist-img-tb{
+    height: 50px ;
+    width: 50px;
+    border-radius: 10px;
+    cursor: pointer;
+}
