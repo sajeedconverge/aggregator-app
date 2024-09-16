@@ -15,6 +15,7 @@ import { SpotifyService } from '../shared/services/spotify.service';
 import { Router } from '@angular/router';
 import { Constants } from '../../shared/Constants';
 import { TooltipModule } from 'primeng/tooltip';
+import { Title } from '@angular/platform-browser';
 
 
 
@@ -163,10 +164,11 @@ export class TrackDetailsComponent implements OnInit {
 
 
   constructor(
-    private stravaService: StravaService,
     private spotifyService: SpotifyService,
-    private router: Router
+    private router: Router,
+    private title:Title
   ) {
+    this.title.setTitle('AudioActive - Track Details')
     this.trackId = sessionStorage.getItem('track-id') || '';
     this.trackName = sessionStorage.getItem('track-name') || '';
   }

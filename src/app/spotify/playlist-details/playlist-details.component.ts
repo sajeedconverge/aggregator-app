@@ -21,6 +21,7 @@ import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spo
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
+import { Title } from '@angular/platform-browser';
 
 
 
@@ -122,8 +123,10 @@ export class PlaylistDetailsComponent implements OnInit {
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private title:Title
   ) {
+    this.title.setTitle('AudioActive - Playlist Details')
     this.fetchThirdPartyDetails();
     this.startCheckingToken();
   }

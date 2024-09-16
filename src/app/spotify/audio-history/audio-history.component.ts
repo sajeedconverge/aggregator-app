@@ -20,6 +20,7 @@ import { Constants } from '../../shared/Constants';
 import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-audio-history',
@@ -120,7 +121,9 @@ export class AudioHistoryComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     private confirmationService: ConfirmationService,
+    private title:Title
   ) {
+    this.title.setTitle('AudioActive - Recently Played')
     this.spotifyAuthService.refreshSpotifyAccessToken();
     this.getRecentAudio()
   }

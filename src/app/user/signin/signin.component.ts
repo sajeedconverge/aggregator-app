@@ -21,6 +21,7 @@ import { UserLoginRequest } from '../shared/models/user-models';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { StravaAuthorizationService } from '../../strava/shared/services/strava-authorization.service';
 import { SpotifyAuthorizationService } from '../../spotify/shared/services/spotify-authorization.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-signin',
@@ -64,7 +65,9 @@ export class SigninComponent implements OnInit {
     private fb: FormBuilder,
     private stravaAuthService: StravaAuthorizationService,
     private spotifyAuthService: SpotifyAuthorizationService,
+    private title:Title
   ) {
+    // this.title.setTitle('AudioActive - Sign In');
 
   }
 

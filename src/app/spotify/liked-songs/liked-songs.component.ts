@@ -21,6 +21,7 @@ import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spo
 import { SpotifyAuthorizationService } from '../shared/services/spotify-authorization.service';
 import { SpotifyService } from '../shared/services/spotify.service';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-liked-songs',
@@ -123,8 +124,10 @@ export class LikedSongsComponent implements OnInit {
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private title:Title
   ) {
+    this.title.setTitle('AudioActive - Liked Songs')
     this.fetchThirdPartyDetails();
     this.startCheckingToken();
   }

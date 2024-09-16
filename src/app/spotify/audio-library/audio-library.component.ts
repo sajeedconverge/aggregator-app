@@ -20,6 +20,7 @@ import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spo
 import { SpotifyAuthorizationService } from '../shared/services/spotify-authorization.service';
 import { SpotifyService } from '../shared/services/spotify.service';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-audio-library',
@@ -121,9 +122,9 @@ export class AudioLibraryComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     private confirmationService: ConfirmationService,
-    private filterService: FilterService,
-
+    private title:Title
   ) {
+    this.title.setTitle('AudioActive - Audio Library')
     //this.spotifyAuthService.refreshSpotifyAccessToken();
     this.getAllAudio()
   }

@@ -15,6 +15,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule } from '@angular/forms';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { RoundPipe } from "../../shared/common-pipes/round.pipe";
+import { Title } from '@angular/platform-browser';
 
 
 
@@ -59,8 +60,10 @@ export class PlaylistComponent implements OnInit {
   constructor(
     private spotifyService: SpotifyService,
     private spotifyAuthService: SpotifyAuthorizationService,
-    private router: Router
+    private router: Router,
+    private title:Title
   ) {
+    this.title.setTitle('AudioActive - PLaylists')
     this.spotifyAuthService.checkExpiryAndRefreshToken();
     this.startCheckingToken();
     this.fetchThirdPartyDetails();
