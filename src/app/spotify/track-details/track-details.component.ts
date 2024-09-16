@@ -178,50 +178,95 @@ export class TrackDetailsComponent implements OnInit {
 
   getTrackHistory() {
     this.isLoading = true;
-    this.stravaService.getActivityDetailsByTrackId(this.trackId).subscribe((historyResponse) => {
-      this.isLoading = true;
+
+    this.spotifyService.getTrackMetricsByTrackId(this.trackId).subscribe(historyResponse => {
       if (historyResponse.statusCode === 200) {
-        this.activityDetails = historyResponse.payload;
+        console.log('track metrics :', historyResponse.payload);
+        //sort data a/c to date in ascending order
+        historyResponse.payload = historyResponse.payload.sort((a:any, b:any) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
-        this.activityDetails.forEach(ad => {
-          ad.jsonData.audio.forEach((track: any) => {
-            if (track.trackid === this.trackId) {
-              this.trackDetails.push(track);
+        historyResponse.payload.forEach((trackMetric: any) => {
+          this.trackDetails.push(trackMetric);
 
-              // to plot the pace chart
-              // Convert pace string to a numerical value for plotting
-              const convertPaceToNumber = (pace: string): number => {
-                //debugger;
-                // Assuming pace format is "mm:ss" (minutes:seconds)
-                const parts = pace.split(':').map(part => parseInt(part, 10));
-                // Convert to total seconds
-                return (parts[0] * 60) + parts[1] + (parts[2] / 100);
-              };
+          // to plot the pace chart
+          // Convert pace string to a numerical value for plotting
+          const convertPaceToNumber = (pace: string): number => {
+            //debugger;
+            // Assuming pace format is "mm:ss" (minutes:seconds)
+            const parts = pace.split(':').map(part => parseInt(part, 10));
+            // Convert to total seconds
+            return (parts[0] * 60) + parts[1] + (parts[2] / 100);
+          };
 
-              // Add duration to labels
-              this.data2.labels.push(`${new Date(track.start_time).toLocaleString('en-US', {
-                weekday: 'short', // e.g., 'Mon'
-                year: 'numeric',  // e.g., '2023'
-                month: 'short',   // e.g., 'Sep'
-                day: 'numeric',   // e.g., '3'
-                hour: '2-digit',  // e.g., '08'
-                minute: '2-digit',// e.g., '07'
-                second: '2-digit' // e.g., '05'
-              })}`);
+          // Add duration to labels
+          this.data2.labels.push(`${new Date(trackMetric.start_time).toLocaleString('en-US', {
+            weekday: 'short', // e.g., 'Mon'
+            year: 'numeric',  // e.g., '2023'
+            month: 'short',   // e.g., 'Sep'
+            day: 'numeric',   // e.g., '3'
+            hour: '2-digit',  // e.g., '08'
+            minute: '2-digit',// e.g., '07'
+            second: '2-digit' // e.g., '05'
+          })}`);
 
-              // Convert pace to numerical value and add to data
-              const paceNumber = convertPaceToNumber(track.pace);
-              this.data2.datasets[0].data.push(paceNumber);
-            }
-          })
+          // Convert pace to numerical value and add to data
+          const paceNumber = convertPaceToNumber(trackMetric.pace);
+          this.data2.datasets[0].data.push(paceNumber);
         });
 
-        //this.showPaceGraph = true;
-        //console.log('this.data2', this.data2);
-        //console.log('this.trackDetails', this.trackDetails);
+        this.trackDetails = this.trackDetails.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+
         this.isLoading = false;
-      }
+
+      };
     });
+
+
+
+    // this.stravaService.getActivityDetailsByTrackId(this.trackId).subscribe((historyResponse) => {
+    //   this.isLoading = true;
+    //   if (historyResponse.statusCode === 200) {
+    //     this.activityDetails = historyResponse.payload;
+
+    //     this.activityDetails.forEach(ad => {
+    //       ad.jsonData.audio.forEach((track: any) => {
+    //         if (track.trackid === this.trackId) {
+    //           this.trackDetails.push(track);
+
+    //           // to plot the pace chart
+    //           // Convert pace string to a numerical value for plotting
+    //           const convertPaceToNumber = (pace: string): number => {
+    //             //debugger;
+    //             // Assuming pace format is "mm:ss" (minutes:seconds)
+    //             const parts = pace.split(':').map(part => parseInt(part, 10));
+    //             // Convert to total seconds
+    //             return (parts[0] * 60) + parts[1] + (parts[2] / 100);
+    //           };
+
+    //           // Add duration to labels
+    //           this.data2.labels.push(`${new Date(track.start_time).toLocaleString('en-US', {
+    //             weekday: 'short', // e.g., 'Mon'
+    //             year: 'numeric',  // e.g., '2023'
+    //             month: 'short',   // e.g., 'Sep'
+    //             day: 'numeric',   // e.g., '3'
+    //             hour: '2-digit',  // e.g., '08'
+    //             minute: '2-digit',// e.g., '07'
+    //             second: '2-digit' // e.g., '05'
+    //           })}`);
+
+    //           // Convert pace to numerical value and add to data
+    //           const paceNumber = convertPaceToNumber(track.pace);
+    //           this.data2.datasets[0].data.push(paceNumber);
+    //         }
+    //       })
+    //     });
+
+    //     //this.showPaceGraph = true;
+    //     //console.log('this.data2', this.data2);
+    //     //console.log('this.trackDetails', this.trackDetails);
+    //     this.isLoading = false;
+    //   }
+    // });
   }
 
   backToTracks() {

@@ -101,11 +101,11 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSpotifyUser?userId=${userId}`, { headers: this.headers });
   }
 
-  postTrackAnalysis(request: PostTrackAnalysisRequest): Observable<any> {
+  postTrackAnalysis(request: PostTrackAnalysisRequest): Observable<ResponseModel> {
     return this.http.post<any>(Constants.baseServerUrl + 'Spotify/PostTrackAnalysis', request, { headers: this.headers });
   }
 
-  getTrackAnalysisById(providerId: string): Observable<any> {
+  getTrackAnalysisById(providerId: string): Observable<ResponseModel> {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetTrackAnalysisByProviderId?providerId=${providerId}`, { headers: this.headers })
       .pipe(
         map(response => {
@@ -126,15 +126,15 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSeveralAudioFeaturesUrl?ids=${ids}`, { headers: this.headers });
   }
 
-  postTrackMetric(request: TrackMetricRequest): Observable<any> {
+  postTrackMetric(request: TrackMetricRequest): Observable<ResponseModel> {
     return this.http.post<any>(Constants.baseServerUrl + 'Spotify/PostTrackMetric', request, { headers: this.headers });
   }
 
-  getTrackMetricsByTrackId(trackId: string): Observable<any> {
+  getTrackMetricsByTrackId(trackId: string): Observable<ResponseModel> {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetTrackMetricsByTrackId?trackId=${trackId}`, { headers: this.headers });
   }
 
-  getMultipleTrackAnalysesByIds(providerIds: string[]): Observable<any> {
+  getMultipleTrackAnalysesByIds(providerIds: string[]): Observable<ResponseModel> {
     const params = new HttpParams().set('providerIds', providerIds.join(','));
     return this.http.get<any>(`${Constants.baseServerUrl}Spotify/GetTrackAnalysesByProviderIds`, {
       headers: this.headers,

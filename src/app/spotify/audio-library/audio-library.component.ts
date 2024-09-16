@@ -148,11 +148,11 @@ export class AudioLibraryComponent implements OnInit {
         console.log('this.audioTracks', this.audioTracks);
         //To fetch audio analysis for each track
         var tracksIds = this.audioTracks.map(plTrack => { return plTrack.id });
-        console.log(tracksIds);
+        // console.log(tracksIds);
 
         this.spotifyService.getMultipleTrackAnalysesByIds(tracksIds).subscribe((analysesResponse) => {
           if (analysesResponse.statusCode === 200) {
-            console.log('multiple analyses', analysesResponse.payload);
+           // console.log('multiple analyses', analysesResponse.payload);
 
           };
         })
