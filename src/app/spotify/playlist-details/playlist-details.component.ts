@@ -252,7 +252,7 @@ export class PlaylistDetailsComponent implements OnInit {
                     this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
                       pltrack.audioAnalysis = res;
                       //To add track analysis
-                      debugger;
+                      // debugger;
                       var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
                       var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
                         providerTrackId: pltrack.track.id,
@@ -274,9 +274,9 @@ export class PlaylistDetailsComponent implements OnInit {
             if (this.nonSavedTrackIds.length > 0) {
               var severalIds = this.nonSavedTrackIds.join(',');
               //console.log(severalIds);
-              this.spotifyService.getSeveralAudioFeaturesUrl(severalIds).subscribe((safUrlResponse) => {
+              this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
                 if (safUrlResponse.statusCode === 200) {
-                  var safUrl = safUrlResponse.payload;
+                  var safUrl = safUrlResponse.payload + severalIds;
                   this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
                    
                     safResponse.audio_features.forEach((audioFeature: any) => {

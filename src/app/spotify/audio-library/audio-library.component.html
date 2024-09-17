@@ -8,8 +8,8 @@
         (onPage)="onPageChange($event)" [totalRecords]="audioTracks.length" [paginator]="true" paginatorPosition="top"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" sortField="name"
         (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
-        (onRowSelect)="rowSelectionEvent()" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)"
-        [lazy]="true" (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta">
+        (onRowSelect)="rowSelectionEvent()" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)">
+        <!-- [lazy]="true" (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta"> -->
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <div></div>

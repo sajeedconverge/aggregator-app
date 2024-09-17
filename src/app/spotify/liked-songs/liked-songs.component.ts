@@ -125,7 +125,7 @@ export class LikedSongsComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private authService: AuthService,
-    private title:Title
+    private title: Title
   ) {
     this.title.setTitle('AudioActive - Liked Songs')
     this.fetchThirdPartyDetails();
@@ -283,9 +283,9 @@ export class LikedSongsComponent implements OnInit {
                 if (this.nonSavedTrackIds.length > 0) {
                   var severalIds = this.nonSavedTrackIds.join(',');
                   //console.log(severalIds);
-                  this.spotifyService.getSeveralAudioFeaturesUrl(severalIds).subscribe((safUrlResponse) => {
+                  this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
                     if (safUrlResponse.statusCode === 200) {
-                      var safUrl = safUrlResponse.payload;
+                      var safUrl = safUrlResponse.payload + severalIds;
                       this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
 
                         safResponse.audio_features.forEach((audioFeature: any) => {

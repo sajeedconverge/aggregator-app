@@ -61,7 +61,7 @@ export class PlaylistComponent implements OnInit {
     private spotifyService: SpotifyService,
     private spotifyAuthService: SpotifyAuthorizationService,
     private router: Router,
-    private title:Title
+    private title: Title
   ) {
     this.title.setTitle('AudioActive - Playlists')
     this.spotifyAuthService.checkExpiryAndRefreshToken();
@@ -70,7 +70,12 @@ export class PlaylistComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //this.isLoading = true;
+    if (sessionStorage.getItem('playlist-view') === 'grid') {
+      this.isGrid = true;
+    } else if (sessionStorage.getItem('playlist-view') === 'list') {
+      this.isGrid = false;
+    };
+
 
   }
 
@@ -118,8 +123,8 @@ export class PlaylistComponent implements OnInit {
         var playlistsUrl = res.payload;
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
-          console.log(this.userPlaylists);
-          //to assign other properties
+          // console.log(this.userPlaylists);
+          // to assign other properties
           this.assignPlaylistProperties();
         });
         this.isLoading = false;
@@ -146,9 +151,9 @@ export class PlaylistComponent implements OnInit {
 
         if (playlist.songs.length > 0) {
 
-          this.spotifyService.getSeveralAudioFeaturesUrl(severalIds).subscribe((safUrlResponse) => {
+          this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
             if (safUrlResponse.statusCode === 200) {
-              var safUrl = safUrlResponse.payload;
+              var safUrl = safUrlResponse.payload + severalIds;
               this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
                 // debugger;
                 // console.log(playlist.name, safResponse.audio_features);
@@ -183,6 +188,15 @@ export class PlaylistComponent implements OnInit {
     sessionStorage.setItem('playlist-id', id);
     sessionStorage.setItem('playlist-snapshot-id', snapShotId);
     this.router.navigate(['/spotify/playlist-details'])
+  }
+
+  changeGridView(isGridView: boolean) {
+    this.isGrid = isGridView;
+    if (isGridView) {
+      sessionStorage.setItem('playlist-view', 'grid');
+    } else {
+      sessionStorage.setItem('playlist-view', 'list');
+    };
   }
 
 

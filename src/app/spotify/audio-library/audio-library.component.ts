@@ -152,10 +152,37 @@ export class AudioLibraryComponent implements OnInit {
         // console.log(tracksIds);
         this.spotifyService.getMultipleTrackAnalysesByIds(tracksIds).subscribe((analysesResponse) => {
           if (analysesResponse.statusCode === 200) {
-             console.log('multiple analyses', analysesResponse.payload);
-            this.audioTracks.forEach(track=> {
-              track.audioAnalysis = analysesResponse.payload.find((analysis:any)=>analysis.providerTrackId===track?.id)?.analysisJsonData
-            })
+            // console.log('multiple analyses', analysesResponse.payload);
+            this.audioTracks.forEach(track => {
+              track.audioAnalysis = analysesResponse.payload.find((analysis: any) => analysis.providerTrackId === track?.id)?.analysisJsonData
+              console.log('track.audioAnalysis', track.audioAnalysis);
+              if (!track.audioAnalysis) {
+                //To fetch track analysis
+                this.spotifyService.getSpotifyAudioAnalysisUrl(track.id).subscribe((res) => {
+                  if (res.statusCode === 200) {
+                    var analysisUrl = res.payload;
+                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                    this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+                      track.audioAnalysis = res;
+                      //To add track analysis
+                      var trackAnalysis = Constants.typeCastTrackAnalysisJson(track.audioAnalysis);
+                      var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+                        providerTrackId: track.id,
+                        trackAnalysisData: JSON.stringify(trackAnalysis)
+                      };
+                      this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
+                        if (postTrackAnalysisResponse.statusCode === 200) {
+                          //console.log("track analysis added successfully.");
+
+                        };
+                      });
+                    });
+                  };
+                });
+              };
+
+
+            });
 
           };
         })
@@ -249,10 +276,9 @@ export class AudioLibraryComponent implements OnInit {
       };
       var durationSum = 0;
       if (this.selectedTracksList.length > 0) {
-        // this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
-        var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+        var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.id === ht.id));
         selectedTracks = selectedTracks.reduce((acc, current) => {
-          const x = acc.find((item: any) => item.track.id === current.track.id);
+          const x = acc.find((item: any) => item.id === current.id);
           if (!x) {
             acc.push(current);
           }
@@ -279,7 +305,7 @@ export class AudioLibraryComponent implements OnInit {
           this.data2.datasets[3].tracks.push(pltrack.name);
           this.data2.datasets[3].colors.push(pltrack.color);
         });
-        console.log('this.data2', this.data2);
+        // console.log('this.data2', this.data2);
         this.isLoading = false;
       } else {
         this.audioTracks.forEach(pltrack => {
@@ -315,9 +341,9 @@ export class AudioLibraryComponent implements OnInit {
     if (this.showDetailedGraph) {
       if (this.selectedTracksList.length > 0) {
         //this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
-        var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+        var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.id === ht.id));
         selectedTracks = selectedTracks.reduce((acc, current) => {
-          const x = acc.find((item: any) => item.track.id === current.track.id);
+          const x = acc.find((item: any) => item.id === current.id);
           if (!x) {
             acc.push(current);
           }
@@ -480,7 +506,7 @@ export class AudioLibraryComponent implements OnInit {
                   };
 
                   this.selectedTracksList.forEach(selectedTrack => {
-                    plOpsBody.uris.push(`spotify:track:${selectedTrack.track.id}`)
+                    plOpsBody.uris.push(`spotify:track:${selectedTrack.id}`)
                   });
 
                   //to store all the selected tracks in db
@@ -504,9 +530,9 @@ export class AudioLibraryComponent implements OnInit {
   }
 
   saveSelectedTracks() {
-    var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+    var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.id === ht.id));
     selectedTracks = selectedTracks.reduce((acc, current) => {
-      const x = acc.find((item: any) => item.track.id === current.track.id);
+      const x = acc.find((item: any) => item.id === current.id);
       if (!x) {
         acc.push(current);
       }
@@ -639,7 +665,7 @@ export class AudioLibraryComponent implements OnInit {
           this.saveSelectedTracks();
 
           this.selectedTracksList.forEach(selectedTrack => {
-            plOpsBody.uris.push(`spotify:track:${selectedTrack.track.id}`)
+            plOpsBody.uris.push(`spotify:track:${selectedTrack.id}`)
           });
 
           this.spotifyService.SpotifyCommonPostApi(opsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
@@ -663,7 +689,7 @@ export class AudioLibraryComponent implements OnInit {
   loadData(event: TableLazyLoadEvent) {
     //debugger;
     console.log('Lazy Load Event:', event);
-    console.log('multi sort meta:', event.multiSortMeta);
+    // console.log('multi sort meta:', event.multiSortMeta);
 
 
 

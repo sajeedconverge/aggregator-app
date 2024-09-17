@@ -83,6 +83,7 @@ export class AppComponent implements OnInit {
     if (this.isUserLoggedIn) {
       this.spotifyLinked = this.authService.isSpotifyLinked();
       this.stravaLinked = this.authService.isStravaLinked();
+     
     };
   }
 

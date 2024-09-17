@@ -121,7 +121,7 @@ export class AudioHistoryComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     private confirmationService: ConfirmationService,
-    private title:Title
+    private title: Title
   ) {
     this.title.setTitle('AudioActive - Recently Played')
     this.spotifyAuthService.refreshSpotifyAccessToken();
@@ -155,10 +155,10 @@ export class AudioHistoryComponent implements OnInit {
             // audio features
             this.spotifyService.getTrackById(pltrack.track.id).subscribe((dbTrackRes) => {
               if (dbTrackRes.statusCode === 200) {
-                //console.log('track found', dbTrackRes.payload.jsonData.audio_features);
+                // console.log('track found', dbTrackRes.payload.jsonData.name);
                 pltrack.audio_features = dbTrackRes.payload.jsonData.audio_features;
               } else {
-                //console.log('track not found');
+                console.log('track not found', pltrack.track.name);
                 this.nonSavedTrackIds.push(pltrack.track.id);
 
                 // this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
@@ -198,15 +198,27 @@ export class AudioHistoryComponent implements OnInit {
             if (this.nonSavedTrackIds.length > 0) {
               var severalIds = this.nonSavedTrackIds.join(',');
               //console.log(severalIds);
-              this.spotifyService.getSeveralAudioFeaturesUrl(severalIds).subscribe((safUrlResponse) => {
+              this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
                 if (safUrlResponse.statusCode === 200) {
-                  var safUrl = safUrlResponse.payload;
+                  var safUrl = safUrlResponse.payload + severalIds;
                   this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
 
-                    safResponse.audio_features.forEach((audioFeature: any) => {
-                      var matchedSong = this.hisotryTracks.find(song => song.track.id === audioFeature.id);
-                      matchedSong.audio_features = audioFeature;
+                    //NEW APPROACH
+                    this.hisotryTracks.forEach(hsTrack => {
+                      if (this.nonSavedTrackIds.includes(hsTrack.track.id)) {
+                        hsTrack.audio_features = safResponse.audio_features.find((audioFeature: any) => hsTrack.track.id === audioFeature.id);
+                      };
                     });
+                    //OLD APPROACH
+                    //console.log('safResponse.audio_features', safResponse.audio_features)
+                    // safResponse.audio_features.forEach((audioFeature: any) => {
+                    //   var matchedSong = this.hisotryTracks.find(song => song.track.id === audioFeature.id);
+                    //   matchedSong.audio_features = audioFeature;
+                    //   if (matchedSong.audio_features == undefined) {
+                    //     console.log('audioFeature.id', audioFeature.id);
+
+                    //   }
+                    // });
                   });
                 };
               });
