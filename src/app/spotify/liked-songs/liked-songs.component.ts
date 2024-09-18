@@ -204,7 +204,7 @@ export class LikedSongsComponent implements OnInit {
             this.likedSongs = resp.items;
             this.likedSongs.forEach(pltrack => {
               pltrack.artist = pltrack.track?.artists[0]?.name;
-              this.originalTracks.push(pltrack.track.id)
+              this.originalTracks.push(pltrack.track.id);
             });
             //console.log('this.playlistTracks', this.likedSongs);
 
