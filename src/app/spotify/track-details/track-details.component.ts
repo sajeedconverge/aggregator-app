@@ -54,26 +54,32 @@ export class TrackDetailsComponent implements OnInit {
   textColorSecondary = this.documentStyle.getPropertyValue('--text-color-secondary');
   surfaceBorder = this.documentStyle.getPropertyValue('--surface-border');
   data1: any = {
-    labels: ['0:00:00'],
+    labels: [],
     datasets: [
       {
         label: 'Tempo',
-        data: [0],
+        data: [],
         fill: false,
         borderColor: this.documentStyle.getPropertyValue('--blue-500'),
         tension: 0.4,
-
+        pointBackgroundColor: '#000000', 
+        pointBorderColor: '#000000',
+        pointRadius: 5, 
+        pointHoverRadius: 8 
       },
       {
         label: 'Loudness',
-        data: [0],
+        data: [],
         fill: false,
         borderColor: this.documentStyle.getPropertyValue('--orange-500'),
         tension: 0.4,
-
+        pointBackgroundColor: '#000000', 
+        pointBorderColor: '#000000',
+        pointRadius: 5, 
+        pointHoverRadius: 8 
       }
     ]
-  };;
+  };
   data2: any = {
     labels: ['0:00:00'],
     datasets: [
@@ -85,7 +91,7 @@ export class TrackDetailsComponent implements OnInit {
         tension: 0.4,
       }
     ]
-  };;
+  };
   options1: any = {
     maintainAspectRatio: false,
     aspectRatio: 0.6,

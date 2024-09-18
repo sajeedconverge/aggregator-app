@@ -180,16 +180,16 @@ export class LikedSongsComponent implements OnInit {
     });
   }
 
-  rowSelectionEvent() {
-    // console.log('this.selectedTrackIds', this.selectedTrackIds);
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
-  }
+  // rowSelectionEvent() {
+  //   // console.log('this.selectedTrackIds', this.selectedTrackIds);
+  //   this.showDetailedGraph = false;
+  //   this.showSummaryGraph = false;
+  // }
 
   getLikedSongs() {
     this.isLoading = true;
     this.likedSongs = [];
-    this.selectedTracksList=[];
+    this.selectedTracksList = [];
     this.spotifyAuthService.refreshSpotifyAccessToken();
 
     this.spotifyService.getLikedSongsUrl().subscribe((urlResponse) => {
@@ -321,73 +321,141 @@ export class LikedSongsComponent implements OnInit {
     });
   }
 
-  showGraphChanged() {
-    this.showDetailedGraph = !this.showDetailedGraph;
-    this.showSummaryGraph = false;
+  showGraphChanged(toRefresh: boolean) {
+    if (!toRefresh) {
+      this.showDetailedGraph = !this.showDetailedGraph;
+      this.showSummaryGraph = false;
+    };
     if (this.showDetailedGraph) {
-      this.generateChart(this.likedSongs, true);
+      if (this.selectedTracksList.length > 0) {
+        //this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
+        var selectedTracks = this.likedSongs?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+        selectedTracks = selectedTracks.reduce((acc, current) => {
+          const x = acc.find((item: any) => item.track.id === current.track.id);
+          if (!x) {
+            acc.push(current);
+          }
+          return acc;
+        }, []);
+        this.generateChart(selectedTracks, true);
+      } else {
+        this.generateChart(this.likedSongs, true);
+      }
+      
     };
   }
 
-  showSummaryGraphChanged() {
-    this.showSummaryGraph = !this.showSummaryGraph;
-    this.showDetailedGraph = false;
+  showSummaryGraphChanged(toRefresh: boolean) {
+    if (!toRefresh) {
+      this.showSummaryGraph = !this.showSummaryGraph;
+      this.showDetailedGraph = false;
+    };
     if (this.showSummaryGraph) {
       this.isLoading = true;
       this.data2 = {
-        labels: ['0:00:00'],
+        labels: [],
         datasets: [
           {
             label: 'Tempo',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', 
+            pointBorderColor: '#000000',
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Loudness',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', 
+            pointBorderColor: '#000000',
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Energy',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', 
+            pointBorderColor: '#000000',
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Danceability',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', 
+            pointBorderColor: '#000000',
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           }
         ]
       };
       var durationSum = 0;
+      if (this.selectedTracksList.length > 0) {
+        var selectedTracks = this.likedSongs?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+        selectedTracks = selectedTracks.reduce((acc, current) => {
+          const x = acc.find((item: any) => item.track.id === current.track.id);
+          if (!x) {
+            acc.push(current);
+          }
+          return acc;
+        }, []);
+        selectedTracks.forEach(pltrack => {
+          durationSum = durationSum + ((pltrack.audio_features.duration_ms));
+          //duration
+          this.data2.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
+          //tempo
+          this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
+          this.data2.datasets[0].tracks.push(pltrack.track.name);
+          // this.data2.datasets[0].colors.push(pltrack.color);
+          //loudness
+          this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
+          this.data2.datasets[1].tracks.push(pltrack.track.name);
+          // this.data2.datasets[1].colors.push(pltrack.color);
+          //energy
+          this.data2.datasets[2].data.push(pltrack.audio_features.energy);
+          this.data2.datasets[2].tracks.push(pltrack.track.name);
+          // this.data2.datasets[2].colors.push(pltrack.color);
+          //danceability
+          this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
+          this.data2.datasets[3].tracks.push(pltrack.track.name);
+          // this.data2.datasets[3].colors.push(pltrack.color);
+        });
+        console.log('this.data2', this.data2);
+        this.isLoading = false;
+      } else {
+        var durationSum = 0;
       this.likedSongs.forEach(pltrack => {
 
         durationSum = durationSum + ((pltrack.audio_features.duration_ms));
@@ -396,24 +464,25 @@ export class LikedSongsComponent implements OnInit {
         //tempo
         this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
         this.data2.datasets[0].tracks.push(pltrack.track.name);
-        this.data2.datasets[0].colors.push(pltrack.color);
+        //this.data2.datasets[0].colors.push(pltrack.color);
         //loudness
         this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
         this.data2.datasets[1].tracks.push(pltrack.track.name);
-        this.data2.datasets[1].colors.push(pltrack.color);
+        //this.data2.datasets[1].colors.push(pltrack.color);
         //energy
         this.data2.datasets[2].data.push(pltrack.audio_features.energy);
         this.data2.datasets[2].tracks.push(pltrack.track.name);
-        this.data2.datasets[2].colors.push(pltrack.color);
+        //this.data2.datasets[2].colors.push(pltrack.color);
         //danceability
         this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
         this.data2.datasets[3].tracks.push(pltrack.track.name);
-        this.data2.datasets[3].colors.push(pltrack.color);
+        //this.data2.datasets[3].colors.push(pltrack.color);
 
       });
       //console.log('this.data2',this.data2);
       this.isLoading = false;
-    }
+      };
+    };
   }
 
   formatTrackDuration(durationMs: number) {
@@ -424,8 +493,8 @@ export class LikedSongsComponent implements OnInit {
 
   tableReordered(event: any) {
     this.reOrderedTracks = [];
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+   // this.showDetailedGraph = false;
+   // this.showSummaryGraph = false;
     // debugger;
     //console.log('dragIndex :', event.dragIndex, 'dropIndex :', event.dropIndex)
 
@@ -447,8 +516,8 @@ export class LikedSongsComponent implements OnInit {
     let field = event.field;
     let order = event.order;
     this.reOrderedTracks = [];
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+   // this.showDetailedGraph = false;
+   // this.showSummaryGraph = false;
 
     const getFieldValue = (obj: any, field: string) => {
       return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
@@ -749,7 +818,13 @@ export class LikedSongsComponent implements OnInit {
     });
   }
 
-
+  refreshGraphs() {
+    if (this.showSummaryGraph) {
+      this.showSummaryGraphChanged(true);
+    } else if (this.showDetailedGraph) {
+      this.showGraphChanged(true);
+    }
+  }
 
 
 

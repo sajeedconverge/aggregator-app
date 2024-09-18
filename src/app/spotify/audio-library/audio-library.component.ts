@@ -139,7 +139,7 @@ export class AudioLibraryComponent implements OnInit {
 
   getAllAudio() {
     this.isLoading = true;
-    this.selectedTracksList=[];
+    this.selectedTracksList = [];
     this.spotifyService.getAllTracks(this.pageNumber, this.pageSize).subscribe((tracksResponse) => {
       if (tracksResponse.statusCode === 200) {
         this.audioTracks = tracksResponse.payload.map((pltrack: any) => {
@@ -205,11 +205,11 @@ export class AudioLibraryComponent implements OnInit {
   }
 
 
-  rowSelectionEvent() {
-    // console.log('this.selectedTrackIds', this.selectedTrackIds);
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
-  }
+  // rowSelectionEvent() {
+  //   // console.log('this.selectedTrackIds', this.selectedTrackIds);
+  //   this.showDetailedGraph = false;
+  //   this.showSummaryGraph = false;
+  // }
 
   getSegmentColor(ctx: any, datasetIndex: number, data: any) {
     const { p0 } = ctx;
@@ -220,61 +220,79 @@ export class AudioLibraryComponent implements OnInit {
     return this.documentStyle.getPropertyValue(color);
   }
 
-  showSummaryGraphChanged() {
-    this.showSummaryGraph = !this.showSummaryGraph;
-    this.showDetailedGraph = false;
+  showSummaryGraphChanged(toRefresh: boolean) {
+    if (!toRefresh) {
+      this.showSummaryGraph = !this.showSummaryGraph;
+      this.showDetailedGraph = false;
+    };
     if (this.showSummaryGraph) {
       this.isLoading = true;
       this.data2 = {
-        labels: ['0:00:00'],
+        labels: [],
         datasets: [
           {
             label: 'Tempo',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', // Color for the data points (black)
+            pointBorderColor: '#000000', // Border color for the data points (black)
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Loudness',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', // Color for the data points (black)
+            pointBorderColor: '#000000', // Border color for the data points (black)
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Energy',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', // Color for the data points (black)
+            pointBorderColor: '#000000', // Border color for the data points (black)
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Danceability',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', // Color for the data points (black)
+            pointBorderColor: '#000000', // Border color for the data points (black)
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           }
         ]
       };
@@ -295,19 +313,19 @@ export class AudioLibraryComponent implements OnInit {
           //tempo
           this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
           this.data2.datasets[0].tracks.push(pltrack.name);
-          this.data2.datasets[0].colors.push(pltrack.color);
+          //this.data2.datasets[0].colors.push(pltrack.color);
           //loudness
           this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
           this.data2.datasets[1].tracks.push(pltrack.name);
-          this.data2.datasets[1].colors.push(pltrack.color);
+          //this.data2.datasets[1].colors.push(pltrack.color);
           //energy
           this.data2.datasets[2].data.push(pltrack.audio_features.energy);
           this.data2.datasets[2].tracks.push(pltrack.name);
-          this.data2.datasets[2].colors.push(pltrack.color);
+          //this.data2.datasets[2].colors.push(pltrack.color);
           //danceability
           this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
           this.data2.datasets[3].tracks.push(pltrack.name);
-          this.data2.datasets[3].colors.push(pltrack.color);
+          //this.data2.datasets[3].colors.push(pltrack.color);
         });
         // console.log('this.data2', this.data2);
         this.isLoading = false;
@@ -319,19 +337,19 @@ export class AudioLibraryComponent implements OnInit {
           //tempo
           this.data2.datasets[0].data.push(pltrack.audio_features?.tempo);
           this.data2.datasets[0].tracks.push(pltrack.name);
-          this.data2.datasets[0].colors.push(pltrack.color);
+          // this.data2.datasets[0].colors.push(pltrack.color);
           //loudness
           this.data2.datasets[1].data.push(pltrack.audio_features?.loudness);
           this.data2.datasets[1].tracks.push(pltrack.name);
-          this.data2.datasets[1].colors.push(pltrack.color);
+          //  this.data2.datasets[1].colors.push(pltrack.color);
           //energy
           this.data2.datasets[2].data.push(pltrack.audio_features?.energy);
           this.data2.datasets[2].tracks.push(pltrack.name);
-          this.data2.datasets[2].colors.push(pltrack.color);
+          //   this.data2.datasets[2].colors.push(pltrack.color);
           //danceability
           this.data2.datasets[3].data.push(pltrack.audio_features?.danceability);
           this.data2.datasets[3].tracks.push(pltrack.name);
-          this.data2.datasets[3].colors.push(pltrack.color);
+          //   this.data2.datasets[3].colors.push(pltrack.color);
         });
         //console.log('this.data2',this.data2);
         this.isLoading = false;
@@ -339,9 +357,12 @@ export class AudioLibraryComponent implements OnInit {
     }
   }
 
-  showGraphChanged() {
-    this.showDetailedGraph = !this.showDetailedGraph;
-    this.showSummaryGraph = false;
+  showGraphChanged(toRefresh: boolean) {
+    if (!toRefresh) {
+      this.showDetailedGraph = !this.showDetailedGraph;
+      this.showSummaryGraph = false;
+    };
+
     if (this.showDetailedGraph) {
       if (this.selectedTracksList.length > 0) {
         //this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
@@ -425,8 +446,8 @@ export class AudioLibraryComponent implements OnInit {
 
   tableReordered(event: any) {
     this.reOrderedTracks = [];
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
 
     // Remove the item from the drag index and insert it at the drop index
     const movedItem = this.audioTracks.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
@@ -442,8 +463,8 @@ export class AudioLibraryComponent implements OnInit {
     let field = event.field;
     let order = event.order;
     this.reOrderedTracks = [];
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
 
     const getFieldValue = (obj: any, field: string) => {
       return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
@@ -475,11 +496,11 @@ export class AudioLibraryComponent implements OnInit {
     });
   }
 
-  selectAllClicked() {
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+  // selectAllClicked() {
+  //   this.showDetailedGraph = false;
+  //   this.showSummaryGraph = false;
 
-  }
+  // }
 
   createNewPlaylist() {
     this.plNameVisible = false;
@@ -695,11 +716,15 @@ export class AudioLibraryComponent implements OnInit {
     console.log('Lazy Load Event:', event);
     // console.log('multi sort meta:', event.multiSortMeta);
 
-
-
-
   }
 
+  refreshGraphs() {
+    if (this.showSummaryGraph) {
+      this.showSummaryGraphChanged(true);
+    } else if (this.showDetailedGraph) {
+      this.showGraphChanged(true);
+    }
+  }
 
 
 
