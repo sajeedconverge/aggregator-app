@@ -70,7 +70,7 @@ export interface AnalysisTrackDetail {
     mode_confidence: number,
 }
 
-export interface TrackMetricRequest{
+export interface TrackMetricRequest {
     id: string
     userId: string
     providerActivityId: number
@@ -84,10 +84,27 @@ export interface TrackMetricRequest{
     played_at: string
     speed: number
     start_time: string
-  }
+}
 
 
+export interface FilterRequest {
+    name?: Parameter[];
+    artist?: Parameter[];
+    duration?: Parameter[];
+    tempo?: Parameter[];
+    danceability?: Parameter[];
+    energy?: Parameter[];
+    loudness?: Parameter[];
+    pageSize: number
+    sortField: string
+    sortOrder: number
+}
 
+export interface Parameter {
+    value: any;
+    matchMode: string;
+    operator: string;
+}
 
 
 

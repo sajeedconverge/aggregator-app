@@ -80,9 +80,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     private primengConfig: PrimeNGConfig,
     private authService: AuthService,
     private messageService: MessageService,
-    private title:Title
+    private title: Title
   ) {
-    this.title.setTitle('AudioActive - Home')
+    this.title.setTitle('AudioActive - Home');
     this.spotifyAuthService.checkExpiryAndRefreshToken();
     this.primengConfig.ripple = true;
     this.fetchActivitiesFromDb();
@@ -310,7 +310,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               ],
               duration_ms: timeDifference,
             },
-            duration_mins : Constants.formatDuration(timeDifference)
+            duration_mins: Constants.formatDuration(timeDifference)
           }
           //matchedTracks.push(noTrackItem);
           matchedTracks.splice(index + 1, 0, noTrackItem);
@@ -455,20 +455,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.pairedTracks.forEach(pt => {
       var PTrackJson = Constants.typeCastPairedTrackJson(pt);
       pairedTrackJsonArray.push(PTrackJson);
-      //To store individual track into db
-      var trackJson = Constants.typeCastTrackJson(pt);
-      var PostTrackRequest: PostTrackRequest = {
-        providerTrackId: pt.track.id,
-        trackData: JSON.stringify(trackJson)
-      };
-      this.spotifyService.postTrack(PostTrackRequest).subscribe((postTrackResponse) => {
-        if (postTrackResponse.statusCode === 200) {
-          console.log("track added successfully.");
+      //avoid No track records
+      if (pt.track.name != 'No Track') {
+        //To store individual track into db
+        var trackJson = Constants.typeCastTrackJson(pt);
+        var PostTrackRequest: PostTrackRequest = {
+          providerTrackId: pt.track.id,
+          trackData: JSON.stringify(trackJson)
+        };
+        this.spotifyService.postTrack(PostTrackRequest).subscribe((postTrackResponse) => {
+          if (postTrackResponse.statusCode === 200) {
+            console.log("track added successfully.");
 
-        }
-      });
+          }
+        });
+      };
+
       //to add trackMetrics
-      //debugger;
       var trackMetric: TrackMetricRequest = {
         id: 'f46876c9-aa8d-42c3-b6a7-5892c2aa445d',
         userId: 'f46876c9-aa8d-42c3-b6a7-5892c2aa445d',
@@ -484,7 +487,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         speed: pt.speed,
         start_time: pt.start_time,
       };
-      
+
       this.spotifyService.postTrackMetric(trackMetric).subscribe((postMetricResponse) => {
         if (postMetricResponse.statusCode === 200) {
           console.log('metric posted successfully.');
@@ -576,19 +579,30 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.showDetails = true;
         //preceeding code
         this.pairedTracks = this.activityDetails[0].audio;
+        
         this.pairedTracks.forEach(pt => {
           pt.isSaved = true; //Boolean value to differenciate that it is from db
-          //removed the api calls from the track (Code improvization)
-          pt.track = JSON.parse(pt.track)
-          // this.spotifyService.getTrackById(pt.trackid).subscribe(trackResponse => {
-          //   if (trackResponse.statusCode === 200) {
-          //     pt.track = trackResponse.payload.jsonData;
-          //   };
-          // });
+          if (pt.track) {
+            //removed the api calls from the track (Code improvization)
+            pt.track = JSON.parse(pt.track)
+          } else {
+            pt.track = {
+              id: pt.trackId,
+              name: 'No Track',
+              audio_features: {
+                tempo: 0
+              },
+              artists: [
+                {
+                  name: 'N/A'
+                }
+              ],
+              duration_ms: pt.duration_mins,
+            }
+          };
           this.isADSaved = true;
         })
         console.log("this.pairedTracks", this.pairedTracks);
-
 
         this.isLoading = false;
       } else if (dbResponse.statusCode === 404) {

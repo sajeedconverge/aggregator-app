@@ -4,7 +4,7 @@ import { map, Observable } from 'rxjs';
 import { Constants } from '../../../shared/Constants';
 import { ResponseModel } from '../../../shared/shared-models';
 import { SpotifyAuthorizationService } from './spotify-authorization.service';
-import { PostTrackAnalysisRequest, PostTrackRequest, TrackMetricRequest } from '../models/spotify-models';
+import { FilterRequest, PostTrackAnalysisRequest, PostTrackRequest, TrackMetricRequest } from '../models/spotify-models';
 
 @Injectable({
   providedIn: 'root'
@@ -67,12 +67,12 @@ export class SpotifyService {
       );
   }
 
-  getAllTracks(pageNumber:number,pageSize:number): Observable<any> {
-    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetAllTracks?pageNumber=${pageNumber}&pageSize=${pageSize}`, { headers: this.headers })
+  getAllTracks(request: FilterRequest): Observable<any> {
+    return this.http.post<any>(Constants.baseServerUrl + `Spotify/GetAllTracks`, request, { headers: this.headers })
       .pipe(
         map(response => {
           // Parse the jsonData property for each track
-          response.payload = response.payload.map((track: any) => {
+          response.payload = response.payload?.map((track: any) => {
             track.jsonData = JSON.parse(track.jsonData);
             return track;
           });

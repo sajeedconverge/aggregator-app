@@ -123,7 +123,7 @@
                         (click)="getAudioFeatures(track.track?.id,track.isSaved)" [label]="track.track?.name"
                         [link]="true" />
                 </td>
-                <td>{{track.track?.artists[0]?.name}}</td>
+                <td>{{ track.track?.artists[0]?.name }}</td>
                 <td>
                     <!-- first choice for saved track and second for track from api -->
                     {{track.isSaved ? (track.track?.audio_features?.tempo | round) : (track.audio_features?.tempo |
