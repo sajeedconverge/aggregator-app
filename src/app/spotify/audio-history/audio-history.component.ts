@@ -138,6 +138,7 @@ export class AudioHistoryComponent implements OnInit {
 
   getRecentAudio() {
     this.isLoading = true;
+    this.selectedTracksList=[];
     this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(this.limit).subscribe((urlResponse) => {
       if (urlResponse.statusCode === 200) {
 

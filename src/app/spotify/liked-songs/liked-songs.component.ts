@@ -189,6 +189,7 @@ export class LikedSongsComponent implements OnInit {
   getLikedSongs() {
     this.isLoading = true;
     this.likedSongs = [];
+    this.selectedTracksList=[];
     this.spotifyAuthService.refreshSpotifyAccessToken();
 
     this.spotifyService.getLikedSongsUrl().subscribe((urlResponse) => {

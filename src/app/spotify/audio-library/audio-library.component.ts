@@ -21,6 +21,7 @@ import { SpotifyAuthorizationService } from '../shared/services/spotify-authoriz
 import { SpotifyService } from '../shared/services/spotify.service';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
+import { PaginatorModule } from 'primeng/paginator';
 
 @Component({
   selector: 'app-audio-library',
@@ -40,7 +41,7 @@ import { Title } from '@angular/platform-browser';
     TooltipModule,
     ButtonGroupModule,
     RoundPipe,
-
+    PaginatorModule,
 
 
   ],
@@ -113,7 +114,7 @@ export class AudioLibraryComponent implements OnInit {
   selectedPlaylist: any;
   userPlaylists: any[] = [];
   multiSortMeta!: any[];
-
+  first: number = 0;
 
   constructor(
     private spotifyService: SpotifyService,
@@ -138,6 +139,7 @@ export class AudioLibraryComponent implements OnInit {
 
   getAllAudio() {
     this.isLoading = true;
+    this.selectedTracksList=[];
     this.spotifyService.getAllTracks(this.pageNumber, this.pageSize).subscribe((tracksResponse) => {
       if (tracksResponse.statusCode === 200) {
         this.audioTracks = tracksResponse.payload.map((pltrack: any) => {
@@ -155,7 +157,7 @@ export class AudioLibraryComponent implements OnInit {
             // console.log('multiple analyses', analysesResponse.payload);
             this.audioTracks.forEach(track => {
               track.audioAnalysis = analysesResponse.payload.find((analysis: any) => analysis.providerTrackId === track?.id)?.analysisJsonData
-              console.log('track.audioAnalysis', track.audioAnalysis);
+              //console.log('track.audioAnalysis', track.audioAnalysis);
               if (!track.audioAnalysis) {
                 //To fetch track analysis
                 this.spotifyService.getSpotifyAudioAnalysisUrl(track.id).subscribe((res) => {
@@ -197,6 +199,8 @@ export class AudioLibraryComponent implements OnInit {
     this.showDetailedGraph = false;
     this.showSummaryGraph = false;
     this.pageSize = event.rows;
+    // debugger;
+    //this.pageNumber = event.page+1;
     this.getAllAudio();
   }
 
