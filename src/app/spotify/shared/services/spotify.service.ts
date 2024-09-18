@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Constants } from '../../../shared/Constants';
@@ -42,7 +42,7 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetCurrentUserPlaylistsUrl`, { headers: this.headers });
   }
 
-  getSpotifyRecentlyPlayedLimitUrl(limit:number): Observable<ResponseModel> {
+  getSpotifyRecentlyPlayedLimitUrl(limit: number): Observable<ResponseModel> {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSpotifyRecentlyPlayedFiftyUrl?limit=${limit}`, { headers: this.headers });
   }
 
@@ -67,8 +67,8 @@ export class SpotifyService {
       );
   }
 
-  getAllTracks(): Observable<any> {
-    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetAllTracks`, { headers: this.headers })
+  getAllTracks(pageNumber:number,pageSize:number): Observable<any> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetAllTracks?pageNumber=${pageNumber}&pageSize=${pageSize}`, { headers: this.headers })
       .pipe(
         map(response => {
           // Parse the jsonData property for each track
@@ -101,11 +101,11 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSpotifyUser?userId=${userId}`, { headers: this.headers });
   }
 
-  postTrackAnalysis(request: PostTrackAnalysisRequest): Observable<any> {
+  postTrackAnalysis(request: PostTrackAnalysisRequest): Observable<ResponseModel> {
     return this.http.post<any>(Constants.baseServerUrl + 'Spotify/PostTrackAnalysis', request, { headers: this.headers });
   }
 
-  getTrackAnalysisById(providerId: string): Observable<any> {
+  getTrackAnalysisById(providerId: string): Observable<ResponseModel> {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetTrackAnalysisByProviderId?providerId=${providerId}`, { headers: this.headers })
       .pipe(
         map(response => {
@@ -122,26 +122,39 @@ export class SpotifyService {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetLikedSongsUrl`, { headers: this.headers });
   }
 
-  getSeveralAudioFeaturesUrl(ids: string): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSeveralAudioFeaturesUrl?ids=${ids}`, { headers: this.headers });
+  getSeveralAudioFeaturesUrl(): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetSeveralAudioFeaturesUrl`, { headers: this.headers });
   }
 
-  postTrackMetric(request: TrackMetricRequest): Observable<any> {
+  postTrackMetric(request: TrackMetricRequest): Observable<ResponseModel> {
     return this.http.post<any>(Constants.baseServerUrl + 'Spotify/PostTrackMetric', request, { headers: this.headers });
   }
 
-  getTrackMetricsByTrackId(trackId:string): Observable<any> {
+  getTrackMetricsByTrackId(trackId: string): Observable<ResponseModel> {
     return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetTrackMetricsByTrackId?trackId=${trackId}`, { headers: this.headers });
+  }
+
+  getMultipleTrackAnalysesByIds(providerIds: string[]): Observable<ResponseModel> {
+    const params = new HttpParams().set('providerIds', providerIds.join(','));
+    return this.http.get<any>(`${Constants.baseServerUrl}Spotify/GetTrackAnalysesByProviderIds`, {
+      headers: this.headers,
+      params: params
+    })
+      .pipe(
+        map(response => {
+          // Parse the jsonData property for each track
+          response.payload = response.payload.map((trackAnalysis: any) => {
+            trackAnalysis.analysisJsonData = JSON.parse(trackAnalysis.analysisJsonData);
+            return trackAnalysis;
+          });
+          return response;
+        })
+      );
   }
 
 
 
 
-
-
-
-
-  
 
 
 

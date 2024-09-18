@@ -11,6 +11,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { StravaService } from '../../strava/shared/services/strava.service';
 import { SpotifyService } from '../../spotify/shared/services/spotify.service';
 import { AuthService } from '../shared/services/auth.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-settings',
@@ -36,7 +37,9 @@ export class SettingsComponent implements OnInit {
     private stravaService: StravaService,
     private spotifyService: SpotifyService,
     private authService: AuthService,
+    private title:Title
   ) {
+    this.title.setTitle('AudioActive - Settings')
     this.fetchThirdPartyDetails();
    }
 

@@ -20,8 +20,8 @@
         </div>
         <div class="m-3 btn_grp_short">
             <p-buttonGroup class="btn-grp-custom">
-                <p-button icon="pi pi-th-large" (onClick)="isGrid=true" [outlined]="!isGrid" />
-                <p-button icon="pi pi-list" (onClick)="isGrid=false" [outlined]="isGrid" />
+                <p-button icon="pi pi-th-large" (onClick)="changeGridView(true)" [outlined]="!isGrid" />
+                <p-button icon="pi pi-list" (onClick)="changeGridView(false)" [outlined]="isGrid" />
             </p-buttonGroup>
         </div>
     </div>

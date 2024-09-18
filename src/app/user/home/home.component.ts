@@ -21,6 +21,7 @@ import { ToastModule } from 'primeng/toast';
 import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
+import { Title } from '@angular/platform-browser';
 
 
 @Component({
@@ -78,8 +79,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     private spotifyService: SpotifyService,
     private primengConfig: PrimeNGConfig,
     private authService: AuthService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private title:Title
   ) {
+    this.title.setTitle('AudioActive - Home')
     this.spotifyAuthService.checkExpiryAndRefreshToken();
     this.primengConfig.ripple = true;
     this.fetchActivitiesFromDb();

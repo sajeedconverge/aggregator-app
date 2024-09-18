@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, FilterService, MessageService, SelectItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ChartModule } from 'primeng/chart';
@@ -20,6 +20,8 @@ import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spo
 import { SpotifyAuthorizationService } from '../shared/services/spotify-authorization.service';
 import { SpotifyService } from '../shared/services/spotify.service';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
+import { Title } from '@angular/platform-browser';
+import { PaginatorModule } from 'primeng/paginator';
 
 @Component({
   selector: 'app-audio-library',
@@ -39,9 +41,9 @@ import { RoundPipe } from '../../shared/common-pipes/round.pipe';
     TooltipModule,
     ButtonGroupModule,
     RoundPipe,
+    PaginatorModule,
 
 
-    
   ],
   templateUrl: './audio-library.component.html',
   styleUrl: './audio-library.component.css',
@@ -55,7 +57,8 @@ export class AudioLibraryComponent implements OnInit {
   playlistName: string = '';
   selectedTracksList: any[] = [];
   audioTracks: any[] = [];
-  limit: number = 10;
+  pageSize: number = 10;
+  pageNumber: number = 1;
   showSummaryGraph: boolean = false;
   showDetailedGraph: boolean = false;
   documentStyle = getComputedStyle(document.documentElement);
@@ -111,9 +114,7 @@ export class AudioLibraryComponent implements OnInit {
   selectedPlaylist: any;
   userPlaylists: any[] = [];
   multiSortMeta!: any[];
-
-
-
+  first: number = 0;
 
   constructor(
     private spotifyService: SpotifyService,
@@ -122,13 +123,14 @@ export class AudioLibraryComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     private confirmationService: ConfirmationService,
+    private title: Title
   ) {
+    this.title.setTitle('AudioActive - Audio Library')
     //this.spotifyAuthService.refreshSpotifyAccessToken();
     this.getAllAudio()
   }
 
   ngOnInit(): void {
-
   }
 
   formatTrackDuration(durationMs: number) {
@@ -137,7 +139,8 @@ export class AudioLibraryComponent implements OnInit {
 
   getAllAudio() {
     this.isLoading = true;
-    this.spotifyService.getAllTracks().subscribe((tracksResponse) => {
+    this.selectedTracksList = [];
+    this.spotifyService.getAllTracks(this.pageNumber, this.pageSize).subscribe((tracksResponse) => {
       if (tracksResponse.statusCode === 200) {
         this.audioTracks = tracksResponse.payload.map((pltrack: any) => {
           pltrack.jsonData.artist = pltrack.jsonData.artists[0].name
@@ -146,88 +149,67 @@ export class AudioLibraryComponent implements OnInit {
           return pltrack.jsonData
         });
         console.log('this.audioTracks', this.audioTracks);
+        //To fetch audio analysis for each track
+        var tracksIds = this.audioTracks.map(plTrack => { return plTrack.id });
+        // console.log(tracksIds);
+        this.spotifyService.getMultipleTrackAnalysesByIds(tracksIds).subscribe((analysesResponse) => {
+          if (analysesResponse.statusCode === 200) {
+            // console.log('multiple analyses', analysesResponse.payload);
+            this.audioTracks.forEach(track => {
+              track.audioAnalysis = analysesResponse.payload.find((analysis: any) => analysis.providerTrackId === track?.id)?.analysisJsonData
+              //console.log('track.audioAnalysis', track.audioAnalysis);
+              if (!track.audioAnalysis) {
+                //To fetch track analysis
+                this.spotifyService.getSpotifyAudioAnalysisUrl(track.id).subscribe((res) => {
+                  if (res.statusCode === 200) {
+                    var analysisUrl = res.payload;
+                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                    this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+                      track.audioAnalysis = res;
+                      //To add track analysis
+                      var trackAnalysis = Constants.typeCastTrackAnalysisJson(track.audioAnalysis);
+                      var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+                        providerTrackId: track.id,
+                        trackAnalysisData: JSON.stringify(trackAnalysis)
+                      };
+                      this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
+                        if (postTrackAnalysisResponse.statusCode === 200) {
+                          //console.log("track analysis added successfully.");
+
+                        };
+                      });
+                    });
+                  };
+                });
+              };
+
+
+            });
+
+          };
+        })
 
         this.isLoading = false;
       }
     });
-
     this.isLoading = false;
-
-    // this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(this.limit).subscribe((urlResponse) => {
-    //   if (urlResponse.statusCode === 200) {
-
-    //     var recentAudioUrl = urlResponse.payload;
-    //     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-    //     this.spotifyService.SpotifyCommonGetApi(recentAudioUrl, spotifyAccessToken).subscribe((audioResponse) => {
-
-    //       this.audioTracks = audioResponse.items;
-    //       console.log('hisotryTracks', this.audioTracks);
-
-
-    //       this.audioTracks.forEach(pltrack => {
-    //         pltrack.artist = pltrack?.artists[0]?.name;
-    //         pltrack.color = Constants.generateRandomPrimeNGColor();
-    //         // audio features
-    //         this.spotifyService.getTrackById(pltrack.id).subscribe((dbTrackRes) => {
-    //           if (dbTrackRes.statusCode === 200) {
-    //             //console.log('track found', dbTrackRes.payload.jsonData.audio_features);
-    //             pltrack.audio_features = dbTrackRes.payload.jsonData.audio_features;
-    //           } else {
-    //             //console.log('track not found');
-    //             this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.id).subscribe((res) => {
-    //               if (res.statusCode === 200) {
-    //                 var featuresUrl = res.payload;
-    //                 const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-    //                 this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-    //                   pltrack.audio_features = res;
-
-    //                 });
-    //               };
-    //             });
-    //           };
-    //         });
-    //         //To get track analysis
-    //         this.spotifyService.getTrackAnalysisById(pltrack.id).subscribe((taRes) => {
-    //           if (taRes.statusCode === 200) {
-
-    //             //console.log('track analysis found', taRes.payload.analysisJsonData);
-    //             pltrack.audioAnalysis = taRes.payload.analysisJsonData;
-    //           } else {
-    //             //console.log('track analysis not found');
-    //             //To fetch track analysis
-    //             this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.id).subscribe((res) => {
-    //               if (res.statusCode === 200) {
-    //                 var analysisUrl = res.payload;
-    //                 const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-    //                 this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-    //                   pltrack.audioAnalysis = res;
-    //                 });
-    //               };
-    //             });
-    //           };
-    //         });
-    //       });
-    //       setTimeout(() => {
-    //         this.isLoading = false;
-    //       }, 5000);
-    //     })
-    //   };
-    // })
   }
 
   onPageChange(event: any) {
     this.showDetailedGraph = false;
     this.showSummaryGraph = false;
-    this.limit = event.rows;
+    this.pageSize = event.rows;
+    // debugger;
+    //this.pageNumber = event.page+1;
     this.getAllAudio();
   }
 
 
-  rowSelectionEvent() {
-    // console.log('this.selectedTrackIds', this.selectedTrackIds);
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
-  }
+  // rowSelectionEvent() {
+  //   // console.log('this.selectedTrackIds', this.selectedTrackIds);
+  //   this.showDetailedGraph = false;
+  //   this.showSummaryGraph = false;
+  // }
 
   getSegmentColor(ctx: any, datasetIndex: number, data: any) {
     const { p0 } = ctx;
@@ -238,70 +220,87 @@ export class AudioLibraryComponent implements OnInit {
     return this.documentStyle.getPropertyValue(color);
   }
 
-  showSummaryGraphChanged() {
-    this.showSummaryGraph = !this.showSummaryGraph;
-    this.showDetailedGraph = false;
+  showSummaryGraphChanged(toRefresh: boolean) {
+    if (!toRefresh) {
+      this.showSummaryGraph = !this.showSummaryGraph;
+      this.showDetailedGraph = false;
+    };
     if (this.showSummaryGraph) {
       this.isLoading = true;
       this.data2 = {
-        labels: ['0:00:00'],
+        labels: [],
         datasets: [
           {
             label: 'Tempo',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', // Color for the data points (black)
+            pointBorderColor: '#000000', // Border color for the data points (black)
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Loudness',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', // Color for the data points (black)
+            pointBorderColor: '#000000', // Border color for the data points (black)
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Energy',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', // Color for the data points (black)
+            pointBorderColor: '#000000', // Border color for the data points (black)
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Danceability',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000', // Color for the data points (black)
+            pointBorderColor: '#000000', // Border color for the data points (black)
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           }
         ]
       };
       var durationSum = 0;
       if (this.selectedTracksList.length > 0) {
-        // this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
-        var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+        var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.id === ht.id));
         selectedTracks = selectedTracks.reduce((acc, current) => {
-          const x = acc.find((item: any) => item.track.id === current.track.id);
+          const x = acc.find((item: any) => item.id === current.id);
           if (!x) {
             acc.push(current);
           }
@@ -314,21 +313,21 @@ export class AudioLibraryComponent implements OnInit {
           //tempo
           this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
           this.data2.datasets[0].tracks.push(pltrack.name);
-          this.data2.datasets[0].colors.push(pltrack.color);
+          //this.data2.datasets[0].colors.push(pltrack.color);
           //loudness
           this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
           this.data2.datasets[1].tracks.push(pltrack.name);
-          this.data2.datasets[1].colors.push(pltrack.color);
+          //this.data2.datasets[1].colors.push(pltrack.color);
           //energy
           this.data2.datasets[2].data.push(pltrack.audio_features.energy);
           this.data2.datasets[2].tracks.push(pltrack.name);
-          this.data2.datasets[2].colors.push(pltrack.color);
+          //this.data2.datasets[2].colors.push(pltrack.color);
           //danceability
           this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
           this.data2.datasets[3].tracks.push(pltrack.name);
-          this.data2.datasets[3].colors.push(pltrack.color);
+          //this.data2.datasets[3].colors.push(pltrack.color);
         });
-        console.log('this.data2', this.data2);
+        // console.log('this.data2', this.data2);
         this.isLoading = false;
       } else {
         this.audioTracks.forEach(pltrack => {
@@ -338,19 +337,19 @@ export class AudioLibraryComponent implements OnInit {
           //tempo
           this.data2.datasets[0].data.push(pltrack.audio_features?.tempo);
           this.data2.datasets[0].tracks.push(pltrack.name);
-          this.data2.datasets[0].colors.push(pltrack.color);
+          // this.data2.datasets[0].colors.push(pltrack.color);
           //loudness
           this.data2.datasets[1].data.push(pltrack.audio_features?.loudness);
           this.data2.datasets[1].tracks.push(pltrack.name);
-          this.data2.datasets[1].colors.push(pltrack.color);
+          //  this.data2.datasets[1].colors.push(pltrack.color);
           //energy
           this.data2.datasets[2].data.push(pltrack.audio_features?.energy);
           this.data2.datasets[2].tracks.push(pltrack.name);
-          this.data2.datasets[2].colors.push(pltrack.color);
+          //   this.data2.datasets[2].colors.push(pltrack.color);
           //danceability
           this.data2.datasets[3].data.push(pltrack.audio_features?.danceability);
           this.data2.datasets[3].tracks.push(pltrack.name);
-          this.data2.datasets[3].colors.push(pltrack.color);
+          //   this.data2.datasets[3].colors.push(pltrack.color);
         });
         //console.log('this.data2',this.data2);
         this.isLoading = false;
@@ -358,15 +357,18 @@ export class AudioLibraryComponent implements OnInit {
     }
   }
 
-  showGraphChanged() {
-    this.showDetailedGraph = !this.showDetailedGraph;
-    this.showSummaryGraph = false;
+  showGraphChanged(toRefresh: boolean) {
+    if (!toRefresh) {
+      this.showDetailedGraph = !this.showDetailedGraph;
+      this.showSummaryGraph = false;
+    };
+
     if (this.showDetailedGraph) {
       if (this.selectedTracksList.length > 0) {
         //this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
-        var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+        var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.id === ht.id));
         selectedTracks = selectedTracks.reduce((acc, current) => {
-          const x = acc.find((item: any) => item.track.id === current.track.id);
+          const x = acc.find((item: any) => item.id === current.id);
           if (!x) {
             acc.push(current);
           }
@@ -444,8 +446,8 @@ export class AudioLibraryComponent implements OnInit {
 
   tableReordered(event: any) {
     this.reOrderedTracks = [];
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
 
     // Remove the item from the drag index and insert it at the drop index
     const movedItem = this.audioTracks.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
@@ -461,8 +463,8 @@ export class AudioLibraryComponent implements OnInit {
     let field = event.field;
     let order = event.order;
     this.reOrderedTracks = [];
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
 
     const getFieldValue = (obj: any, field: string) => {
       return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
@@ -494,11 +496,11 @@ export class AudioLibraryComponent implements OnInit {
     });
   }
 
-  selectAllClicked() {
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+  // selectAllClicked() {
+  //   this.showDetailedGraph = false;
+  //   this.showSummaryGraph = false;
 
-  }
+  // }
 
   createNewPlaylist() {
     this.plNameVisible = false;
@@ -529,7 +531,7 @@ export class AudioLibraryComponent implements OnInit {
                   };
 
                   this.selectedTracksList.forEach(selectedTrack => {
-                    plOpsBody.uris.push(`spotify:track:${selectedTrack.track.id}`)
+                    plOpsBody.uris.push(`spotify:track:${selectedTrack.id}`)
                   });
 
                   //to store all the selected tracks in db
@@ -553,9 +555,9 @@ export class AudioLibraryComponent implements OnInit {
   }
 
   saveSelectedTracks() {
-    var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+    var selectedTracks = this.audioTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.id === ht.id));
     selectedTracks = selectedTracks.reduce((acc, current) => {
-      const x = acc.find((item: any) => item.track.id === current.track.id);
+      const x = acc.find((item: any) => item.id === current.id);
       if (!x) {
         acc.push(current);
       }
@@ -688,7 +690,7 @@ export class AudioLibraryComponent implements OnInit {
           this.saveSelectedTracks();
 
           this.selectedTracksList.forEach(selectedTrack => {
-            plOpsBody.uris.push(`spotify:track:${selectedTrack.track.id}`)
+            plOpsBody.uris.push(`spotify:track:${selectedTrack.id}`)
           });
 
           this.spotifyService.SpotifyCommonPostApi(opsUrl, plOpsBody, spotifyAccessToken).subscribe((addedItemsResponse) => {
@@ -709,21 +711,19 @@ export class AudioLibraryComponent implements OnInit {
     table.clear();
   }
 
-  // tableFiltered(event:any) {
-  //   // (onFilter)="tableFiltered($event)"
-  //   console.log('tableFiltered :',event);
-  // }
-
   loadData(event: TableLazyLoadEvent) {
     //debugger;
-    // event.first = First row offset
-    // event.rows = Number of rows per page
-    // event.sortField = Field name to sort with
-    // event.sortOrder = Sort order as number, 1 for asc and -1 for desc
-    // event.filters = Filter metadata
     console.log('Lazy Load Event:', event);
-    console.log('multi sort meta:', event.multiSortMeta);
-    // Load data here based on event parameters
+    // console.log('multi sort meta:', event.multiSortMeta);
+
+  }
+
+  refreshGraphs() {
+    if (this.showSummaryGraph) {
+      this.showSummaryGraphChanged(true);
+    } else if (this.showDetailedGraph) {
+      this.showGraphChanged(true);
+    }
   }
 
 

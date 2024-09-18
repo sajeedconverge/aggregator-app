@@ -21,6 +21,7 @@ import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spo
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
+import { Title } from '@angular/platform-browser';
 
 
 
@@ -122,8 +123,10 @@ export class PlaylistDetailsComponent implements OnInit {
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private title: Title
   ) {
+    this.title.setTitle('AudioActive - Playlist Details')
     this.fetchThirdPartyDetails();
     this.startCheckingToken();
   }
@@ -249,7 +252,7 @@ export class PlaylistDetailsComponent implements OnInit {
                     this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
                       pltrack.audioAnalysis = res;
                       //To add track analysis
-                      debugger;
+                      // debugger;
                       var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
                       var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
                         providerTrackId: pltrack.track.id,
@@ -271,11 +274,11 @@ export class PlaylistDetailsComponent implements OnInit {
             if (this.nonSavedTrackIds.length > 0) {
               var severalIds = this.nonSavedTrackIds.join(',');
               //console.log(severalIds);
-              this.spotifyService.getSeveralAudioFeaturesUrl(severalIds).subscribe((safUrlResponse) => {
+              this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
                 if (safUrlResponse.statusCode === 200) {
-                  var safUrl = safUrlResponse.payload;
+                  var safUrl = safUrlResponse.payload + severalIds;
                   this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
-                   
+
                     safResponse.audio_features.forEach((audioFeature: any) => {
                       var matchedSong = this.playlistTracks.find(song => song.track.id === audioFeature.id);
                       matchedSong.audio_features = audioFeature;
@@ -307,69 +310,89 @@ export class PlaylistDetailsComponent implements OnInit {
     };
   }
 
-  showGraphChanged() {
-    this.showDetailedGraph = !this.showDetailedGraph;
-    this.showSummaryGraph = false;
+  showGraphChanged(toRefresh: boolean) {
+    if (!toRefresh) {
+      this.showDetailedGraph = !this.showDetailedGraph;
+      this.showSummaryGraph = false;
+    };
     if (this.showDetailedGraph) {
       this.generateChart(this.playlistTracks, true);
     };
   }
 
-  showSummaryGraphChanged() {
-    this.showSummaryGraph = !this.showSummaryGraph;
-    this.showDetailedGraph = false;
+  showSummaryGraphChanged(toRefresh: boolean) {
+    if (!toRefresh) {
+      this.showSummaryGraph = !this.showSummaryGraph;
+      this.showDetailedGraph = false;
+    };
     if (this.showSummaryGraph) {
       this.isLoading = true;
       this.data2 = {
-        labels: ['0:00:00'],
+        labels: [],
         datasets: [
           {
             label: 'Tempo',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000',
+            pointBorderColor: '#000000',
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Loudness',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000',
+            pointBorderColor: '#000000',
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Energy',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000',
+            pointBorderColor: '#000000',
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           },
           {
             label: 'Danceability',
-            data: [0],
+            data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
-            tracks: [''],
-            colors: [],  // Add an array to store color information
-            segment: {
-              borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
-            }
+            tracks: [],
+            pointBackgroundColor: '#000000',
+            pointBorderColor: '#000000',
+            pointRadius: 5, 
+            pointHoverRadius: 8 
+            // colors: [],  // Add an array to store color information
+            // segment: {
+            //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
+            // }
           }
         ]
       };
@@ -382,19 +405,19 @@ export class PlaylistDetailsComponent implements OnInit {
         //tempo
         this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
         this.data2.datasets[0].tracks.push(pltrack.track.name);
-        this.data2.datasets[0].colors.push(pltrack.color);
+        // this.data2.datasets[0].colors.push(pltrack.color);
         //loudness
         this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
         this.data2.datasets[1].tracks.push(pltrack.track.name);
-        this.data2.datasets[1].colors.push(pltrack.color);
+        // this.data2.datasets[1].colors.push(pltrack.color);
         //energy
         this.data2.datasets[2].data.push(pltrack.audio_features.energy);
         this.data2.datasets[2].tracks.push(pltrack.track.name);
-        this.data2.datasets[2].colors.push(pltrack.color);
+        // this.data2.datasets[2].colors.push(pltrack.color);
         //danceability
         this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
         this.data2.datasets[3].tracks.push(pltrack.track.name);
-        this.data2.datasets[3].colors.push(pltrack.color);
+        // this.data2.datasets[3].colors.push(pltrack.color);
 
       });
       //console.log('this.data2',this.data2);
@@ -478,8 +501,8 @@ export class PlaylistDetailsComponent implements OnInit {
 
   tableReordered(event: any) {
     this.reOrderedTracks = [];
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+    //this.showDetailedGraph = false;
+    //this.showSummaryGraph = false;
     // debugger;
     //console.log('dragIndex :', event.dragIndex, 'dropIndex :', event.dropIndex)
 
@@ -501,8 +524,8 @@ export class PlaylistDetailsComponent implements OnInit {
     let field = event.field;
     let order = event.order;
     this.reOrderedTracks = [];
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+    //this.showDetailedGraph = false;
+    //this.showSummaryGraph = false;
 
     const getFieldValue = (obj: any, field: string) => {
       return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
@@ -656,7 +679,13 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
 
-
+  refreshGraphs() {
+    if (this.showSummaryGraph) {
+      this.showSummaryGraphChanged(true);
+    } else if (this.showDetailedGraph) {
+      this.showGraphChanged(true);
+    }
+  }
 
 
 
