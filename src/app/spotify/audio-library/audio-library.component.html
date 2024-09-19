@@ -103,7 +103,7 @@
                     Danceability
                     <p-sortIcon field="audio_features.danceability" />
                     <p-columnFilter type="numeric" field="audio_features.danceability" display="menu"
-                        [minFractionDigits]="3" [maxFractionDigits]="3" [showOperator]="false" />
+                        [showOperator]="false" />
                 </th>
                 <th pSortableColumn="audio_features.energy">
                     Energy
@@ -133,12 +133,15 @@
                     <p-button class="anchor_btn" [label]="track?.name" [link]="true"
                         (onClick)="navigateToTrackDetails(track.name,track.id)" />
                 </td>
+                <!-- <td>
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="success" [outlined]="true" (onClick)="showPreviewPopup(track)" />
+                </td> -->
                 <td>{{track.artists[0].name}}</td>
                 <td>{{ formatTrackDuration(track?.duration_ms) }}</td>
                 <td>{{ track.audio_features?.tempo | round}}</td>
-                <td>{{ track.audio_features?.danceability }}</td>
-                <td>{{ track.audio_features?.energy }}</td>
-                <td>{{ track.audio_features?.loudness }}</td>
+                <td>{{ track.audio_features?.danceability | number:'1.3-3' }}</td>
+                <td>{{ track.audio_features?.energy | number:'1.3-3'}}</td>
+                <td>{{ track.audio_features?.loudness | number:'1.3-3'}}</td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -206,5 +209,14 @@
                 </tr>
             </ng-template>
         </p-table>
+    </div>
+</p-dialog>
+
+
+<p-dialog header="Add Tracks to existing Playlist" [modal]="true" [draggable]="false" [(visible)]="showPreview"
+    [closable]="true" [style]="{ width: '50rem' }">
+    <div class="">
+        <iframe [src]="currentTrack?.uri | uri" width="600" height="600" frameborsrcder="0" allowtransparency="true"
+            allow="encrypted-media"></iframe>
     </div>
 </p-dialog>

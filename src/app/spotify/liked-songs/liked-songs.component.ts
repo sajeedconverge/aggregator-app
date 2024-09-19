@@ -364,8 +364,6 @@ export class LikedSongsComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000', 
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
@@ -380,8 +378,6 @@ export class LikedSongsComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000', 
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
@@ -396,8 +392,6 @@ export class LikedSongsComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000', 
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
@@ -412,8 +406,6 @@ export class LikedSongsComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000', 
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor

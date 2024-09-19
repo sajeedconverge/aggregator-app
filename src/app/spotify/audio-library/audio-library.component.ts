@@ -23,6 +23,7 @@ import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
 import { PaginatorModule } from 'primeng/paginator';
 import { debounceTime, distinctUntilChanged, ignoreElements } from 'rxjs';
+import { UriPipe } from "../../shared/common-pipes/uri.pipe";
 
 @Component({
   selector: 'app-audio-library',
@@ -43,8 +44,7 @@ import { debounceTime, distinctUntilChanged, ignoreElements } from 'rxjs';
     ButtonGroupModule,
     RoundPipe,
     PaginatorModule,
-
-
+    UriPipe
   ],
   templateUrl: './audio-library.component.html',
   styleUrl: './audio-library.component.css',
@@ -128,8 +128,8 @@ export class AudioLibraryComponent implements OnInit {
     sortField: 'name',
     sortOrder: 1
   };
-
-
+  showPreview: boolean = false;
+  currentTrack: any;
 
 
 
@@ -155,7 +155,7 @@ export class AudioLibraryComponent implements OnInit {
   ) {
     this.title.setTitle('AudioActive - Audio Library')
     //this.spotifyAuthService.refreshSpotifyAccessToken();
-    this.getAllAudio()
+    //this.getAllAudio()
   }
 
   ngOnInit(): void {
@@ -175,10 +175,13 @@ export class AudioLibraryComponent implements OnInit {
       ).subscribe((tracksResponse) => {
         if (tracksResponse.statusCode === 200) {
           this.audioTracks = tracksResponse.payload.map((pltrack: any) => {
-            pltrack.jsonData.artist = pltrack.jsonData.artists[0].name
+            pltrack.jsonData.artist = pltrack.jsonData.artists[0].name;
+            // pltrack.jsonData.audio_features.loudness=(pltrack.jsonData.audio_features.loudness*(-10));
+            // pltrack.jsonData.audio_features.energy=(pltrack.jsonData.audio_features.energy*(100));
+            // pltrack.jsonData.audio_features.danceability =(pltrack.jsonData.audio_features.danceability*(100));
             pltrack.jsonData.color = Constants.generateRandomPrimeNGColor();
             pltrack.jsonData.duration = Constants.formatMilliseconds(pltrack.jsonData.duration_ms);
-            return pltrack.jsonData
+            return pltrack.jsonData;
           });
           console.log('this.audioTracks', this.audioTracks);
           //To fetch audio analysis for each track
@@ -261,6 +264,7 @@ export class AudioLibraryComponent implements OnInit {
       this.isLoading = true;
       this.data2 = {
         labels: [],
+        // labels: ['00:00:00'],
         datasets: [
           {
             label: 'Tempo',
@@ -271,8 +275,6 @@ export class AudioLibraryComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000', // Color for the data points (black)
             pointBorderColor: '#000000', // Border color for the data points (black)
-            pointRadius: 5,
-            pointHoverRadius: 8
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
@@ -287,8 +289,6 @@ export class AudioLibraryComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000', // Color for the data points (black)
             pointBorderColor: '#000000', // Border color for the data points (black)
-            pointRadius: 5,
-            pointHoverRadius: 8
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
@@ -303,8 +303,6 @@ export class AudioLibraryComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000', // Color for the data points (black)
             pointBorderColor: '#000000', // Border color for the data points (black)
-            pointRadius: 5,
-            pointHoverRadius: 8
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
@@ -319,8 +317,6 @@ export class AudioLibraryComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000', // Color for the data points (black)
             pointBorderColor: '#000000', // Border color for the data points (black)
-            pointRadius: 5,
-            pointHoverRadius: 8
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
@@ -781,7 +777,10 @@ export class AudioLibraryComponent implements OnInit {
     }
   }
 
-
+  showPreviewPopup(track: any) {
+    this.showPreview = true;
+    this.currentTrack = track;
+  }
 
 
 

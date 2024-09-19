@@ -104,7 +104,7 @@ export class Constants {
 
     //to find the matching element of the stream with the given start time of the track
     public static findNearestStartTime(array: any[], timeStamp: string): any | null {
-        
+
         if (!array || array.length === 0) {
             return null;
         };
@@ -122,7 +122,7 @@ export class Constants {
 
     //to find the matching element of the stream with the given end time of the track
     public static findNearestEndTime(array: any[], startTime: string, endTime: string): any | null {
-        
+
         if (!array || array.length === 0) {
             return null;
         };

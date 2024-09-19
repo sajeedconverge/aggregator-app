@@ -64,8 +64,6 @@ export class TrackDetailsComponent implements OnInit {
         tension: 0.4,
         pointBackgroundColor: '#000000', 
         pointBorderColor: '#000000',
-        pointRadius: 5, 
-        pointHoverRadius: 8 
       },
       {
         label: 'Loudness',
@@ -75,8 +73,6 @@ export class TrackDetailsComponent implements OnInit {
         tension: 0.4,
         pointBackgroundColor: '#000000', 
         pointBorderColor: '#000000',
-        pointRadius: 5, 
-        pointHoverRadius: 8 
       }
     ]
   };

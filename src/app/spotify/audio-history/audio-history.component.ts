@@ -138,7 +138,7 @@ export class AudioHistoryComponent implements OnInit {
 
   getRecentAudio() {
     this.isLoading = true;
-    this.selectedTracksList=[];
+    this.selectedTracksList = [];
     this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(this.limit).subscribe((urlResponse) => {
       if (urlResponse.statusCode === 200) {
 
@@ -159,19 +159,20 @@ export class AudioHistoryComponent implements OnInit {
                 // console.log('track found', dbTrackRes.payload.jsonData.name);
                 pltrack.audio_features = dbTrackRes.payload.jsonData.audio_features;
               } else {
-                console.log('track not found', pltrack.track.name);
-                this.nonSavedTrackIds.push(pltrack.track.id);
+                //console.log('track not found', pltrack.track.name);
+                //this.nonSavedTrackIds.push(pltrack.track.id);
 
-                // this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
-                //   if (res.statusCode === 200) {
-                //     var featuresUrl = res.payload;
-                //     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                //     this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-                //       pltrack.audio_features = res;
+                this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
+                  if (res.statusCode === 200) {
+                    var featuresUrl = res.payload;
+                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                    this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
+                      pltrack.audio_features = res;
 
-                //     });
-                //   };
-                // });
+                    });
+                  };
+                });
+
               };
             });
             //To get track analysis
@@ -196,34 +197,48 @@ export class AudioHistoryComponent implements OnInit {
             });
           });
           setTimeout(() => {
-            if (this.nonSavedTrackIds.length > 0) {
-              var severalIds = this.nonSavedTrackIds.join(',');
-              //console.log(severalIds);
-              this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
-                if (safUrlResponse.statusCode === 200) {
-                  var safUrl = safUrlResponse.payload + severalIds;
-                  this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
+            // if (this.nonSavedTrackIds.length > 0) {
+            //   //var severalIds = this.nonSavedTrackIds.join(',');
+            //   //console.log(severalIds);
 
-                    //NEW APPROACH
-                    this.hisotryTracks.forEach(hsTrack => {
-                      if (this.nonSavedTrackIds.includes(hsTrack.track.id)) {
-                        hsTrack.audio_features = safResponse.audio_features.find((audioFeature: any) => hsTrack.track.id === audioFeature.id);
-                      };
-                    });
-                    //OLD APPROACH
-                    //console.log('safResponse.audio_features', safResponse.audio_features)
-                    // safResponse.audio_features.forEach((audioFeature: any) => {
-                    //   var matchedSong = this.hisotryTracks.find(song => song.track.id === audioFeature.id);
-                    //   matchedSong.audio_features = audioFeature;
-                    //   if (matchedSong.audio_features == undefined) {
-                    //     console.log('audioFeature.id', audioFeature.id);
+            //   // //Different Approach
+            //   // this.nonSavedTrackIds.forEach(nsTrackId => {
+            //   //   this.spotifyService.getSpotifyAudioFeaturesUrl(nsTrackId).subscribe((urlRes) => {
+            //   //     if (urlRes.statusCode === 200) {
+            //   //       var featuresUrl = urlRes.payload;
+            //   //       this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((featuresRes) => {
 
-                    //   }
-                    // });
-                  });
-                };
-              });
-            };
+            //   //       });
+            //   //     };
+            //   //   });
+            //   // });
+
+
+            //   // this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
+            //   //   if (safUrlResponse.statusCode === 200) {
+            //   //     var safUrl = safUrlResponse.payload + severalIds;
+            //   //     this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
+
+            //   //       //NEW APPROACH
+            //   //       this.hisotryTracks.forEach(hsTrack => {
+            //   //         if (this.nonSavedTrackIds.includes(hsTrack.track.id)) {
+            //   //           hsTrack.audio_features = safResponse.audio_features.find((audioFeature: any) => hsTrack.track.id === audioFeature.id);
+            //   //         };
+            //   //       });
+            //   //       //OLD APPROACH
+            //   //       //console.log('safResponse.audio_features', safResponse.audio_features)
+            //   //       // safResponse.audio_features.forEach((audioFeature: any) => {
+            //   //       //   var matchedSong = this.hisotryTracks.find(song => song.track.id === audioFeature.id);
+            //   //       //   matchedSong.audio_features = audioFeature;
+            //   //       //   if (matchedSong.audio_features == undefined) {
+            //   //       //     console.log('audioFeature.id', audioFeature.id);
+
+            //   //       //   }
+            //   //       // });
+            //   //     });
+            //   //   };
+            //   // });
+            // };
             this.isLoading = false;
           }, 5000);
         })
@@ -271,10 +286,8 @@ export class AudioHistoryComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
@@ -287,10 +300,8 @@ export class AudioHistoryComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
@@ -303,10 +314,8 @@ export class AudioHistoryComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
@@ -319,10 +328,8 @@ export class AudioHistoryComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
