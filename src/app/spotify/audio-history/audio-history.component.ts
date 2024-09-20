@@ -200,48 +200,6 @@ export class AudioHistoryComponent implements OnInit {
             });
           });
           setTimeout(() => {
-            // if (this.nonSavedTrackIds.length > 0) {
-            //   //var severalIds = this.nonSavedTrackIds.join(',');
-            //   //console.log(severalIds);
-
-            //   // //Different Approach
-            //   // this.nonSavedTrackIds.forEach(nsTrackId => {
-            //   //   this.spotifyService.getSpotifyAudioFeaturesUrl(nsTrackId).subscribe((urlRes) => {
-            //   //     if (urlRes.statusCode === 200) {
-            //   //       var featuresUrl = urlRes.payload;
-            //   //       this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((featuresRes) => {
-
-            //   //       });
-            //   //     };
-            //   //   });
-            //   // });
-
-
-            //   // this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
-            //   //   if (safUrlResponse.statusCode === 200) {
-            //   //     var safUrl = safUrlResponse.payload + severalIds;
-            //   //     this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
-
-            //   //       //NEW APPROACH
-            //   //       this.hisotryTracks.forEach(hsTrack => {
-            //   //         if (this.nonSavedTrackIds.includes(hsTrack.track.id)) {
-            //   //           hsTrack.audio_features = safResponse.audio_features.find((audioFeature: any) => hsTrack.track.id === audioFeature.id);
-            //   //         };
-            //   //       });
-            //   //       //OLD APPROACH
-            //   //       //console.log('safResponse.audio_features', safResponse.audio_features)
-            //   //       // safResponse.audio_features.forEach((audioFeature: any) => {
-            //   //       //   var matchedSong = this.hisotryTracks.find(song => song.track.id === audioFeature.id);
-            //   //       //   matchedSong.audio_features = audioFeature;
-            //   //       //   if (matchedSong.audio_features == undefined) {
-            //   //       //     console.log('audioFeature.id', audioFeature.id);
-
-            //   //       //   }
-            //   //       // });
-            //   //     });
-            //   //   };
-            //   // });
-            // };
             this.isLoading = false;
           }, 5000);
         })
