@@ -288,7 +288,7 @@ export class Constants {
                 analysis_channels: trackAnalysis.track.analysis_channels,
                 end_of_fade_in: trackAnalysis.track.end_of_fade_in,
                 start_of_fade_out: trackAnalysis.track.start_of_fade_out,
-                loudness: Math.round(trackAnalysis.track.loudness*(-10)),
+                loudness: Math.round(trackAnalysis.track.loudness * (-10)),
                 tempo: Math.round(trackAnalysis.track.tempo),
                 tempo_confidence: trackAnalysis.track.tempo_confidence,
                 time_signature: trackAnalysis.track.time_signature,

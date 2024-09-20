@@ -282,7 +282,7 @@ export class PlaylistDetailsComponent implements OnInit {
                     safResponse.audio_features.forEach((audioFeature: any) => {
                       var matchedSong = this.playlistTracks.find(song => song.track.id === audioFeature.id);
                       matchedSong.audio_features = audioFeature;
-
+                     
                       //add track to db with it's features
                       var trackJson = Constants.typeCastTrackJson(matchedSong);
                       var postTrackRequest: PostTrackRequest = {
@@ -292,6 +292,10 @@ export class PlaylistDetailsComponent implements OnInit {
                       this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
                         if (postTrackRes.statusCode === 200) {
                           // console.log("track added successfully.", matchedSong.track.name);
+                          matchedSong.audio_features.tempo = Math.round(matchedSong.audio_features.tempo);
+                          matchedSong.audio_features.loudness = Math.round(matchedSong.audio_features.loudness * (-10));
+                          matchedSong.audio_features.energy = Math.round(matchedSong.audio_features.energy * (100));
+                          matchedSong.audio_features.danceability = Math.round(matchedSong.audio_features.danceability * (100));
                         };
                       });
 

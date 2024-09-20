@@ -168,7 +168,10 @@ export class AudioHistoryComponent implements OnInit {
                     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
                     this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
                       pltrack.audio_features = res;
-
+                      pltrack.audio_features.tempo = Math.round(pltrack.audio_features.tempo);
+                      pltrack.audio_features.loudness = Math.round(pltrack.audio_features.loudness * (-10));
+                      pltrack.audio_features.energy = Math.round(pltrack.audio_features.energy * (100));
+                      pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
                     });
                   };
                 });

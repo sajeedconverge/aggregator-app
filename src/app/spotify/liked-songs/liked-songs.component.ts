@@ -292,6 +292,10 @@ export class LikedSongsComponent implements OnInit {
                         safResponse.audio_features.forEach((audioFeature: any) => {
                           var matchedSong = this.likedSongs.find(song => song.track.id === audioFeature.id);
                           matchedSong.audio_features = audioFeature;
+                          matchedSong.audio_features.tempo = Math.round(matchedSong.audio_features.tempo);
+                          matchedSong.audio_features.loudness = Math.round(matchedSong.audio_features.loudness * (-10));
+                          matchedSong.audio_features.energy = Math.round(matchedSong.audio_features.energy * (100));
+                          matchedSong.audio_features.danceability = Math.round(matchedSong.audio_features.danceability * (100));
 
                           //add track to db with it's features
                           var trackJson = Constants.typeCastTrackJson(matchedSong);
@@ -341,7 +345,7 @@ export class LikedSongsComponent implements OnInit {
       } else {
         this.generateChart(this.likedSongs, true);
       }
-      
+
     };
   }
 
@@ -362,7 +366,7 @@ export class LikedSongsComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
             // colors: [],  // Add an array to store color information
             // segment: {
@@ -376,7 +380,7 @@ export class LikedSongsComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
             // colors: [],  // Add an array to store color information
             // segment: {
@@ -390,7 +394,7 @@ export class LikedSongsComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
             // colors: [],  // Add an array to store color information
             // segment: {
@@ -404,7 +408,7 @@ export class LikedSongsComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
             // colors: [],  // Add an array to store color information
             // segment: {
@@ -448,31 +452,31 @@ export class LikedSongsComponent implements OnInit {
         this.isLoading = false;
       } else {
         var durationSum = 0;
-      this.likedSongs.forEach(pltrack => {
+        this.likedSongs.forEach(pltrack => {
 
-        durationSum = durationSum + ((pltrack.audio_features.duration_ms));
-        //duration
-        this.data2.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
-        //tempo
-        this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
-        this.data2.datasets[0].tracks.push(pltrack.track.name);
-        //this.data2.datasets[0].colors.push(pltrack.color);
-        //loudness
-        this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
-        this.data2.datasets[1].tracks.push(pltrack.track.name);
-        //this.data2.datasets[1].colors.push(pltrack.color);
-        //energy
-        this.data2.datasets[2].data.push(pltrack.audio_features.energy);
-        this.data2.datasets[2].tracks.push(pltrack.track.name);
-        //this.data2.datasets[2].colors.push(pltrack.color);
-        //danceability
-        this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
-        this.data2.datasets[3].tracks.push(pltrack.track.name);
-        //this.data2.datasets[3].colors.push(pltrack.color);
+          durationSum = durationSum + ((pltrack.audio_features.duration_ms));
+          //duration
+          this.data2.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
+          //tempo
+          this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
+          this.data2.datasets[0].tracks.push(pltrack.track.name);
+          //this.data2.datasets[0].colors.push(pltrack.color);
+          //loudness
+          this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
+          this.data2.datasets[1].tracks.push(pltrack.track.name);
+          //this.data2.datasets[1].colors.push(pltrack.color);
+          //energy
+          this.data2.datasets[2].data.push(pltrack.audio_features.energy);
+          this.data2.datasets[2].tracks.push(pltrack.track.name);
+          //this.data2.datasets[2].colors.push(pltrack.color);
+          //danceability
+          this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
+          this.data2.datasets[3].tracks.push(pltrack.track.name);
+          //this.data2.datasets[3].colors.push(pltrack.color);
 
-      });
-      //console.log('this.data2',this.data2);
-      this.isLoading = false;
+        });
+        //console.log('this.data2',this.data2);
+        this.isLoading = false;
       };
     };
   }
@@ -485,8 +489,8 @@ export class LikedSongsComponent implements OnInit {
 
   tableReordered(event: any) {
     this.reOrderedTracks = [];
-   // this.showDetailedGraph = false;
-   // this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
     // debugger;
     //console.log('dragIndex :', event.dragIndex, 'dropIndex :', event.dropIndex)
 
@@ -508,8 +512,8 @@ export class LikedSongsComponent implements OnInit {
     let field = event.field;
     let order = event.order;
     this.reOrderedTracks = [];
-   // this.showDetailedGraph = false;
-   // this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
 
     const getFieldValue = (obj: any, field: string) => {
       return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);

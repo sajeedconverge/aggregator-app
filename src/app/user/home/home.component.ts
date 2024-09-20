@@ -157,7 +157,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                   this.recentlyPlayedFifty.forEach(track => {
                     track.start_time = Constants.getTrackStartTime(track.played_at, track.track.duration_ms);
                   });
-
+                  //debugger;
                   //to calculate activity end time
                   this.nonFilteredActivities.forEach(activity => {
                     activity.end_date = Constants.getActivityEndTime(activity.start_date, activity.elapsed_time);
@@ -170,6 +170,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
 
                     if (activity.distance > 0 && activity.audio.length > 0) {
+                    
                       this.athleteActivities.push(activity);
                     };
 
@@ -245,7 +246,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.recentAudio = [];
     this.activityDetails = [];
     this.spotifyAuthService.refreshSpotifyAccessToken();
-    this.spotifyService.getSpotifyRecentlyPlayedUrl(activityTime).subscribe((res) => {
+    this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(50).subscribe((res) => {
       if (res.statusCode === 200) {
         const url = res.payload;
 
@@ -328,8 +329,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.pairedTracks[0] = {
         track: {
           id: '',
-          name: 'No track',
-          artists: [{ name: '' }]
+          name: 'No Track',
+          artists: [{ name: 'N/A' }]
         },
         start_time: '',
         distance_start: 0.00,
@@ -345,6 +346,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.spotifyService.getSpotifyAudioFeaturesUrl(track.track.id).subscribe((res) => {
           if (res.statusCode === 200) {
             var featuresUrl = res.payload;
+
             const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
             this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
               track.audio_features = audioFeature;
@@ -375,6 +377,12 @@ export class HomeComponent implements OnInit, OnDestroy {
           var featuresUrl = res.payload;
           const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
           this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
+
+            audioFeature.tempo = Math.round(audioFeature.tempo);
+            audioFeature.loudness = Math.round(audioFeature.loudness * (-10));
+            audioFeature.energy = Math.round(audioFeature.energy * (100));
+            audioFeature.danceability = Math.round(audioFeature.danceability * (100));
+
             this.audioFeatures.push(audioFeature);
             this.showAudioFeatures = true;
           });
@@ -536,7 +544,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           unfilteredActivites.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
           //console.log(actResponse);
           let lastActivityTime = unfilteredActivites[(unfilteredActivites.length) - 1].start_date;
-          this.spotifyService.getSpotifyRecentlyPlayedUrl(lastActivityTime).subscribe((rpRes) => {
+          this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(50).subscribe((rpRes) => {
             if (rpRes.statusCode === 200) {
               this.isLoading = true;
               var recentlyPlayedUrl = rpRes.payload;
@@ -579,7 +587,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.showDetails = true;
         //preceeding code
         this.pairedTracks = this.activityDetails[0].audio;
-        
+
         this.pairedTracks.forEach(pt => {
           pt.isSaved = true; //Boolean value to differenciate that it is from db
           if (pt.track) {
