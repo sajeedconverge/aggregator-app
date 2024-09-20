@@ -176,9 +176,11 @@ export class AudioLibraryComponent implements OnInit {
         if (tracksResponse.statusCode === 200) {
           this.audioTracks = tracksResponse.payload.map((pltrack: any) => {
             pltrack.jsonData.artist = pltrack.jsonData.artists[0].name;
+            ////
             // pltrack.jsonData.audio_features.loudness=(pltrack.jsonData.audio_features.loudness*(-10));
             // pltrack.jsonData.audio_features.energy=(pltrack.jsonData.audio_features.energy*(100));
             // pltrack.jsonData.audio_features.danceability =(pltrack.jsonData.audio_features.danceability*(100));
+            ////
             pltrack.jsonData.color = Constants.generateRandomPrimeNGColor();
             pltrack.jsonData.duration = Constants.formatMilliseconds(pltrack.jsonData.duration_ms);
             return pltrack.jsonData;
@@ -263,8 +265,8 @@ export class AudioLibraryComponent implements OnInit {
     if (this.showSummaryGraph) {
       this.isLoading = true;
       this.data2 = {
-        labels: [],
-        // labels: ['00:00:00'],
+        // labels: [],
+        labels: ['00:00:00'],
         datasets: [
           {
             label: 'Tempo',
@@ -273,6 +275,7 @@ export class AudioLibraryComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
             tracks: [],
+            backgroundColor: this.documentStyle.getPropertyValue('--blue-500'),
             pointBackgroundColor: '#000000', // Color for the data points (black)
             pointBorderColor: '#000000', // Border color for the data points (black)
             // colors: [],  // Add an array to store color information
@@ -285,6 +288,7 @@ export class AudioLibraryComponent implements OnInit {
             data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
+            backgroundColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
             tracks: [],
             pointBackgroundColor: '#000000', // Color for the data points (black)
@@ -299,6 +303,7 @@ export class AudioLibraryComponent implements OnInit {
             data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
+            backgroundColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
             tracks: [],
             pointBackgroundColor: '#000000', // Color for the data points (black)
@@ -313,6 +318,7 @@ export class AudioLibraryComponent implements OnInit {
             data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
+            backgroundColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
             tracks: [],
             pointBackgroundColor: '#000000', // Color for the data points (black)

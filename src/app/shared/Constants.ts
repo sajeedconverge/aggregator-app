@@ -229,7 +229,20 @@ export class Constants {
 
     public static typeCastTrackJson(track: any): TrackJsonObject {
         var trackJson: TrackJsonObject = {
-            album: track.track.album,
+            album: {
+                type: track.track.album.type,
+                album_type: track.track.album.album_type,
+                href: track.track.album.href,
+                id: track.track.album.id,
+                images: track.track.album.images,
+                name: track.track.album.name,
+                release_date: track.track.album.release_date,
+                release_date_precision: track.track.album.release_date_precision,
+                uri: track.track.album.uri,
+                artists: track.track.album.artists,
+                external_urls: track.track.album.external_urls,
+                total_tracks: track.track.album.total_tracks,
+            },
             artists: track.track.artists,
             duration_ms: track.track.duration_ms,
             id: track.track.id,
@@ -237,9 +250,28 @@ export class Constants {
             popularity: track.track.popularity,
             type: track.track.type,
             uri: track.track.uri,
-            audio_features: track.audio_features,
+            audio_features: {
+                danceability: Math.round(track.audio_features.danceability * (100)),
+                energy: Math.round(track.audio_features.energy * (100)),
+                key: track.audio_features.key,
+                loudness: Math.round(track.audio_features.loudness * (-10)),
+                mode: track.audio_features.mode,
+                speechiness: track.audio_features.speechiness,
+                acousticness: track.audio_features.acousticness,
+                instrumentalness: track.audio_features.instrumentalness,
+                liveness: track.audio_features.liveness,
+                valence: Math.round(track.audio_features.valence * (100)),
+                tempo: Math.round(track.audio_features.tempo),
+                type: track.audio_features.type,
+                id: track.audio_features.id,
+                uri: track.audio_features.uri,
+                track_href: track.audio_features.track_href,
+                analysis_url: track.audio_features.analysis_url,
+                duration_ms: track.audio_features.duration_ms,
+                time_signature: track.audio_features.time_signature,
+            },
         };
-        return trackJson
+        return trackJson;
     }
 
     public static typeCastTrackAnalysisJson(trackAnalysis: { sections: any[], track: AnalysisTrackDetail }): TrackAnalysisJsonObject {
@@ -256,8 +288,8 @@ export class Constants {
                 analysis_channels: trackAnalysis.track.analysis_channels,
                 end_of_fade_in: trackAnalysis.track.end_of_fade_in,
                 start_of_fade_out: trackAnalysis.track.start_of_fade_out,
-                loudness: trackAnalysis.track.loudness,
-                tempo: trackAnalysis.track.tempo,
+                loudness: Math.round(trackAnalysis.track.loudness*(-10)),
+                tempo: Math.round(trackAnalysis.track.tempo),
                 tempo_confidence: trackAnalysis.track.tempo_confidence,
                 time_signature: trackAnalysis.track.time_signature,
                 time_signature_confidence: trackAnalysis.track.time_signature_confidence,

@@ -9,7 +9,6 @@ import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig } f
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    // provideClientHydration(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authConfigInterceptor]), withFetch()),
