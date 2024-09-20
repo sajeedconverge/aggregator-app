@@ -1,11 +1,11 @@
 import { HttpHeaders } from "@angular/common/http";
-import { AnalysisTrackDetail, PairedTrackJsonObject, SpotifySettings, TrackAnalysisJsonObject, TrackJsonObject } from "../spotify/shared/models/spotify-models";
+import { AnalysisTrackDetail, PairedTrackJsonObject, Section, SpotifySettings, TrackAnalysisJsonObject, TrackJsonObject } from "../spotify/shared/models/spotify-models";
 import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "../strava/shared/models/strava-models";
 
 export class Constants {
 
-    public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
-    // public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
+    // public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
+    public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     public static spotifySettings: SpotifySettings = {
         clientId: "",
@@ -275,9 +275,16 @@ export class Constants {
     }
 
     public static typeCastTrackAnalysisJson(trackAnalysis: { sections: any[], track: AnalysisTrackDetail }): TrackAnalysisJsonObject {
+        var correctedSections = trackAnalysis.sections.map((section: Section) => {
+            return {
+                ...section, // Spread the existing properties to retain them
+                tempo: Math.round(section.tempo),
+                loudness: Math.round(section.loudness * -10),
+            };
+        });
+
         var trackAnalysisJson: TrackAnalysisJsonObject = {
-            sections: trackAnalysis.sections,
-            //track: trackAnalysis.track
+            sections: correctedSections,
             track: {
                 num_samples: trackAnalysis.track.num_samples,
                 duration: trackAnalysis.track.duration,

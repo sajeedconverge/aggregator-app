@@ -222,34 +222,38 @@ export class LikedSongsComponent implements OnInit {
                     //console.log('track not found');
                     this.nonSavedTrackIds.push(pltrack.track.id);
 
-                    // //Add track to DB after fetching it's features
-                    // this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
-                    //   if (res.statusCode === 200) {
-                    //     var featuresUrl = res.payload;
-                    //     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                    //     this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-                    //       pltrack.audio_features = res;
-                    //       //add track to db with it's features
-                    //       var trackJson = Constants.typeCastTrackJson(pltrack);
-                    //       var postTrackRequest: PostTrackRequest = {
-                    //         providerTrackId: pltrack.track.id,
-                    //         trackData: JSON.stringify(trackJson)
-                    //       };
-                    //       this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
-                    //         if (postTrackRes.statusCode === 200) {
-                    //           //console.log("track added successfully.", pltrack.track.name);
-                    //         };
-                    //       });
-                    //     });
-                    //   };
-                    // });
+                    //Add track to DB after fetching it's features
+                    this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
+                      if (res.statusCode === 200) {
+                        var featuresUrl = res.payload;
+                        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                        this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
+                          pltrack.audio_features = res;
+                          //add track to db with it's features
+                          var trackJson = Constants.typeCastTrackJson(pltrack);
+                          var postTrackRequest: PostTrackRequest = {
+                            providerTrackId: pltrack.track.id,
+                            trackData: JSON.stringify(trackJson)
+                          };
+                          this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
+                            if (postTrackRes.statusCode === 200) {
+                              //console.log("track added successfully.", pltrack.track.name);
+                              pltrack.audio_features.tempo = Math.round(pltrack.audio_features.tempo);
+                              pltrack.audio_features.loudness = Math.round(pltrack.audio_features.loudness * (-10));
+                              pltrack.audio_features.energy = Math.round(pltrack.audio_features.energy * (100));
+                              pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
+                            };
+                          });
+                        });
+                      };
+                    });
                   };
                 });
                 //To get track analysis
                 this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
 
                   if (taRes.statusCode === 200) {
-                    //console.log('track analysis found', taRes.payload.analysisJsonData);
+                    console.log('track analysis found from db', taRes.payload.analysisJsonData);
                     pltrack.audioAnalysis = taRes.payload.analysisJsonData;
 
                   } else {
@@ -281,40 +285,40 @@ export class LikedSongsComponent implements OnInit {
               });
               setTimeout(() => {
                 //console.log('nonSavedTrackIds', this.nonSavedTrackIds);
-                if (this.nonSavedTrackIds.length > 0) {
-                  var severalIds = this.nonSavedTrackIds.join(',');
-                  //console.log(severalIds);
-                  this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
-                    if (safUrlResponse.statusCode === 200) {
-                      var safUrl = safUrlResponse.payload + severalIds;
-                      this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
+                // if (this.nonSavedTrackIds.length > 0) {
+                //   var severalIds = this.nonSavedTrackIds.join(',');
+                //   //console.log(severalIds);
+                //   this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
+                //     if (safUrlResponse.statusCode === 200) {
+                //       var safUrl = safUrlResponse.payload + severalIds;
+                //       this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
 
-                        safResponse.audio_features.forEach((audioFeature: any) => {
-                          var matchedSong = this.likedSongs.find(song => song.track.id === audioFeature.id);
-                          matchedSong.audio_features = audioFeature;
-                          
-                          //add track to db with it's features
-                          var trackJson = Constants.typeCastTrackJson(matchedSong);
-                          var postTrackRequest: PostTrackRequest = {
-                            providerTrackId: matchedSong.track.id,
-                            trackData: JSON.stringify(trackJson)
-                          };
-                          this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
-                            if (postTrackRes.statusCode === 200) {
-                              //console.log("track added successfully.", matchedSong.track.name);
-                              matchedSong.audio_features.tempo = Math.round(matchedSong.audio_features.tempo);
-                              matchedSong.audio_features.loudness = Math.round(matchedSong.audio_features.loudness * (-10));
-                              matchedSong.audio_features.energy = Math.round(matchedSong.audio_features.energy * (100));
-                              matchedSong.audio_features.danceability = Math.round(matchedSong.audio_features.danceability * (100));
-    
-                            };
-                          });
+                //         safResponse.audio_features.forEach((audioFeature: any) => {
+                //           var matchedSong = this.likedSongs.find(song => song.track.id === audioFeature.id);
+                //           matchedSong.audio_features = audioFeature;
 
-                        });
-                      });
-                    };
-                  });
-                };
+                //           //add track to db with it's features
+                //           var trackJson = Constants.typeCastTrackJson(matchedSong);
+                //           var postTrackRequest: PostTrackRequest = {
+                //             providerTrackId: matchedSong.track.id,
+                //             trackData: JSON.stringify(trackJson)
+                //           };
+                //           this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
+                //             if (postTrackRes.statusCode === 200) {
+                //               //console.log("track added successfully.", matchedSong.track.name);
+                //               matchedSong.audio_features.tempo = Math.round(matchedSong.audio_features.tempo);
+                //               matchedSong.audio_features.loudness = Math.round(matchedSong.audio_features.loudness * (-10));
+                //               matchedSong.audio_features.energy = Math.round(matchedSong.audio_features.energy * (100));
+                //               matchedSong.audio_features.danceability = Math.round(matchedSong.audio_features.danceability * (100));
+
+                //             };
+                //           });
+
+                //         });
+                //       });
+                //     };
+                //   });
+                // };
                 this.isLoading = false;
               }, 5000);
             } else {
