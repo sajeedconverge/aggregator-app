@@ -261,7 +261,7 @@ export class PlaylistDetailsComponent implements OnInit {
                       this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
                         if (postTrackAnalysisResponse.statusCode === 200) {
                           //console.log("track analysis added successfully.");
-
+                          pltrack.audioAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
                         };
                       });
                     });
@@ -282,7 +282,7 @@ export class PlaylistDetailsComponent implements OnInit {
                     safResponse.audio_features.forEach((audioFeature: any) => {
                       var matchedSong = this.playlistTracks.find(song => song.track.id === audioFeature.id);
                       matchedSong.audio_features = audioFeature;
-                     
+
                       //add track to db with it's features
                       var trackJson = Constants.typeCastTrackJson(matchedSong);
                       var postTrackRequest: PostTrackRequest = {

@@ -619,7 +619,7 @@ export class AudioHistoryComponent implements OnInit {
                 this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
                   if (postTrackAnalysisResponse.statusCode === 200) {
                     //console.log("track analysis added successfully.");
-
+                    pltrack.audioAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
                   };
                 });
               });

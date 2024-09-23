@@ -253,7 +253,7 @@ export class LikedSongsComponent implements OnInit {
                 this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
 
                   if (taRes.statusCode === 200) {
-                    console.log('track analysis found from db', taRes.payload.analysisJsonData);
+                    // console.log('track analysis found from db', taRes.payload.analysisJsonData);
                     pltrack.audioAnalysis = taRes.payload.analysisJsonData;
 
                   } else {
@@ -274,7 +274,7 @@ export class LikedSongsComponent implements OnInit {
                           this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
                             if (postTrackAnalysisResponse.statusCode === 200) {
                               //console.log("track analysis added successfully.");
-
+                              pltrack.audioAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
                             };
                           });
                         });
