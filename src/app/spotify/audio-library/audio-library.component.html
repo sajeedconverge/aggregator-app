@@ -10,8 +10,7 @@
         [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
         (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)" [lazy]="true"
         (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta">
-        <!-- (onFilter)="applyTableFilter($event)" -->
-
+        
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <div></div>
@@ -213,10 +212,10 @@
 </p-dialog>
 
 
-<p-dialog header="Add Tracks to existing Playlist" [modal]="true" [draggable]="false" [(visible)]="showPreview"
+<p-dialog header="Track Preview" [modal]="true" [draggable]="false" [(visible)]="showPreview"
     [closable]="true" [style]="{ width: '50rem' }">
     <div class="">
-        <iframe [src]="currentTrack?.uri | uri" width="600" height="600" frameborsrcder="0" allowtransparency="true"
+        <iframe [src]="currentTrack?.uri | uri" width="600" height="250" frameborsrcder="0" allowtransparency="true"
             allow="encrypted-media"></iframe>
     </div>
 </p-dialog>

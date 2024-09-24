@@ -22,6 +22,7 @@ import { SpotifyAuthorizationService } from '../shared/services/spotify-authoriz
 import { SpotifyService } from '../shared/services/spotify.service';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
+import { PaginatorModule } from 'primeng/paginator';
 
 @Component({
   selector: 'app-liked-songs',
@@ -40,7 +41,12 @@ import { Title } from '@angular/platform-browser';
     InputTextModule,
     TooltipModule,
     ButtonGroupModule,
-    RoundPipe
+    RoundPipe,
+    PaginatorModule,
+
+
+
+
 
 
   ],
@@ -73,7 +79,6 @@ export class LikedSongsComponent implements OnInit {
           color: this.textColor
         }
       },
-
       tooltip: {
         callbacks: {
           // Customize the label in the tooltip
@@ -114,8 +119,9 @@ export class LikedSongsComponent implements OnInit {
   selectedPlaylist: any;
   userPlaylists: any[] = [];
   selectedTracksList: any[] = [];
-
-
+  pageSize: number = 10;
+  offset: number = 0;
+  totalLikedSongsCount: number = 0;
 
 
   constructor(
@@ -158,7 +164,7 @@ export class LikedSongsComponent implements OnInit {
     this.checkInterval = setInterval(() => {
       const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
       if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
-        this.getLikedSongs();
+        this.getLikedSongs(this.offset, this.pageSize);
         clearInterval(this.checkInterval); // Stop the interval
       } else {
         this.fetchThirdPartyDetails();
@@ -186,13 +192,13 @@ export class LikedSongsComponent implements OnInit {
   //   this.showSummaryGraph = false;
   // }
 
-  getLikedSongs() {
+  getLikedSongs(offset: number, limit: number) {
     this.isLoading = true;
     this.likedSongs = [];
     this.selectedTracksList = [];
     this.spotifyAuthService.refreshSpotifyAccessToken();
 
-    this.spotifyService.getLikedSongsUrl().subscribe((urlResponse) => {
+    this.spotifyService.getLikedSongsUrl(offset, limit).subscribe((urlResponse) => {
       if (urlResponse.statusCode === 200) {
         var likedSongsUrl = urlResponse.payload;
 
@@ -200,8 +206,10 @@ export class LikedSongsComponent implements OnInit {
         if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
 
           this.spotifyService.SpotifyCommonGetApi(likedSongsUrl, spotifyAccessToken).subscribe((resp) => {
-
+            // debugger;
+            this.totalLikedSongsCount = resp.total;
             this.likedSongs = resp.items;
+
             this.likedSongs.forEach(pltrack => {
               pltrack.artist = pltrack.track?.artists[0]?.name;
               this.originalTracks.push(pltrack.track.id);
@@ -826,6 +834,45 @@ export class LikedSongsComponent implements OnInit {
       this.showGraphChanged(true);
     }
   }
+
+  onPageChange(event: any) {
+    this.showDetailedGraph = false;
+    this.showSummaryGraph = false;
+    this.pageSize = event.rows;
+    this.offset = event.first;
+    // debugger;
+    // console.log('event.page', event.page);
+    // console.log('event.rows', event.rows);
+
+    this.getLikedSongs(this.offset, this.pageSize);
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

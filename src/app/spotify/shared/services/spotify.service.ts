@@ -118,8 +118,8 @@ export class SpotifyService {
       );
   }
 
-  getLikedSongsUrl(): Observable<ResponseModel> {
-    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetLikedSongsUrl`, { headers: this.headers });
+  getLikedSongsUrl(offset:number,limit:number): Observable<ResponseModel> {
+    return this.http.get<any>(Constants.baseServerUrl + `Spotify/GetLikedSongsUrl?offset=${offset}&limit=${limit}`, { headers: this.headers });
   }
 
   getSeveralAudioFeaturesUrl(): Observable<ResponseModel> {

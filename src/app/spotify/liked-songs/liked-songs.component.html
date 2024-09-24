@@ -4,11 +4,18 @@
 <p-confirmDialog />
 <!-- liked songs List -->
 <div class="palylist_table">
-    <p-table [value]="likedSongs" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-        [totalRecords]="likedSongs.length" [paginator]="true" sortField="added_at" (sortOrder)="1"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    <!-- <p-table [value]="likedSongs" [rows]="pageSize" (onPage)="onPageChange($event)" [showCurrentPageReport]="true"
+        [rowsPerPageOptions]="[10,25,50]" [totalRecords]="totalLikedSongsCount" [paginator]="true" sortField="added_at"
+        (sortOrder)="1" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        paginatorPosition="top" [(selection)]="selectedTracksList" [tableStyle]="{'min-width': '60rem'}"
+        (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)"> -->
+    <p-table [value]="likedSongs" [lazy]="true" (onLazyLoad)="onPageChange($event)" [rows]="pageSize"
+        [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]" [totalRecords]="totalLikedSongsCount"
+        [paginator]="true" sortField="added_at" (sortOrder)="1"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" paginatorPosition="top"
         [(selection)]="selectedTracksList" [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered($event)"
         (onSort)="tableSorted($event)">
+
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <div></div>
@@ -58,6 +65,11 @@
             <div>
                 <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
             </div>
+            <!-- <p-paginator (onPageChange)="onPageChange($event)" [rows]="pageSize" [rowsPerPageOptions]="[10, 25, 50]"
+                [totalRecords]="totalLikedSongsCount" [showCurrentPageReport]="true" [showPageLinks]="true"
+                [showJumpToPageDropdown]="false" class=""
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tracks" /> -->
+
         </ng-template>
 
         <ng-template pTemplate="header">
