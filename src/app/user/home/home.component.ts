@@ -170,7 +170,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
 
                     if (activity.distance > 0 && activity.audio.length > 0) {
-                    
+
                       this.athleteActivities.push(activity);
                     };
 
@@ -343,22 +343,25 @@ export class HomeComponent implements OnInit, OnDestroy {
     } else {
       //To get audio feature every song played during the activity
       result[0].tracks.forEach((track) => {
-        this.spotifyService.getSpotifyAudioFeaturesUrl(track.track.id).subscribe((res) => {
-          if (res.statusCode === 200) {
-            var featuresUrl = res.payload;
+        if (track.track.name !== 'No Track') {
+          this.spotifyService.getSpotifyAudioFeaturesUrl(track.track.id).subscribe((res) => {
+            if (res.statusCode === 200) {
+              var featuresUrl = res.payload;
 
-            const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-            this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
-              track.audio_features = audioFeature;
-              track.duration_mins = Constants.formatDuration(track.track.duration_ms);
+              const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+              this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((audioFeature) => {
+                track.audio_features = audioFeature;
+                track.duration_mins = Constants.formatDuration(track.track.duration_ms);
 
-            });
-          };
-        });
+              });
+            };
+          });
+        };
       });
     };
     this.pairedResult = result;
     console.log("pairedItems", result);
+    this.isLoading = false;
     return result;
   }
 
@@ -400,6 +403,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.spotifyService.SpotifyCommonGetApi(streamsUrl, stravaAccessToken).subscribe((streamRes) => {
           if (streamRes) {
             this.activityStreams = streamRes;
+
             this.pairedResult[0].activity.activity_streams = this.activityStreams;
             //console.log("this.activityStreams", this.activityStreams);
 
@@ -417,23 +421,17 @@ export class HomeComponent implements OnInit, OnDestroy {
               var trackEndTime = track.played_at;
 
               var startDistObject = Constants.findNearestStartTime(mappedStream, trackStartTime);
-              //console.log('startDistObject',startDistObject);
 
               var endDistObject = Constants.findNearestEndTime(mappedStream, startDistObject.time, trackEndTime);
-              //console.log('endDistObject',endDistObject);
 
               track.distance_start = (startDistObject?.distance || 0) / 1000;
               track.distance_end = (endDistObject?.distance || 0) / 1000;
               track.distance = (track.distance_end - track.distance_start);
 
               var movingTimeMs = 0;
-              // for (let index = (startDistObject?.index || 0); index < (endDistObject?.index || 0); index++) {
-              //   movingTimeMs += mappedStream[index].duration_increment_ms;
-              // };
               movingTimeMs = (endDistObject?.duration_increment_ms) - (startDistObject?.duration_increment_ms)
 
               track.moving_time = Constants.formatDuration(Math.min(movingTimeMs, track.track.duration_ms));
-              //track.moving_time = Constants.formatDuration(movingTimeMs);
 
               var hoursTime = (Math.min(movingTimeMs, track.track.duration_ms)) / (1000 * 60 * 60);
               track.speed = (track.distance / (hoursTime));
@@ -441,8 +439,6 @@ export class HomeComponent implements OnInit, OnDestroy {
               track.pace = (track.speed > 0) ? (1000 / ((track.distance * 1000) / (Math.min(movingTimeMs / 1000, track.track.duration_ms / 1000)))) : 0;
               track.pace = Constants.formatDuration(track.pace * 1000);
             });
-
-
             this.isLoading = false;
           };
         });
@@ -543,7 +539,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           });
           unfilteredActivites.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
           //console.log(actResponse);
-          let lastActivityTime = unfilteredActivites[(unfilteredActivites.length) - 1].start_date;
+          // let lastActivityTime = unfilteredActivites[(unfilteredActivites.length) - 1].start_date;
           this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(50).subscribe((rpRes) => {
             if (rpRes.statusCode === 200) {
               this.isLoading = true;
@@ -554,7 +550,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                 //To calculate track start time
                 this.recentAudio.forEach(track => {
                   track.start_time = Constants.getTrackStartTime(track.played_at, track.track.duration_ms);
-                  //track.end_time = Constants.getTrackEndTime(track.played_at, track.track.duration_ms);
+
                 });
                 //console.log("this.recentAudio", this.recentAudio);
                 //to filter out the activities with no tracks
