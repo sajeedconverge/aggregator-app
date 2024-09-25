@@ -164,14 +164,14 @@ export class PlaylistDetailsComponent implements OnInit {
       const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
       if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
         // this.getPlayListTracks();
-        this.onPageChange(
-          {
-            first: 0,
-            rows: 10,
-            sortField: "added_at",
-            sortOrder: 1
-          }
-        );
+        // this.onPageChange(
+        //   {
+        //     first: 0,
+        //     rows: 10,
+        //     sortField: "added_at",
+        //     sortOrder: 1
+        //   }
+        // );
 
         clearInterval(this.checkInterval); // Stop the interval
       } else {
@@ -195,7 +195,7 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   getPlayListTracks(offset: number, limit: number) {
-  
+  // debugger;
     this.isLoading = true;
     this.dataMessage='Loading data...';
     this.playlistTracks = [];
@@ -205,7 +205,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
     this.currentPlayListName = playlistName;
     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-    if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
+    if (spotifyAccessToken.length > 0 ) {
 
       url = url + `?offset=${offset}&limit=${limit}`;
       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {

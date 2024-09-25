@@ -130,7 +130,7 @@ export class AudioLibraryComponent implements OnInit {
   };
   showPreview: boolean = false;
   currentTrack: any;
-  dataMessage:string='';
+  dataMessage: string = '';
 
 
 
@@ -167,7 +167,7 @@ export class AudioLibraryComponent implements OnInit {
 
   getAllAudio() {
     this.isLoading = true;
-    this.dataMessage='Loading data...';
+    this.dataMessage = 'Loading data...';
     this.selectedTracksList = [];
     if (this.filterRequest.sortField) {
       this.spotifyService.getAllTracks(this.filterRequest).pipe(
@@ -223,14 +223,14 @@ export class AudioLibraryComponent implements OnInit {
           //     });
           //   };
           // });
-
+          this.dataMessage = 'No tracks found in audio Library.';
           this.isLoading = false;
-          
+
+        } else {
+          this.dataMessage = 'No tracks found in audio Library.';
         };
       });
     };
-      this.dataMessage='No tracks found in audio Library.';
-    
     this.isLoading = false;
   }
 
