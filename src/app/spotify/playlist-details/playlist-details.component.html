@@ -127,15 +127,12 @@
                 <td>{{ track?.audio_features?.danceability }}</td>
                 <td>{{ track?.audio_features?.energy }}</td>
                 <td>{{ track?.audio_features?.loudness }}</td>
-                <!-- <td>
-                    <p-button class="anchor_btn" (click)="openInSpotify(track.track.external_urls.spotify)"
-                        label="Open in Spotify" [link]="true" />
-                </td> -->
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <tr class="">
-                <td colspan="10">No tracks found in the current playlist.</td>
+                <!-- <td colspan="10">No tracks found in the current playlist.</td> -->
+                <td colspan="10">{{dataMessage}}</td>
             </tr>
         </ng-template>
     </p-table>

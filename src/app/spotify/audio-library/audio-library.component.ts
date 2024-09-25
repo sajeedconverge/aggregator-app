@@ -130,7 +130,7 @@ export class AudioLibraryComponent implements OnInit {
   };
   showPreview: boolean = false;
   currentTrack: any;
-
+  dataMessage:string='';
 
 
 
@@ -167,6 +167,7 @@ export class AudioLibraryComponent implements OnInit {
 
   getAllAudio() {
     this.isLoading = true;
+    this.dataMessage='Loading data...';
     this.selectedTracksList = [];
     if (this.filterRequest.sortField) {
       this.spotifyService.getAllTracks(this.filterRequest).pipe(
@@ -213,7 +214,6 @@ export class AudioLibraryComponent implements OnInit {
           //               this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
           //                 if (postTrackAnalysisResponse.statusCode === 200) {
           //                   //console.log("track analysis added successfully.");
-
           //                 };
           //               });
           //             });
@@ -223,10 +223,14 @@ export class AudioLibraryComponent implements OnInit {
           //     });
           //   };
           // });
+
           this.isLoading = false;
+          
         };
       });
     };
+      this.dataMessage='No tracks found in audio Library.';
+    
     this.isLoading = false;
   }
 
@@ -752,7 +756,7 @@ export class AudioLibraryComponent implements OnInit {
   }
 
   loadData(event: any) {
-    //debugger;
+    // debugger;
     this.isLoading = true;
     this.audioTracks = [];
     // console.log('Lazy Load Event:', event);
@@ -766,7 +770,7 @@ export class AudioLibraryComponent implements OnInit {
     this.filterRequest.energy = event.filters['audio_features.energy']?.filter((item: any) => item.value !== null).map((item: any) => item);
     this.filterRequest.loudness = event.filters['audio_features.loudness']?.filter((item: any) => item.value !== null).map((item: any) => item);
 
-    this.filterRequest.sortField = event.sortField;
+    this.filterRequest.sortField = event.sortField ? event.sortField : this.filterRequest.sortField;
     this.filterRequest.sortOrder = event.sortOrder;
     this.filterRequest.pageSize = event.rows
 

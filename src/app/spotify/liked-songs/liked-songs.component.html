@@ -43,12 +43,13 @@
                                     </span>
                                 </p-button>
                             </p-buttonGroup> -->
-                            <p-button class=" btn-grp-custom" [outlined]="!showSummaryGraph" size="small" (onClick)="showSummaryGraphChanged(false)"
-                            pTooltip="Summary Graph" tooltipPosition="bottom">
-                            <span class="material-symbols-outlined">
-                                show_chart
-                            </span>
-                        </p-button>
+                            <p-button class=" btn-grp-custom" [outlined]="!showSummaryGraph" size="small"
+                                (onClick)="showSummaryGraphChanged(false)" pTooltip="Summary Graph"
+                                tooltipPosition="bottom">
+                                <span class="material-symbols-outlined">
+                                    show_chart
+                                </span>
+                            </p-button>
                         </div>
 
                         <p-button class="mr-2" severity="warning" (onClick)="addTracksToExistingPlaylist()"
@@ -145,7 +146,9 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <tr class="">
-                <td colspan="10">No tracks found in the current playlist.</td>
+                <td colspan="10">
+                    {{dataMessage}}
+                </td>
             </tr>
         </ng-template>
     </p-table>

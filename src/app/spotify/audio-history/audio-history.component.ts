@@ -112,7 +112,7 @@ export class AudioHistoryComponent implements OnInit {
   selectedPlaylist: any;
   userPlaylists: any[] = [];
   nonSavedTrackIds: string[] = [];
-
+  dataMessage:string='';
 
   constructor(
     private spotifyService: SpotifyService,
@@ -138,6 +138,7 @@ export class AudioHistoryComponent implements OnInit {
 
   getRecentAudio() {
     this.isLoading = true;
+    this.dataMessage='Loading data...';
     this.selectedTracksList = [];
     this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(this.limit).subscribe((urlResponse) => {
       if (urlResponse.statusCode === 200) {
@@ -150,7 +151,7 @@ export class AudioHistoryComponent implements OnInit {
           console.log('hisotryTracks', this.hisotryTracks);
 
 
-          this.hisotryTracks.forEach(pltrack => {
+          this.hisotryTracks.forEach((pltrack,index) => {
             pltrack.artist = pltrack.track?.artists[0]?.name;
             pltrack.color = Constants.generateRandomPrimeNGColor();
             // audio features
@@ -199,11 +200,17 @@ export class AudioHistoryComponent implements OnInit {
             //     this.isLoading = true;
             //   };
             // });
+            if(index==(this.hisotryTracks.length-1)){
+              this.dataMessage='No tracks found in the audio history.'
+            };
+
           });
           setTimeout(() => {
             this.isLoading = false;
           }, 3000);
         })
+      }else{
+        this.dataMessage='No tracks found in audio history.';
       };
     })
   }
