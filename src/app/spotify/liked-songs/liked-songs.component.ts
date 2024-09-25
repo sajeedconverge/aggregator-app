@@ -263,7 +263,7 @@ export class LikedSongsComponent implements OnInit {
                   if (taRes.statusCode === 200) {
                     // console.log('track analysis found from db', taRes.payload.analysisJsonData);
                     pltrack.audioAnalysis = taRes.payload.analysisJsonData;
-
+                    this.isLoading = true;
                   } else {
                     //console.log('track analysis not found');
                     //To fetch track analysis
@@ -288,6 +288,7 @@ export class LikedSongsComponent implements OnInit {
                         });
                       };
                     });
+                    this.isLoading = true;
                   };
                 });
               });

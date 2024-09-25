@@ -181,7 +181,7 @@ export class AudioHistoryComponent implements OnInit {
             //To get track analysis
             this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
               if (taRes.statusCode === 200) {
-
+                this.isLoading = true;
                 //console.log('track analysis found', taRes.payload.analysisJsonData);
                 pltrack.audioAnalysis = taRes.payload.analysisJsonData;
               } else {
@@ -196,6 +196,7 @@ export class AudioHistoryComponent implements OnInit {
                     });
                   };
                 });
+                this.isLoading = true;
               };
             });
           });

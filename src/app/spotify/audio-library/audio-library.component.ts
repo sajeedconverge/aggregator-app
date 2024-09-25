@@ -637,7 +637,7 @@ export class AudioLibraryComponent implements OnInit {
         if (taRes.statusCode === 200) {
           //console.log('track analysis found', taRes.payload.analysisJsonData);
           pltrack.audioAnalysis = taRes.payload.analysisJsonData;
-
+          
         } else {
           //console.log('track analysis not found');
           //debugger;
