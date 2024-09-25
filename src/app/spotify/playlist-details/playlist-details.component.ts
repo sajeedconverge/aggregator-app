@@ -258,41 +258,41 @@ export class PlaylistDetailsComponent implements OnInit {
 
               };
             });
-            //To get track analysis
-            this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
+            // //To get track analysis
+            // this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
 
-              if (taRes.statusCode === 200) {
-                //console.log('track analysis found', taRes.payload.analysisJsonData);
-                pltrack.audioAnalysis = taRes.payload.analysisJsonData;
-                this.isLoading = true;
-              } else {
-                //console.log('track analysis not found');
-                //To fetch track analysis
-                this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
-                  if (res.statusCode === 200) {
-                    var analysisUrl = res.payload;
-                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                    this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                      pltrack.audioAnalysis = res;
-                      //To add track analysis
-                      // debugger;
-                      var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
-                      var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
-                        providerTrackId: pltrack.track.id,
-                        trackAnalysisData: JSON.stringify(trackAnalysis)
-                      };
-                      this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
-                        if (postTrackAnalysisResponse.statusCode === 200) {
-                          //console.log("track analysis added successfully.");
-                          pltrack.audioAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
-                        };
-                      });
-                      this.isLoading = true;
-                    });
-                  };
-                });
-              };
-            });
+            //   if (taRes.statusCode === 200) {
+            //     //console.log('track analysis found', taRes.payload.analysisJsonData);
+            //     pltrack.audioAnalysis = taRes.payload.analysisJsonData;
+            //     this.isLoading = true;
+            //   } else {
+            //     //console.log('track analysis not found');
+            //     //To fetch track analysis
+            //     this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
+            //       if (res.statusCode === 200) {
+            //         var analysisUrl = res.payload;
+            //         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+            //         this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+            //           pltrack.audioAnalysis = res;
+            //           //To add track analysis
+            //           // debugger;
+            //           var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
+            //           var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+            //             providerTrackId: pltrack.track.id,
+            //             trackAnalysisData: JSON.stringify(trackAnalysis)
+            //           };
+            //           this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
+            //             if (postTrackAnalysisResponse.statusCode === 200) {
+            //               //console.log("track analysis added successfully.");
+            //               pltrack.audioAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
+            //             };
+            //           });
+            //           this.isLoading = true;
+            //         });
+            //       };
+            //     });
+            //   };
+            // });
           });
           setTimeout(() => {
             // if (this.nonSavedTrackIds.length > 0) {
@@ -329,7 +329,7 @@ export class PlaylistDetailsComponent implements OnInit {
             //   });
             // };
             this.isLoading = false;
-          }, 5000);
+          }, 3000);
         } else {
 
           this.isLoading = false;
@@ -708,8 +708,8 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   onPageChange(event: any) {
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
     this.pageSize = event.rows;
     this.offset = event.first;
     // debugger;

@@ -178,39 +178,39 @@ export class AudioHistoryComponent implements OnInit {
 
               };
             });
-            //To get track analysis
-            this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
-              if (taRes.statusCode === 200) {
-                this.isLoading = true;
-                //console.log('track analysis found', taRes.payload.analysisJsonData);
-                pltrack.audioAnalysis = taRes.payload.analysisJsonData;
-              } else {
-                //console.log('track analysis not found');
-                //To fetch track analysis
-                this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
-                  if (res.statusCode === 200) {
-                    var analysisUrl = res.payload;
-                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                    this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                      pltrack.audioAnalysis = res;
-                    });
-                  };
-                });
-                this.isLoading = true;
-              };
-            });
+            // //To get track analysis
+            // this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
+            //   if (taRes.statusCode === 200) {
+            //     this.isLoading = true;
+            //     //console.log('track analysis found', taRes.payload.analysisJsonData);
+            //     pltrack.audioAnalysis = taRes.payload.analysisJsonData;
+            //   } else {
+            //     //console.log('track analysis not found');
+            //     //To fetch track analysis
+            //     this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
+            //       if (res.statusCode === 200) {
+            //         var analysisUrl = res.payload;
+            //         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+            //         this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+            //           pltrack.audioAnalysis = res;
+            //         });
+            //       };
+            //     });
+            //     this.isLoading = true;
+            //   };
+            // });
           });
           setTimeout(() => {
             this.isLoading = false;
-          }, 5000);
+          }, 3000);
         })
       };
     })
   }
 
   onPageChange(event: any) {
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
     this.limit = event.rows;
     this.getRecentAudio();
   }

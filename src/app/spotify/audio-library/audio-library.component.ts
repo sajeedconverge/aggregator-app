@@ -187,41 +187,42 @@ export class AudioLibraryComponent implements OnInit {
           });
           console.log('this.audioTracks', this.audioTracks);
           //To fetch audio analysis for each track
-          var tracksIds = this.audioTracks.map(plTrack => { return plTrack.id });
-          // console.log(tracksIds);
-          this.spotifyService.getMultipleTrackAnalysesByIds(tracksIds).subscribe((analysesResponse) => {
-            if (analysesResponse.statusCode === 200) {
-              // console.log('multiple analyses', analysesResponse.payload);
-              this.audioTracks.forEach(track => {
-                track.audioAnalysis = analysesResponse.payload.find((analysis: any) => analysis.providerTrackId === track?.id)?.analysisJsonData
-                //console.log('track.audioAnalysis', track.audioAnalysis);
-                if (!track.audioAnalysis) {
-                  //To fetch track analysis
-                  this.spotifyService.getSpotifyAudioAnalysisUrl(track.id).subscribe((res) => {
-                    if (res.statusCode === 200) {
-                      var analysisUrl = res.payload;
-                      const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                      this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                        track.audioAnalysis = res;
-                        //To add track analysis
-                        var trackAnalysis = Constants.typeCastTrackAnalysisJson(track.audioAnalysis);
-                        var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
-                          providerTrackId: track.id,
-                          trackAnalysisData: JSON.stringify(trackAnalysis)
-                        };
-                        this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
-                          if (postTrackAnalysisResponse.statusCode === 200) {
-                            //console.log("track analysis added successfully.");
+          // var tracksIds = this.audioTracks.map(plTrack => { return plTrack.id });
+          // // console.log(tracksIds);
+          // //To fetch audio analysis
+          // this.spotifyService.getMultipleTrackAnalysesByIds(tracksIds).subscribe((analysesResponse) => {
+          //   if (analysesResponse.statusCode === 200) {
+          //     // console.log('multiple analyses', analysesResponse.payload);
+          //     this.audioTracks.forEach(track => {
+          //       track.audioAnalysis = analysesResponse.payload.find((analysis: any) => analysis.providerTrackId === track?.id)?.analysisJsonData
+          //       //console.log('track.audioAnalysis', track.audioAnalysis);
+          //       if (!track.audioAnalysis) {
+          //         //To fetch track analysis
+          //         this.spotifyService.getSpotifyAudioAnalysisUrl(track.id).subscribe((res) => {
+          //           if (res.statusCode === 200) {
+          //             var analysisUrl = res.payload;
+          //             const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+          //             this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+          //               track.audioAnalysis = res;
+          //               //To add track analysis
+          //               var trackAnalysis = Constants.typeCastTrackAnalysisJson(track.audioAnalysis);
+          //               var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+          //                 providerTrackId: track.id,
+          //                 trackAnalysisData: JSON.stringify(trackAnalysis)
+          //               };
+          //               this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
+          //                 if (postTrackAnalysisResponse.statusCode === 200) {
+          //                   //console.log("track analysis added successfully.");
 
-                          };
-                        });
-                      });
-                    };
-                  });
-                };
-              });
-            };
-          })
+          //                 };
+          //               });
+          //             });
+          //           };
+          //         });
+          //       };
+          //     });
+          //   };
+          // });
           this.isLoading = false;
         };
       });
@@ -230,8 +231,8 @@ export class AudioLibraryComponent implements OnInit {
   }
 
   onPageChange(event: any) {
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
     this.pageSize = event.rows;
     // debugger;
     //this.pageNumber = event.page+1;
@@ -631,40 +632,40 @@ export class AudioLibraryComponent implements OnInit {
           });
         };
       });
-      //To get track analysis
-      this.spotifyService.getTrackAnalysisById(pltrack.id).subscribe((taRes) => {
+      // //To get track analysis
+      // this.spotifyService.getTrackAnalysisById(pltrack.id).subscribe((taRes) => {
 
-        if (taRes.statusCode === 200) {
-          //console.log('track analysis found', taRes.payload.analysisJsonData);
-          pltrack.audioAnalysis = taRes.payload.analysisJsonData;
-          
-        } else {
-          //console.log('track analysis not found');
-          //debugger;
-          //To fetch track analysis
-          this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.id).subscribe((res) => {
-            if (res.statusCode === 200) {
-              var analysisUrl = res.payload;
-              const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-              this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                pltrack.audioAnalysis = res;
-                //To add track analysis
-                var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
-                var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
-                  providerTrackId: pltrack.id,
-                  trackAnalysisData: JSON.stringify(trackAnalysis)
-                };
-                this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
-                  if (postTrackAnalysisResponse.statusCode === 200) {
-                    //console.log("track analysis added successfully.");
+      //   if (taRes.statusCode === 200) {
+      //     //console.log('track analysis found', taRes.payload.analysisJsonData);
+      //     pltrack.audioAnalysis = taRes.payload.analysisJsonData;
 
-                  };
-                });
-              });
-            };
-          });
-        };
-      });
+      //   } else {
+      //     //console.log('track analysis not found');
+      //     //debugger;
+      //     //To fetch track analysis
+      //     this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.id).subscribe((res) => {
+      //       if (res.statusCode === 200) {
+      //         var analysisUrl = res.payload;
+      //         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+      //         this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+      //           pltrack.audioAnalysis = res;
+      //           //To add track analysis
+      //           var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
+      //           var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+      //             providerTrackId: pltrack.id,
+      //             trackAnalysisData: JSON.stringify(trackAnalysis)
+      //           };
+      //           this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
+      //             if (postTrackAnalysisResponse.statusCode === 200) {
+      //               //console.log("track analysis added successfully.");
+
+      //             };
+      //           });
+      //         });
+      //       };
+      //     });
+      //   };
+      // });
     });
   }
 
