@@ -65,9 +65,11 @@ export class SigninComponent implements OnInit {
     private fb: FormBuilder,
     private stravaAuthService: StravaAuthorizationService,
     private spotifyAuthService: SpotifyAuthorizationService,
-    private title:Title
+    private title: Title
   ) {
-    // this.title.setTitle('AudioActive - Sign In');
+    this.title.setTitle('AudioActive');
+
+
 
   }
 

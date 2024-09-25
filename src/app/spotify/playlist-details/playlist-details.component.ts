@@ -116,6 +116,12 @@ export class PlaylistDetailsComponent implements OnInit {
   reOrderedTracks: string[] = [];
   pattern = '\\S+.*';
   nonSavedTrackIds: string[] = [];
+  pageSize: number = 10;
+  offset: number = 0;
+  totalItemsCount: number = 0;
+
+
+
 
   constructor(
     private spotifyService: SpotifyService,
@@ -157,7 +163,16 @@ export class PlaylistDetailsComponent implements OnInit {
     this.checkInterval = setInterval(() => {
       const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
       if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
-        this.getPlayListTracks();
+        // this.getPlayListTracks();
+        this.onPageChange(
+          {
+            first: 0,
+            rows: 10,
+            sortField: "added_at",
+            sortOrder: 1
+          }
+        );
+
         clearInterval(this.checkInterval); // Stop the interval
       } else {
         this.fetchThirdPartyDetails();
@@ -179,7 +194,7 @@ export class PlaylistDetailsComponent implements OnInit {
     });
   }
 
-  getPlayListTracks() {
+  getPlayListTracks(offset: number, limit: number) {
     this.isLoading = true;
     this.playlistTracks = [];
     this.spotifyAuthService.refreshSpotifyAccessToken();
@@ -190,8 +205,10 @@ export class PlaylistDetailsComponent implements OnInit {
     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
     if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
 
+      url = url + `?offset=${offset}&limit=${limit}`;
       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {
 
+        this.totalItemsCount = resp.total;
         this.playlistTracks = resp.items;
         this.playlistTracks.forEach(pltrack => {
           pltrack.artist = pltrack.track?.artists[0]?.name;
@@ -212,96 +229,107 @@ export class PlaylistDetailsComponent implements OnInit {
               } else {
                 //console.log('track not found');
                 this.nonSavedTrackIds.push(pltrack.track.id);
-                // //Add track to DB after fetching it's features
-                // this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
-                //   if (res.statusCode === 200) {
-                //     var featuresUrl = res.payload;
-                //     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                //     this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-                //       pltrack.audio_features = res;
-                //       //add track to db with it's features
-                //       var trackJson = Constants.typeCastTrackJson(pltrack);
-                //       var postTrackRequest: PostTrackRequest = {
-                //         providerTrackId: pltrack.track.id,
-                //         trackData: JSON.stringify(trackJson)
-                //       };
-                //       this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
-                //         if (postTrackRes.statusCode === 200) {
-                //           //console.log("track added successfully.", pltrack.track.name);
-                //         };
-                //       });
-                //     });
-                //   };
-                // });
-              };
-            });
-            //To get track analysis
-            this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
-
-              if (taRes.statusCode === 200) {
-                //console.log('track analysis found', taRes.payload.analysisJsonData);
-                pltrack.audioAnalysis = taRes.payload.analysisJsonData;
-
-              } else {
-                //console.log('track analysis not found');
-                //To fetch track analysis
-                this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
+                
+                //Add track to DB after fetching it's features
+                this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
                   if (res.statusCode === 200) {
-                    var analysisUrl = res.payload;
+                    var featuresUrl = res.payload;
                     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                    this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                      pltrack.audioAnalysis = res;
-                      //To add track analysis
-                      // debugger;
-                      var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
-                      var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+                    this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
+                      pltrack.audio_features = res;
+                      //add track to db with it's features
+                      var trackJson = Constants.typeCastTrackJson(pltrack);
+                      var postTrackRequest: PostTrackRequest = {
                         providerTrackId: pltrack.track.id,
-                        trackAnalysisData: JSON.stringify(trackAnalysis)
+                        trackData: JSON.stringify(trackJson)
                       };
-                      this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
-                        if (postTrackAnalysisResponse.statusCode === 200) {
-                          //console.log("track analysis added successfully.");
-
+                      this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
+                        if (postTrackRes.statusCode === 200) {
+                          //console.log("track added successfully.", pltrack.track.name);
+                          pltrack.audio_features.tempo = Math.round(pltrack.audio_features.tempo);
+                          pltrack.audio_features.loudness = Math.round(pltrack.audio_features.loudness * (-10));
+                          pltrack.audio_features.energy = Math.round(pltrack.audio_features.energy * (100));
+                          pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
                         };
                       });
                     });
                   };
                 });
+
               };
             });
+            // //To get track analysis
+            // this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
+
+            //   if (taRes.statusCode === 200) {
+            //     //console.log('track analysis found', taRes.payload.analysisJsonData);
+            //     pltrack.audioAnalysis = taRes.payload.analysisJsonData;
+            //     this.isLoading = true;
+            //   } else {
+            //     //console.log('track analysis not found');
+            //     //To fetch track analysis
+            //     this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
+            //       if (res.statusCode === 200) {
+            //         var analysisUrl = res.payload;
+            //         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+            //         this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+            //           pltrack.audioAnalysis = res;
+            //           //To add track analysis
+            //           // debugger;
+            //           var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
+            //           var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+            //             providerTrackId: pltrack.track.id,
+            //             trackAnalysisData: JSON.stringify(trackAnalysis)
+            //           };
+            //           this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
+            //             if (postTrackAnalysisResponse.statusCode === 200) {
+            //               //console.log("track analysis added successfully.");
+            //               pltrack.audioAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
+            //             };
+            //           });
+            //           this.isLoading = true;
+            //         });
+            //       };
+            //     });
+            //   };
+            // });
           });
           setTimeout(() => {
-            if (this.nonSavedTrackIds.length > 0) {
-              var severalIds = this.nonSavedTrackIds.join(',');
-              //console.log(severalIds);
-              this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
-                if (safUrlResponse.statusCode === 200) {
-                  var safUrl = safUrlResponse.payload + severalIds;
-                  this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
+            // if (this.nonSavedTrackIds.length > 0) {
+            //   var severalIds = this.nonSavedTrackIds.join(',');
+            //   //console.log(severalIds);
+            //   this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
+            //     if (safUrlResponse.statusCode === 200) {
+            //       var safUrl = safUrlResponse.payload + severalIds;
+            //       this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
 
-                    safResponse.audio_features.forEach((audioFeature: any) => {
-                      var matchedSong = this.playlistTracks.find(song => song.track.id === audioFeature.id);
-                      matchedSong.audio_features = audioFeature;
+            //         safResponse.audio_features.forEach((audioFeature: any) => {
+            //           var matchedSong = this.playlistTracks.find(song => song.track.id === audioFeature.id);
+            //           matchedSong.audio_features = audioFeature;
 
-                      //add track to db with it's features
-                      var trackJson = Constants.typeCastTrackJson(matchedSong);
-                      var postTrackRequest: PostTrackRequest = {
-                        providerTrackId: matchedSong.track.id,
-                        trackData: JSON.stringify(trackJson)
-                      };
-                      this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
-                        if (postTrackRes.statusCode === 200) {
-                          // console.log("track added successfully.", matchedSong.track.name);
-                        };
-                      });
+            //           //add track to db with it's features
+            //           var trackJson = Constants.typeCastTrackJson(matchedSong);
+            //           var postTrackRequest: PostTrackRequest = {
+            //             providerTrackId: matchedSong.track.id,
+            //             trackData: JSON.stringify(trackJson)
+            //           };
+            //           this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
+            //             if (postTrackRes.statusCode === 200) {
+            //               // console.log("track added successfully.", matchedSong.track.name);
+            //               matchedSong.audio_features.tempo = Math.round(matchedSong.audio_features.tempo);
+            //               matchedSong.audio_features.loudness = Math.round(matchedSong.audio_features.loudness * (-10));
+            //               matchedSong.audio_features.energy = Math.round(matchedSong.audio_features.energy * (100));
+            //               matchedSong.audio_features.danceability = Math.round(matchedSong.audio_features.danceability * (100));
+            //             };
+            //           });
 
-                    });
-                  });
-                };
-              });
-            };
+            //         });
+            //       });
+            //     };
+            //   });
+            // };
             this.isLoading = false;
-          }, 5000);
+          }, 3000);
         } else {
 
           this.isLoading = false;
@@ -339,8 +367,6 @@ export class PlaylistDetailsComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
@@ -355,8 +381,6 @@ export class PlaylistDetailsComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
@@ -371,8 +395,6 @@ export class PlaylistDetailsComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
@@ -387,8 +409,6 @@ export class PlaylistDetailsComponent implements OnInit {
             tracks: [],
             pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
@@ -553,7 +573,7 @@ export class PlaylistDetailsComponent implements OnInit {
       return comparison * order; // Apply the sort order: 1 for ascending, -1 for descending
     });
     this.playlistTracks.forEach(plTrack => {
-      this.reOrderedTracks.push(plTrack.track.id)
+      this.reOrderedTracks.push(plTrack.track.id);
     });
     // //temp code 
     // var reOrderedTracks = this.playlistTracks.map(plTrack => { return plTrack.track.name });
@@ -687,7 +707,17 @@ export class PlaylistDetailsComponent implements OnInit {
     }
   }
 
+  onPageChange(event: any) {
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
+    this.pageSize = event.rows;
+    this.offset = event.first;
+    // debugger;
+    // console.log('this.pageSize', this.pageSize);
+    // console.log('this.offset', this.offset);
 
+    this.getPlayListTracks(this.offset, this.pageSize);
+  }
 
 
 

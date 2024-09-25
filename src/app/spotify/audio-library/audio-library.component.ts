@@ -16,12 +16,14 @@ import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.com
 import { Router } from '@angular/router';
 import { Constants } from '../../shared/Constants';
 import { AuthService } from '../../user/shared/services/auth.service';
-import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
+import { FilterRequest, PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spotify-models';
 import { SpotifyAuthorizationService } from '../shared/services/spotify-authorization.service';
 import { SpotifyService } from '../shared/services/spotify.service';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
 import { PaginatorModule } from 'primeng/paginator';
+import { debounceTime, distinctUntilChanged, ignoreElements } from 'rxjs';
+import { UriPipe } from "../../shared/common-pipes/uri.pipe";
 
 @Component({
   selector: 'app-audio-library',
@@ -42,8 +44,7 @@ import { PaginatorModule } from 'primeng/paginator';
     ButtonGroupModule,
     RoundPipe,
     PaginatorModule,
-
-
+    UriPipe
   ],
   templateUrl: './audio-library.component.html',
   styleUrl: './audio-library.component.css',
@@ -115,6 +116,33 @@ export class AudioLibraryComponent implements OnInit {
   userPlaylists: any[] = [];
   multiSortMeta!: any[];
   first: number = 0;
+  filterRequest: FilterRequest = {
+    name: [],
+    artist: [],
+    duration: [],
+    tempo: [],
+    danceability: [],
+    energy: [],
+    loudness: [],
+    pageSize: this.pageSize,
+    sortField: 'name',
+    sortOrder: 1
+  };
+  showPreview: boolean = false;
+  currentTrack: any;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   constructor(
     private spotifyService: SpotifyService,
@@ -127,7 +155,7 @@ export class AudioLibraryComponent implements OnInit {
   ) {
     this.title.setTitle('AudioActive - Audio Library')
     //this.spotifyAuthService.refreshSpotifyAccessToken();
-    this.getAllAudio()
+    //this.getAllAudio()
   }
 
   ngOnInit(): void {
@@ -140,68 +168,78 @@ export class AudioLibraryComponent implements OnInit {
   getAllAudio() {
     this.isLoading = true;
     this.selectedTracksList = [];
-    this.spotifyService.getAllTracks(this.pageNumber, this.pageSize).subscribe((tracksResponse) => {
-      if (tracksResponse.statusCode === 200) {
-        this.audioTracks = tracksResponse.payload.map((pltrack: any) => {
-          pltrack.jsonData.artist = pltrack.jsonData.artists[0].name
-          pltrack.jsonData.color = Constants.generateRandomPrimeNGColor();
-          pltrack.jsonData.duration = Constants.formatMilliseconds(pltrack.jsonData.duration_ms);
-          return pltrack.jsonData
-        });
-        console.log('this.audioTracks', this.audioTracks);
-        //To fetch audio analysis for each track
-        var tracksIds = this.audioTracks.map(plTrack => { return plTrack.id });
-        // console.log(tracksIds);
-        this.spotifyService.getMultipleTrackAnalysesByIds(tracksIds).subscribe((analysesResponse) => {
-          if (analysesResponse.statusCode === 200) {
-            // console.log('multiple analyses', analysesResponse.payload);
-            this.audioTracks.forEach(track => {
-              track.audioAnalysis = analysesResponse.payload.find((analysis: any) => analysis.providerTrackId === track?.id)?.analysisJsonData
-              //console.log('track.audioAnalysis', track.audioAnalysis);
-              if (!track.audioAnalysis) {
-                //To fetch track analysis
-                this.spotifyService.getSpotifyAudioAnalysisUrl(track.id).subscribe((res) => {
-                  if (res.statusCode === 200) {
-                    var analysisUrl = res.payload;
-                    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                    this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                      track.audioAnalysis = res;
-                      //To add track analysis
-                      var trackAnalysis = Constants.typeCastTrackAnalysisJson(track.audioAnalysis);
-                      var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
-                        providerTrackId: track.id,
-                        trackAnalysisData: JSON.stringify(trackAnalysis)
-                      };
-                      this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
-                        if (postTrackAnalysisResponse.statusCode === 200) {
-                          //console.log("track analysis added successfully.");
+    if (this.filterRequest.sortField) {
+      this.spotifyService.getAllTracks(this.filterRequest).pipe(
+        debounceTime(3000), // Ensure only one call is made within 3000ms
+        distinctUntilChanged() // Ensure only distinct values trigger the API call
+      ).subscribe((tracksResponse) => {
+        if (tracksResponse.statusCode === 200) {
+          this.audioTracks = tracksResponse.payload.map((pltrack: any) => {
+            pltrack.jsonData.artist = pltrack.jsonData.artists[0].name;
+            ////
+            // pltrack.jsonData.audio_features.loudness=(pltrack.jsonData.audio_features.loudness*(-10));
+            // pltrack.jsonData.audio_features.energy=(pltrack.jsonData.audio_features.energy*(100));
+            // pltrack.jsonData.audio_features.danceability =(pltrack.jsonData.audio_features.danceability*(100));
+            ////
+            pltrack.jsonData.color = Constants.generateRandomPrimeNGColor();
+            pltrack.jsonData.duration = Constants.formatMilliseconds(pltrack.jsonData.duration_ms);
+            return pltrack.jsonData;
+          });
+          console.log('this.audioTracks', this.audioTracks);
+          //To fetch audio analysis for each track
+          // var tracksIds = this.audioTracks.map(plTrack => { return plTrack.id });
+          // // console.log(tracksIds);
+          // //To fetch audio analysis
+          // this.spotifyService.getMultipleTrackAnalysesByIds(tracksIds).subscribe((analysesResponse) => {
+          //   if (analysesResponse.statusCode === 200) {
+          //     // console.log('multiple analyses', analysesResponse.payload);
+          //     this.audioTracks.forEach(track => {
+          //       track.audioAnalysis = analysesResponse.payload.find((analysis: any) => analysis.providerTrackId === track?.id)?.analysisJsonData
+          //       //console.log('track.audioAnalysis', track.audioAnalysis);
+          //       if (!track.audioAnalysis) {
+          //         //To fetch track analysis
+          //         this.spotifyService.getSpotifyAudioAnalysisUrl(track.id).subscribe((res) => {
+          //           if (res.statusCode === 200) {
+          //             var analysisUrl = res.payload;
+          //             const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+          //             this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+          //               track.audioAnalysis = res;
+          //               //To add track analysis
+          //               var trackAnalysis = Constants.typeCastTrackAnalysisJson(track.audioAnalysis);
+          //               var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+          //                 providerTrackId: track.id,
+          //                 trackAnalysisData: JSON.stringify(trackAnalysis)
+          //               };
+          //               this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
+          //                 if (postTrackAnalysisResponse.statusCode === 200) {
+          //                   //console.log("track analysis added successfully.");
 
-                        };
-                      });
-                    });
-                  };
-                });
-              };
-
-
-            });
-
-          };
-        })
-
-        this.isLoading = false;
-      }
-    });
+          //                 };
+          //               });
+          //             });
+          //           };
+          //         });
+          //       };
+          //     });
+          //   };
+          // });
+          this.isLoading = false;
+        };
+      });
+    };
     this.isLoading = false;
   }
 
   onPageChange(event: any) {
-    this.showDetailedGraph = false;
-    this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
     this.pageSize = event.rows;
     // debugger;
     //this.pageNumber = event.page+1;
-    this.getAllAudio();
+    if (this.filterRequest) {
+      this.getAllAudio();
+    };
+
   }
 
 
@@ -228,7 +266,8 @@ export class AudioLibraryComponent implements OnInit {
     if (this.showSummaryGraph) {
       this.isLoading = true;
       this.data2 = {
-        labels: [],
+        // labels: [],
+        labels: ['00:00:00'],
         datasets: [
           {
             label: 'Tempo',
@@ -237,10 +276,9 @@ export class AudioLibraryComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
             tracks: [],
+            backgroundColor: this.documentStyle.getPropertyValue('--blue-500'),
             pointBackgroundColor: '#000000', // Color for the data points (black)
             pointBorderColor: '#000000', // Border color for the data points (black)
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
@@ -251,12 +289,11 @@ export class AudioLibraryComponent implements OnInit {
             data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
+            backgroundColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
             tracks: [],
             pointBackgroundColor: '#000000', // Color for the data points (black)
             pointBorderColor: '#000000', // Border color for the data points (black)
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
@@ -267,12 +304,11 @@ export class AudioLibraryComponent implements OnInit {
             data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
+            backgroundColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
             tracks: [],
             pointBackgroundColor: '#000000', // Color for the data points (black)
             pointBorderColor: '#000000', // Border color for the data points (black)
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
@@ -283,12 +319,11 @@ export class AudioLibraryComponent implements OnInit {
             data: [],
             fill: false,
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
+            backgroundColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
             tracks: [],
             pointBackgroundColor: '#000000', // Color for the data points (black)
             pointBorderColor: '#000000', // Border color for the data points (black)
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
@@ -597,40 +632,40 @@ export class AudioLibraryComponent implements OnInit {
           });
         };
       });
-      //To get track analysis
-      this.spotifyService.getTrackAnalysisById(pltrack.id).subscribe((taRes) => {
+      // //To get track analysis
+      // this.spotifyService.getTrackAnalysisById(pltrack.id).subscribe((taRes) => {
 
-        if (taRes.statusCode === 200) {
-          //console.log('track analysis found', taRes.payload.analysisJsonData);
-          pltrack.audioAnalysis = taRes.payload.analysisJsonData;
+      //   if (taRes.statusCode === 200) {
+      //     //console.log('track analysis found', taRes.payload.analysisJsonData);
+      //     pltrack.audioAnalysis = taRes.payload.analysisJsonData;
 
-        } else {
-          //console.log('track analysis not found');
-          //debugger;
-          //To fetch track analysis
-          this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.id).subscribe((res) => {
-            if (res.statusCode === 200) {
-              var analysisUrl = res.payload;
-              const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-              this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                pltrack.audioAnalysis = res;
-                //To add track analysis
-                var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
-                var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
-                  providerTrackId: pltrack.id,
-                  trackAnalysisData: JSON.stringify(trackAnalysis)
-                };
-                this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
-                  if (postTrackAnalysisResponse.statusCode === 200) {
-                    //console.log("track analysis added successfully.");
+      //   } else {
+      //     //console.log('track analysis not found');
+      //     //debugger;
+      //     //To fetch track analysis
+      //     this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.id).subscribe((res) => {
+      //       if (res.statusCode === 200) {
+      //         var analysisUrl = res.payload;
+      //         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+      //         this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+      //           pltrack.audioAnalysis = res;
+      //           //To add track analysis
+      //           var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
+      //           var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+      //             providerTrackId: pltrack.id,
+      //             trackAnalysisData: JSON.stringify(trackAnalysis)
+      //           };
+      //           this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
+      //             if (postTrackAnalysisResponse.statusCode === 200) {
+      //               //console.log("track analysis added successfully.");
 
-                  };
-                });
-              });
-            };
-          });
-        };
-      });
+      //             };
+      //           });
+      //         });
+      //       };
+      //     });
+      //   };
+      // });
     });
   }
 
@@ -706,15 +741,38 @@ export class AudioLibraryComponent implements OnInit {
   }
 
   clear(table: Table) {
-    table.sortField = 'name';
-    table.sortOrder = 1;
     table.clear();
+    console.log('clear method called :')
+    this.filterRequest.sortField = 'name';
+    this.filterRequest.sortOrder = 1;
+    this.filterRequest.pageSize = this.pageSize;
+    if (this.filterRequest.sortField) {
+      this.getAllAudio();
+    };
   }
 
-  loadData(event: TableLazyLoadEvent) {
+  loadData(event: any) {
     //debugger;
-    console.log('Lazy Load Event:', event);
-    // console.log('multi sort meta:', event.multiSortMeta);
+    this.isLoading = true;
+    this.audioTracks = [];
+    // console.log('Lazy Load Event:', event);
+    // Handle the standard fields first
+    this.filterRequest.name = event.filters.name?.filter((item: any) => item.value !== null).map((item: any) => item);
+    this.filterRequest.artist = event.filters.artist?.filter((item: any) => item.value !== null).map((item: any) => item);
+    this.filterRequest.duration = event.filters.duration?.filter((item: any) => item.value !== null).map((item: any) => item);
+    // Handle the audio features
+    this.filterRequest.tempo = event.filters['audio_features.tempo']?.filter((item: any) => item.value !== null).map((item: any) => item);
+    this.filterRequest.danceability = event.filters['audio_features.danceability']?.filter((item: any) => item.value !== null).map((item: any) => item);
+    this.filterRequest.energy = event.filters['audio_features.energy']?.filter((item: any) => item.value !== null).map((item: any) => item);
+    this.filterRequest.loudness = event.filters['audio_features.loudness']?.filter((item: any) => item.value !== null).map((item: any) => item);
+
+    this.filterRequest.sortField = event.sortField;
+    this.filterRequest.sortOrder = event.sortOrder;
+    this.filterRequest.pageSize = event.rows
+
+    if (this.filterRequest) {
+      this.getAllAudio();
+    };
 
   }
 
@@ -725,6 +783,24 @@ export class AudioLibraryComponent implements OnInit {
       this.showGraphChanged(true);
     }
   }
+
+  showPreviewPopup(track: any) {
+    this.showPreview = true;
+    this.currentTrack = track;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

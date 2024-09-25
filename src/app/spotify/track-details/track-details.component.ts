@@ -64,8 +64,6 @@ export class TrackDetailsComponent implements OnInit {
         tension: 0.4,
         pointBackgroundColor: '#000000', 
         pointBorderColor: '#000000',
-        pointRadius: 5, 
-        pointHoverRadius: 8 
       },
       {
         label: 'Loudness',
@@ -75,8 +73,6 @@ export class TrackDetailsComponent implements OnInit {
         tension: 0.4,
         pointBackgroundColor: '#000000', 
         pointBorderColor: '#000000',
-        pointRadius: 5, 
-        pointHoverRadius: 8 
       }
     ]
   };
@@ -309,7 +305,7 @@ export class TrackDetailsComponent implements OnInit {
             var analysisUrl = urlRes.payload;
             const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
             this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((analysisResponse) => {
-              this.trackAnalysis = analysisResponse;
+              this.trackAnalysis = Constants.typeCastTrackAnalysisJson(analysisResponse);
               //console.log('this.trackAnalysis', this.trackAnalysis);
               var durationSum = 0;
               this.trackAnalysis.sections.forEach((section: any) => {

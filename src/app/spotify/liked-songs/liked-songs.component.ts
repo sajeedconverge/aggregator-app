@@ -22,6 +22,7 @@ import { SpotifyAuthorizationService } from '../shared/services/spotify-authoriz
 import { SpotifyService } from '../shared/services/spotify.service';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
+import { PaginatorModule } from 'primeng/paginator';
 
 @Component({
   selector: 'app-liked-songs',
@@ -40,7 +41,12 @@ import { Title } from '@angular/platform-browser';
     InputTextModule,
     TooltipModule,
     ButtonGroupModule,
-    RoundPipe
+    RoundPipe,
+    PaginatorModule,
+
+
+
+
 
 
   ],
@@ -73,7 +79,6 @@ export class LikedSongsComponent implements OnInit {
           color: this.textColor
         }
       },
-
       tooltip: {
         callbacks: {
           // Customize the label in the tooltip
@@ -114,8 +119,9 @@ export class LikedSongsComponent implements OnInit {
   selectedPlaylist: any;
   userPlaylists: any[] = [];
   selectedTracksList: any[] = [];
-
-
+  pageSize: number = 10;
+  offset: number = 0;
+  totalLikedSongsCount: number = 0;
 
 
   constructor(
@@ -158,7 +164,7 @@ export class LikedSongsComponent implements OnInit {
     this.checkInterval = setInterval(() => {
       const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
       if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
-        this.getLikedSongs();
+        this.getLikedSongs(this.offset, this.pageSize);
         clearInterval(this.checkInterval); // Stop the interval
       } else {
         this.fetchThirdPartyDetails();
@@ -186,13 +192,13 @@ export class LikedSongsComponent implements OnInit {
   //   this.showSummaryGraph = false;
   // }
 
-  getLikedSongs() {
+  getLikedSongs(offset: number, limit: number) {
     this.isLoading = true;
     this.likedSongs = [];
     this.selectedTracksList = [];
     this.spotifyAuthService.refreshSpotifyAccessToken();
 
-    this.spotifyService.getLikedSongsUrl().subscribe((urlResponse) => {
+    this.spotifyService.getLikedSongsUrl(offset, limit).subscribe((urlResponse) => {
       if (urlResponse.statusCode === 200) {
         var likedSongsUrl = urlResponse.payload;
 
@@ -200,8 +206,10 @@ export class LikedSongsComponent implements OnInit {
         if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
 
           this.spotifyService.SpotifyCommonGetApi(likedSongsUrl, spotifyAccessToken).subscribe((resp) => {
-
+            // debugger;
+            this.totalLikedSongsCount = resp.total;
             this.likedSongs = resp.items;
+
             this.likedSongs.forEach(pltrack => {
               pltrack.artist = pltrack.track?.artists[0]?.name;
               this.originalTracks.push(pltrack.track.id);
@@ -222,55 +230,26 @@ export class LikedSongsComponent implements OnInit {
                     //console.log('track not found');
                     this.nonSavedTrackIds.push(pltrack.track.id);
 
-                    // //Add track to DB after fetching it's features
-                    // this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
-                    //   if (res.statusCode === 200) {
-                    //     var featuresUrl = res.payload;
-                    //     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                    //     this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
-                    //       pltrack.audio_features = res;
-                    //       //add track to db with it's features
-                    //       var trackJson = Constants.typeCastTrackJson(pltrack);
-                    //       var postTrackRequest: PostTrackRequest = {
-                    //         providerTrackId: pltrack.track.id,
-                    //         trackData: JSON.stringify(trackJson)
-                    //       };
-                    //       this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
-                    //         if (postTrackRes.statusCode === 200) {
-                    //           //console.log("track added successfully.", pltrack.track.name);
-                    //         };
-                    //       });
-                    //     });
-                    //   };
-                    // });
-                  };
-                });
-                //To get track analysis
-                this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
-
-                  if (taRes.statusCode === 200) {
-                    //console.log('track analysis found', taRes.payload.analysisJsonData);
-                    pltrack.audioAnalysis = taRes.payload.analysisJsonData;
-
-                  } else {
-                    //console.log('track analysis not found');
-                    //To fetch track analysis
-                    this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
+                    //Add track to DB after fetching it's features
+                    this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
                       if (res.statusCode === 200) {
-                        var analysisUrl = res.payload;
+                        var featuresUrl = res.payload;
                         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-                        this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
-                          pltrack.audioAnalysis = res;
-                          //To add track analysis
-                          var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
-                          var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+                        this.spotifyService.SpotifyCommonGetApi(featuresUrl, spotifyAccessToken).subscribe((res) => {
+                          pltrack.audio_features = res;
+                          //add track to db with it's features
+                          var trackJson = Constants.typeCastTrackJson(pltrack);
+                          var postTrackRequest: PostTrackRequest = {
                             providerTrackId: pltrack.track.id,
-                            trackAnalysisData: JSON.stringify(trackAnalysis)
+                            trackData: JSON.stringify(trackJson)
                           };
-                          this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
-                            if (postTrackAnalysisResponse.statusCode === 200) {
-                              //console.log("track analysis added successfully.");
-
+                          this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
+                            if (postTrackRes.statusCode === 200) {
+                              //console.log("track added successfully.", pltrack.track.name);
+                              pltrack.audio_features.tempo = Math.round(pltrack.audio_features.tempo);
+                              pltrack.audio_features.loudness = Math.round(pltrack.audio_features.loudness * (-10));
+                              pltrack.audio_features.energy = Math.round(pltrack.audio_features.energy * (100));
+                              pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
                             };
                           });
                         });
@@ -278,40 +257,79 @@ export class LikedSongsComponent implements OnInit {
                     });
                   };
                 });
+                // //To get track analysis
+                // this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
+
+                //   if (taRes.statusCode === 200) {
+                //     // console.log('track analysis found from db', taRes.payload.analysisJsonData);
+                //     pltrack.audioAnalysis = taRes.payload.analysisJsonData;
+                //     this.isLoading = true;
+                //   } else {
+                //     //console.log('track analysis not found');
+                //     //To fetch track analysis
+                //     this.spotifyService.getSpotifyAudioAnalysisUrl(pltrack.track.id).subscribe((res) => {
+                //       if (res.statusCode === 200) {
+                //         var analysisUrl = res.payload;
+                //         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+                //         this.spotifyService.SpotifyCommonGetApi(analysisUrl, spotifyAccessToken).subscribe((res) => {
+                //           pltrack.audioAnalysis = res;
+                //           //To add track analysis
+                //           var trackAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
+                //           var PostTrackAnalysisRequest: PostTrackAnalysisRequest = {
+                //             providerTrackId: pltrack.track.id,
+                //             trackAnalysisData: JSON.stringify(trackAnalysis)
+                //           };
+                //           this.spotifyService.postTrackAnalysis(PostTrackAnalysisRequest).subscribe((postTrackAnalysisResponse) => {
+                //             if (postTrackAnalysisResponse.statusCode === 200) {
+                //               //console.log("track analysis added successfully.");
+                //               pltrack.audioAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
+                //             };
+                //           });
+                //         });
+                //       };
+                //     });
+                //     this.isLoading = true;
+                //   };
+                // });
               });
               setTimeout(() => {
                 //console.log('nonSavedTrackIds', this.nonSavedTrackIds);
-                if (this.nonSavedTrackIds.length > 0) {
-                  var severalIds = this.nonSavedTrackIds.join(',');
-                  //console.log(severalIds);
-                  this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
-                    if (safUrlResponse.statusCode === 200) {
-                      var safUrl = safUrlResponse.payload + severalIds;
-                      this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
+                // if (this.nonSavedTrackIds.length > 0) {
+                //   var severalIds = this.nonSavedTrackIds.join(',');
+                //   //console.log(severalIds);
+                //   this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
+                //     if (safUrlResponse.statusCode === 200) {
+                //       var safUrl = safUrlResponse.payload + severalIds;
+                //       this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
 
-                        safResponse.audio_features.forEach((audioFeature: any) => {
-                          var matchedSong = this.likedSongs.find(song => song.track.id === audioFeature.id);
-                          matchedSong.audio_features = audioFeature;
+                //         safResponse.audio_features.forEach((audioFeature: any) => {
+                //           var matchedSong = this.likedSongs.find(song => song.track.id === audioFeature.id);
+                //           matchedSong.audio_features = audioFeature;
 
-                          //add track to db with it's features
-                          var trackJson = Constants.typeCastTrackJson(matchedSong);
-                          var postTrackRequest: PostTrackRequest = {
-                            providerTrackId: matchedSong.track.id,
-                            trackData: JSON.stringify(trackJson)
-                          };
-                          this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
-                            if (postTrackRes.statusCode === 200) {
-                              //console.log("track added successfully.", matchedSong.track.name);
-                            };
-                          });
+                //           //add track to db with it's features
+                //           var trackJson = Constants.typeCastTrackJson(matchedSong);
+                //           var postTrackRequest: PostTrackRequest = {
+                //             providerTrackId: matchedSong.track.id,
+                //             trackData: JSON.stringify(trackJson)
+                //           };
+                //           this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
+                //             if (postTrackRes.statusCode === 200) {
+                //               //console.log("track added successfully.", matchedSong.track.name);
+                //               matchedSong.audio_features.tempo = Math.round(matchedSong.audio_features.tempo);
+                //               matchedSong.audio_features.loudness = Math.round(matchedSong.audio_features.loudness * (-10));
+                //               matchedSong.audio_features.energy = Math.round(matchedSong.audio_features.energy * (100));
+                //               matchedSong.audio_features.danceability = Math.round(matchedSong.audio_features.danceability * (100));
 
-                        });
-                      });
-                    };
-                  });
-                };
+                //             };
+                //           });
+
+                //         });
+                //       });
+                //     };
+                //   });
+                // };
                 this.isLoading = false;
-              }, 5000);
+              }, 3000);
             } else {
               this.isLoading = false;
             }
@@ -341,7 +359,7 @@ export class LikedSongsComponent implements OnInit {
       } else {
         this.generateChart(this.likedSongs, true);
       }
-      
+
     };
   }
 
@@ -362,10 +380,8 @@ export class LikedSongsComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--blue-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 0, this.data2)  // Pass dataset index to getSegmentColor
@@ -378,10 +394,8 @@ export class LikedSongsComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--orange-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 1, this.data2)  // Pass dataset index to getSegmentColor
@@ -394,10 +408,8 @@ export class LikedSongsComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--red-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 2, this.data2)  // Pass dataset index to getSegmentColor
@@ -410,10 +422,8 @@ export class LikedSongsComponent implements OnInit {
             borderColor: this.documentStyle.getPropertyValue('--green-500'),
             tension: 0.4,
             tracks: [],
-            pointBackgroundColor: '#000000', 
+            pointBackgroundColor: '#000000',
             pointBorderColor: '#000000',
-            pointRadius: 5, 
-            pointHoverRadius: 8 
             // colors: [],  // Add an array to store color information
             // segment: {
             //   borderColor: (ctx: any) => this.getSegmentColor(ctx, 3, this.data2)  // Pass dataset index to getSegmentColor
@@ -456,31 +466,31 @@ export class LikedSongsComponent implements OnInit {
         this.isLoading = false;
       } else {
         var durationSum = 0;
-      this.likedSongs.forEach(pltrack => {
+        this.likedSongs.forEach(pltrack => {
 
-        durationSum = durationSum + ((pltrack.audio_features.duration_ms));
-        //duration
-        this.data2.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
-        //tempo
-        this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
-        this.data2.datasets[0].tracks.push(pltrack.track.name);
-        //this.data2.datasets[0].colors.push(pltrack.color);
-        //loudness
-        this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
-        this.data2.datasets[1].tracks.push(pltrack.track.name);
-        //this.data2.datasets[1].colors.push(pltrack.color);
-        //energy
-        this.data2.datasets[2].data.push(pltrack.audio_features.energy);
-        this.data2.datasets[2].tracks.push(pltrack.track.name);
-        //this.data2.datasets[2].colors.push(pltrack.color);
-        //danceability
-        this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
-        this.data2.datasets[3].tracks.push(pltrack.track.name);
-        //this.data2.datasets[3].colors.push(pltrack.color);
+          durationSum = durationSum + ((pltrack.audio_features.duration_ms));
+          //duration
+          this.data2.labels.push(`${Constants.formatMilliseconds(durationSum)}`);
+          //tempo
+          this.data2.datasets[0].data.push(pltrack.audio_features.tempo);
+          this.data2.datasets[0].tracks.push(pltrack.track.name);
+          //this.data2.datasets[0].colors.push(pltrack.color);
+          //loudness
+          this.data2.datasets[1].data.push(pltrack.audio_features.loudness);
+          this.data2.datasets[1].tracks.push(pltrack.track.name);
+          //this.data2.datasets[1].colors.push(pltrack.color);
+          //energy
+          this.data2.datasets[2].data.push(pltrack.audio_features.energy);
+          this.data2.datasets[2].tracks.push(pltrack.track.name);
+          //this.data2.datasets[2].colors.push(pltrack.color);
+          //danceability
+          this.data2.datasets[3].data.push(pltrack.audio_features.danceability);
+          this.data2.datasets[3].tracks.push(pltrack.track.name);
+          //this.data2.datasets[3].colors.push(pltrack.color);
 
-      });
-      //console.log('this.data2',this.data2);
-      this.isLoading = false;
+        });
+        //console.log('this.data2',this.data2);
+        this.isLoading = false;
       };
     };
   }
@@ -493,8 +503,8 @@ export class LikedSongsComponent implements OnInit {
 
   tableReordered(event: any) {
     this.reOrderedTracks = [];
-   // this.showDetailedGraph = false;
-   // this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
     // debugger;
     //console.log('dragIndex :', event.dragIndex, 'dropIndex :', event.dropIndex)
 
@@ -516,8 +526,8 @@ export class LikedSongsComponent implements OnInit {
     let field = event.field;
     let order = event.order;
     this.reOrderedTracks = [];
-   // this.showDetailedGraph = false;
-   // this.showSummaryGraph = false;
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
 
     const getFieldValue = (obj: any, field: string) => {
       return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
@@ -825,6 +835,45 @@ export class LikedSongsComponent implements OnInit {
       this.showGraphChanged(true);
     }
   }
+
+  onPageChange(event: any) {
+    // this.showDetailedGraph = false;
+    // this.showSummaryGraph = false;
+    this.pageSize = event.rows;
+    this.offset = event.first;
+    // debugger;
+    // console.log('event.page', event.page);
+    // console.log('event.rows', event.rows);
+
+    this.getLikedSongs(this.offset, this.pageSize);
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -12,15 +12,15 @@ export interface PostTrackRequest {
 
 
 export interface TrackJsonObject {
-    album: any
-    artists: any[]
+    album: Album
+    artists: Artist[]
     duration_ms: number
     id: string
     name: string
     popularity: number
     type: string
     uri: string
-    audio_features: any
+    audio_features: AudioFeatures
 }
 
 export interface PairedTrackJsonObject {
@@ -70,7 +70,7 @@ export interface AnalysisTrackDetail {
     mode_confidence: number,
 }
 
-export interface TrackMetricRequest{
+export interface TrackMetricRequest {
     id: string
     userId: string
     providerActivityId: number
@@ -84,17 +84,96 @@ export interface TrackMetricRequest{
     played_at: string
     speed: number
     start_time: string
-  }
+}
 
 
+export interface FilterRequest {
+    name?: Parameter[];
+    artist?: Parameter[];
+    duration?: Parameter[];
+    tempo?: Parameter[];
+    danceability?: Parameter[];
+    energy?: Parameter[];
+    loudness?: Parameter[];
+    pageSize: number
+    sortField: string
+    sortOrder: number
+}
+
+export interface Parameter {
+    value: any;
+    matchMode: string;
+    operator: string;
+}
+
+export interface Album {
+    type: string
+    album_type: string
+    href: string
+    id: string
+    images: Image[]
+    name: string
+    release_date: string
+    release_date_precision: string
+    uri: string
+    artists: Artist[]
+    external_urls: ExternalUrls
+    total_tracks: number
+}
 
 
+export interface Image {
+    height: number
+    url: string
+    width: number
+}
 
+export interface Artist {
+    external_urls: ExternalUrls
+    href: string
+    id: string
+    name: string
+    type: string
+    uri: string
+}
 
+export interface ExternalUrls {
+    spotify: string
+}
 
+export interface AudioFeatures {
+    danceability: number
+    energy: number
+    key: number
+    loudness: number
+    mode: number
+    speechiness: number
+    acousticness: number
+    instrumentalness: number
+    liveness: number
+    valence: number
+    tempo: number
+    type: string
+    id: string
+    uri: string
+    track_href: string
+    analysis_url: string
+    duration_ms: number
+    time_signature: number
+}
 
-
-
-
-
+export interface Section {
+    start: number
+    duration: number
+    confidence: number
+    loudness: number
+    tempo: number
+    tempo_confidence: number
+    key: number
+    key_confidence: number
+    mode: number
+    mode_confidence: number
+    time_signature: number
+    time_signature_confidence: number
+}
 
