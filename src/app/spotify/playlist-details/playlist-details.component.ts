@@ -119,7 +119,7 @@ export class PlaylistDetailsComponent implements OnInit {
   pageSize: number = 10;
   offset: number = 0;
   totalItemsCount: number = 0;
-
+  dataMessage:string='';
 
 
 
@@ -195,7 +195,9 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   getPlayListTracks(offset: number, limit: number) {
+  
     this.isLoading = true;
+    this.dataMessage='Loading data...';
     this.playlistTracks = [];
     this.spotifyAuthService.refreshSpotifyAccessToken();
     var url = sessionStorage.getItem('playlist-items-url') || '';
@@ -218,7 +220,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
         if (this.playlistTracks.length > 0) {
           // To assign Audio Features to the track
-          this.playlistTracks.forEach((pltrack) => {
+          this.playlistTracks.forEach((pltrack,index) => {
             pltrack.color = Constants.generateRandomPrimeNGColor();
             //To get Track features from DB
             this.spotifyService.getTrackById(pltrack.track.id).subscribe((dbTrackRes) => {
@@ -293,6 +295,9 @@ export class PlaylistDetailsComponent implements OnInit {
             //     });
             //   };
             // });
+          if(index==(this.playlistTracks.length-1)){
+            this.dataMessage='No tracks found in the current playlist.'
+          };
           });
           setTimeout(() => {
             // if (this.nonSavedTrackIds.length > 0) {

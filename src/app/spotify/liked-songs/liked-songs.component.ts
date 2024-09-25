@@ -122,7 +122,7 @@ export class LikedSongsComponent implements OnInit {
   pageSize: number = 10;
   offset: number = 0;
   totalLikedSongsCount: number = 0;
-
+  dataMessage: string = '';
 
   constructor(
     private spotifyService: SpotifyService,
@@ -164,7 +164,7 @@ export class LikedSongsComponent implements OnInit {
     this.checkInterval = setInterval(() => {
       const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
       if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
-        this.getLikedSongs(this.offset, this.pageSize);
+        // this.getLikedSongs(this.offset, this.pageSize);
         clearInterval(this.checkInterval); // Stop the interval
       } else {
         this.fetchThirdPartyDetails();
@@ -194,6 +194,7 @@ export class LikedSongsComponent implements OnInit {
 
   getLikedSongs(offset: number, limit: number) {
     this.isLoading = true;
+    this.dataMessage = 'Loading data...';
     this.likedSongs = [];
     this.selectedTracksList = [];
     this.spotifyAuthService.refreshSpotifyAccessToken();
@@ -328,13 +329,18 @@ export class LikedSongsComponent implements OnInit {
                 //     };
                 //   });
                 // };
+
+                this.dataMessage = 'No tracks found in liked songs.';
                 this.isLoading = false;
+
               }, 3000);
             } else {
               this.isLoading = false;
             }
           });
         };
+      } else {
+        this.dataMessage = 'No tracks found in liked songs.';
       }
     });
   }
@@ -842,8 +848,8 @@ export class LikedSongsComponent implements OnInit {
     this.pageSize = event.rows;
     this.offset = event.first;
     // debugger;
-    // console.log('event.page', event.page);
-    // console.log('event.rows', event.rows);
+    // console.log('this.pageSize', this.pageSize);
+    // console.log('this.offset', this.offset);
 
     this.getLikedSongs(this.offset, this.pageSize);
 
