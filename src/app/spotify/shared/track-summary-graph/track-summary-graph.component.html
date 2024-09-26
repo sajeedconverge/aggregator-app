@@ -7,7 +7,7 @@
                 <b>{{ selectedDate.code == 'DAY' ? orders.dailyData.dateRange : selectedDate.code == 'WEEK' ? orders.weeklyData.dateRange : orders.monthlyData.dateRange }}</b>
             </p>
         </div>
-        <p-dropdown [options]="dateRanges" [(ngModel)]="selectedDate" placeholder="Monthly" optionLabel="name" [showClear]="false" styleClass="w-9rem" (onChange)="onDateChangeBarChart()"></p-dropdown>
+        <p-dropdown [options]="featureRanges" [(ngModel)]="selectedDate" placeholder="Monthly" optionLabel="name" [showClear]="false" styleClass="w-9rem" (onChange)="onDateChangeBarChart()"></p-dropdown>
     </div>
     <div class="chart-info mb-3 flex align-items-center gap-5 flex-wrap">
         <div class="info">

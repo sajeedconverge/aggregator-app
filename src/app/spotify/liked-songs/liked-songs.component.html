@@ -11,10 +11,10 @@
         (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)"> -->
     <p-table [value]="likedSongs" [lazy]="true" (onLazyLoad)="onPageChange($event)" [rows]="pageSize"
         [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]" [totalRecords]="totalLikedSongsCount"
-        [paginator]="true" sortField="added_at" (sortOrder)="1"
+        [paginator]="true" sortField="added_at" (sortOrder)="1" #tableRef
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" paginatorPosition="top"
         [(selection)]="selectedTracksList" [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered($event)"
-        (onSort)="tableSorted($event)">
+        (onSort)="tableSorted($event)" >
 
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
@@ -68,11 +68,12 @@
             </div>
             <div>
                 <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" />
-            
-                <div  *ngIf="showSummaryGraph">
-                    <app-track-summary-graph></app-track-summary-graph>
-                </div>
-                
+
+                <!-- <div *ngIf="showSummaryGraph">
+                    <app-track-summary-graph [tracksData]="tracksData"
+                        [selectedTracksList]="selectedTracksList"></app-track-summary-graph>
+                </div> -->
+
             </div>
             <!-- <div>
                 <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessagesModule } from 'primeng/messages';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -24,6 +24,7 @@ import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
 import { PaginatorModule } from 'primeng/paginator';
 import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
+import { TracksData, TrackType } from '../shared/models/graph-models';
 
 @Component({
   selector: 'app-liked-songs',
@@ -124,6 +125,21 @@ export class LikedSongsComponent implements OnInit {
   offset: number = 0;
   totalLikedSongsCount: number = 0;
   dataMessage: string = '';
+  tracksData: TracksData = {
+    trackType: TrackType.LikedSongs,
+    tracks: []
+  };
+  @ViewChild('tableRef') table!: Table;
+
+
+
+
+
+
+
+
+
+
 
   constructor(
     private spotifyService: SpotifyService,
@@ -294,7 +310,18 @@ export class LikedSongsComponent implements OnInit {
                 //   };
                 // });
               });
+              this.tracksData.tracks = this.likedSongs;
               setTimeout(() => {
+                //debugger;
+                if (this.table) {
+                  var sortEvent: any = {
+
+                    field: this.table?.sortField,
+                    order: this.table?.sortOrder
+                  };
+                  this.tableSorted(sortEvent);
+                };
+
                 //console.log('nonSavedTrackIds', this.nonSavedTrackIds);
                 // if (this.nonSavedTrackIds.length > 0) {
                 //   var severalIds = this.nonSavedTrackIds.join(',');
@@ -516,8 +543,8 @@ export class LikedSongsComponent implements OnInit {
     //console.log('dragIndex :', event.dragIndex, 'dropIndex :', event.dropIndex)
 
     // Remove the item from the drag index and insert it at the drop index
-    const movedItem = this.likedSongs.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
-    this.likedSongs.splice(event.dropIndex, 0, movedItem);  // Insert the moved item at dropIndex
+    //const movedItem = this.likedSongs.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
+    //this.likedSongs.splice(event.dropIndex, 0, movedItem);  // Insert the moved item at dropIndex
 
     // //temp code 
     // var reOrderedTracks = this.playlistTracks.map(plTrack => { return plTrack.track.name });
