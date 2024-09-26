@@ -238,7 +238,7 @@ export class AudioHistoryComponent implements OnInit {
               this.tableSorted(sortEvent);
             };
             this.isLoading = false;
-          }, 3000);
+          },(this.hisotryTracks.length>25)? 8000 :5000);
         })
       } else {
         this.dataMessage = 'No tracks found in audio history.';

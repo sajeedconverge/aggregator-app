@@ -361,7 +361,7 @@ export class LikedSongsComponent implements OnInit {
                 this.dataMessage = 'No tracks found in liked songs.';
                 this.isLoading = false;
 
-              }, 3000);
+              }, (this.likedSongs.length>25)? 8000 :5000);
             } else {
               this.isLoading = false;
             }

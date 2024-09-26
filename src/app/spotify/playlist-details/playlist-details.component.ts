@@ -334,7 +334,7 @@ export class PlaylistDetailsComponent implements OnInit {
             //   });
             // };
             this.isLoading = false;
-          }, 3000);
+          }, (this.playlistTracks.length>25)? 8000 :5000);
         } else {
 
           this.isLoading = false;

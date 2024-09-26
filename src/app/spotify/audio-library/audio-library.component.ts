@@ -480,7 +480,7 @@ export class AudioLibraryComponent implements OnInit {
       this.isLoading = false;
       this.showDetailedGraph = true;
       //console.log('data', this.data);
-    }, 3000);
+    }, 5000);
   }
 
   tableReordered(event: any) {
