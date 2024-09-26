@@ -64,6 +64,7 @@ export class TrackSummaryGraphComponent {
   chartData: any;
   chartOptions: any;
   totalTime: any;
+  totalTracks:number=0;
 
   @Input() tracksData!: TracksData;
   @Input() selectedTracksList!: any[];
@@ -242,6 +243,8 @@ export class TrackSummaryGraphComponent {
       });
       //console.log('this.chartData',this.chartData);
     };
+
+    this.totalTracks = (this.selectedTracksList.length>0)? this.selectedTracksList.length:this.tracksData.tracks.length
   }
 
 
