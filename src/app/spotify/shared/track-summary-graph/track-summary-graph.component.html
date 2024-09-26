@@ -1,1 +1,45 @@
-<p>track-summary-graph works!</p>
+<div class="card">
+    <div class="card-header gap-3">
+        <div class="card-title">
+            <h6>Orders</h6>
+            <p class="subtitle">
+                Your <b>{{ selectedDate.name }}</b> orders data from
+                <b>{{ selectedDate.code == 'DAY' ? orders.dailyData.dateRange : selectedDate.code == 'WEEK' ? orders.weeklyData.dateRange : orders.monthlyData.dateRange }}</b>
+            </p>
+        </div>
+        <p-dropdown [options]="dateRanges" [(ngModel)]="selectedDate" placeholder="Monthly" optionLabel="name" [showClear]="false" styleClass="w-9rem" (onChange)="onDateChangeBarChart()"></p-dropdown>
+    </div>
+    <div class="chart-info mb-3 flex align-items-center gap-5 flex-wrap">
+        <div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Total Orders</h6>
+            <p class="m-0 p-0 font-bold">
+                {{ selectedDate.code == 'DAY' ? sumOf(orders.dailyData.orders) : selectedDate.code == 'WEEK' ? sumOf(orders.weeklyData.orders) : sumOf(orders.monthlyData.orders) }}
+            </p>
+        </div>
+        <div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Total Units</h6>
+            <p class="m-0 p-0 font-bold">
+                {{ selectedDate.code == 'DAY' ? sumOf(orders.dailyData.orderUnits) : selectedDate.code == 'WEEK' ? sumOf(orders.weeklyData.orderUnits) : sumOf(orders.monthlyData.orderUnits) }}
+            </p>
+        </div>
+        <div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Total Sales</h6>
+            <p class="m-0 p-0 font-bold">
+                {{ selectedDate.code == 'DAY' ? orders.dailyData.totalSales : selectedDate.code == 'WEEK' ? orders.weeklyData.totalSales : orders.monthlyData.totalSales }}
+            </p>
+        </div>
+        <div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Avg. sales/orders item</h6>
+            <p class="m-0 p-0 font-bold">
+                {{ selectedDate.code == 'DAY' ? orders.dailyData.avarageSalesByOrder : selectedDate.code == 'WEEK' ? orders.weeklyData.avarageSalesByOrder : orders.monthlyData.avarageSalesByOrder }}
+            </p>
+        </div>
+        <div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Avg. units/orders item</h6>
+            <p class="m-0 p-0 font-bold">
+                {{ selectedDate.code == 'DAY' ? orders.dailyData.avarageUnitByOrder : selectedDate.code == 'WEEK' ? orders.weeklyData.avarageUnitByOrder : orders.monthlyData.avarageUnitByOrder }}
+            </p>
+        </div>
+    </div>
+    <p-chart type="bar" height="530" [data]="chartData" [options]="chartOptions"></p-chart>
+</div>

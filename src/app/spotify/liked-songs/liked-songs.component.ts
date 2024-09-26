@@ -23,6 +23,7 @@ import { SpotifyService } from '../shared/services/spotify.service';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
 import { PaginatorModule } from 'primeng/paginator';
+import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
 
 @Component({
   selector: 'app-liked-songs',
@@ -43,7 +44,7 @@ import { PaginatorModule } from 'primeng/paginator';
     ButtonGroupModule,
     RoundPipe,
     PaginatorModule,
-
+    TrackSummaryGraphComponent,
 
 
 
