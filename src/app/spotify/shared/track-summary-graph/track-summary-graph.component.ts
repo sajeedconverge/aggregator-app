@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChartModule } from 'primeng/chart';
 import { DropdownModule } from 'primeng/dropdown';
-import { TracksData } from '../models/graph-models';
+import { TracksData, TrackType } from '../models/graph-models';
 import { Constants } from '../../../shared/Constants';
 
 @Component({
@@ -59,10 +59,11 @@ export class TrackSummaryGraphComponent {
       totalSales: '$5,162.00'
     }
   };
-
+  chartTitle: string = '';
   //main chart data
   chartData: any;
   chartOptions: any;
+  totalTime: any;
 
   @Input() tracksData!: TracksData;
   @Input() selectedTracksList!: any[];
@@ -71,35 +72,32 @@ export class TrackSummaryGraphComponent {
 
   constructor(
 
-  ) { }
+  ) {
+
+  }
 
 
 
   ngOnInit(): void {
     this.selectedDate = this.featureRanges[0];
-    console.log(this.tracksData);
+    // console.log(this.tracksData);
+    switch (this.tracksData.trackType) {
+      case TrackType.AudioLibrary:
+        this.chartTitle = 'Audio Library';
+        break;
+      case TrackType.LikedSongs:
+        this.chartTitle = 'Liked Songs';
+        break;
+      case TrackType.PlaylistTracks:
+        this.chartTitle = 'Playlist Tracks';
+        break;
+      case TrackType.RecentlyPlayed:
+        this.chartTitle = 'Recently Played';
+        break;
 
-    // this.chartData = {
-    //   labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
-    //   datasets: [
-    //     {
-    //       label: 'Orders',
-    //       data: this.orders.dailyData.orders,
-    //       fill: false,
-    //       backgroundColor: this.documentStyle.getPropertyValue('--primary-color'),
-    //       borderRadius: 6
-    //     },
-
-    //     {
-    //       label: 'Units',
-    //       data: this.orders.dailyData.orderUnits,
-    //       fill: false,
-    //       backgroundColor: this.documentStyle.getPropertyValue('--primary-light-color'),
-    //       borderRadius: 6
-    //     }
-    //   ]
-    // };
-
+      default:
+        break;
+    };
 
     this.chartOptions = {
       animation: {
@@ -146,10 +144,7 @@ export class TrackSummaryGraphComponent {
         }
       }
     };
-
-
     this.showSummaryGraphChanged();
-
   }
 
   sortDatasetsByValue(datasets: any) {
@@ -207,56 +202,46 @@ export class TrackSummaryGraphComponent {
       }, []);
       selectedTracks.forEach((pltrack, index) => {
         durationSum = durationSum + ((pltrack.audio_features.duration_ms));
+        this.totalTime = Constants.formatMilliseconds(durationSum);
         //duration
         this.chartData.labels.push(index + 1);
         //tempo
         this.chartData.datasets[0].data.push(pltrack.audio_features.tempo);
         this.chartData.datasets[0].tracks.push(pltrack.track);
-        // this.chartData.datasets[0].colors.push(pltrack.color);
         //loudness
         this.chartData.datasets[1].data.push(pltrack.audio_features.loudness);
         this.chartData.datasets[1].tracks.push(pltrack.track);
-        // this.chartData.datasets[1].colors.push(pltrack.color);
         //energy
         this.chartData.datasets[2].data.push(pltrack.audio_features.energy);
         this.chartData.datasets[2].tracks.push(pltrack.track);
-        // this.chartData.datasets[2].colors.push(pltrack.color);
         //danceability
         this.chartData.datasets[3].data.push(pltrack.audio_features.danceability);
         this.chartData.datasets[3].tracks.push(pltrack.track);
-        // this.chartData.datasets[3].colors.push(pltrack.color);
       });
-      console.log('this.chartData', this.chartData);
-      // this.isLoading = false;
+     // console.log('this.chartData', this.chartData);
     } else {
       var durationSum = 0;
       this.tracksData.tracks.forEach((pltrack, index) => {
 
         durationSum = durationSum + ((pltrack.audio_features.duration_ms));
+        this.totalTime = Constants.formatMilliseconds(durationSum);
         //duration
         this.chartData.labels.push(index + 1);
         //tempo
         this.chartData.datasets[3].data.push(pltrack.audio_features.tempo);
         this.chartData.datasets[3].tracks.push(pltrack.track);
-        //this.chartData.datasets[0].colors.push(pltrack.color);
         //loudness
         this.chartData.datasets[2].data.push(pltrack.audio_features.loudness);
         this.chartData.datasets[2].tracks.push(pltrack.track);
-        //this.chartData.datasets[1].colors.push(pltrack.color);
         //energy
         this.chartData.datasets[0].data.push(pltrack.audio_features.energy);
         this.chartData.datasets[0].tracks.push(pltrack.track);
-        //this.chartData.datasets[2].colors.push(pltrack.color);
         //danceability
         this.chartData.datasets[1].data.push(pltrack.audio_features.danceability);
         this.chartData.datasets[1].tracks.push(pltrack.track);
-        //this.chartData.datasets[3].colors.push(pltrack.color);
-
       });
       //console.log('this.chartData',this.chartData);
-      // this.isLoading = false;
     };
-    // };
   }
 
 
@@ -314,6 +299,7 @@ export class TrackSummaryGraphComponent {
       const titleLines = tooltip.title || [];
       const bodyLines = tooltip.body.map((b: any) => b.lines);
       const tableHead = document.createElement('thead');
+      var trackIndex: number = 0;
       var track: any;
 
       titleLines.forEach((title: any) => {
@@ -322,8 +308,7 @@ export class TrackSummaryGraphComponent {
 
         const th = document.createElement('th');
         th.style.borderWidth = '0';
-        //th.innerText = this.selectedDate.code == 'DAY' ? 'Day ' : '';
-        var trackIndex = (Number(title) - 1)
+        trackIndex = (Number(title) - 1)
         th.innerText = context.tooltip.dataPoints[0].dataset.tracks[trackIndex].name;
         track = context.tooltip.dataPoints[0].dataset.tracks[trackIndex];
 
@@ -333,68 +318,90 @@ export class TrackSummaryGraphComponent {
         tr.appendChild(th);
         tableHead.appendChild(tr);
       });
-
       const tableBody = document.createElement('tbody');
 
-
-      //For track duration
+      const trEmpty = document.createElement('tr');
+      trEmpty.innerHTML = `</br>`;
+      tableBody.appendChild(trEmpty);
+      
+      //for starting time
       const tr = document.createElement('tr');
       tr.style.backgroundColor = 'inherit';
       tr.style.borderWidth = '0';
       const td = document.createElement('td');
       td.style.borderWidth = '0';
-      const text = document.createTextNode(`Duration : ${Constants.formatMilliseconds(track.duration_ms)}`)
-      // td.appendChild(span);
+      var trackStartTime = trackIndex === 0 ? 0 : this.tracksData.tracks.slice(0, trackIndex).reduce((sum, track) => sum + track.track.duration_ms, 0);
+      const text = document.createTextNode(`Start : ${Constants.formatMilliseconds(trackStartTime)}`);
       td.appendChild(text);
       tr.appendChild(td);
       tableBody.appendChild(tr);
 
+      //For track duration 
+      const tr1 = document.createElement('tr1');
+      tr1.style.backgroundColor = 'inherit';
+      tr1.style.borderWidth = '0';
+      tr1.style.paddingBottom = '10px';
+      const td1 = document.createElement('td1');
+      td.style.borderWidth = '0';
+      const text1 = document.createTextNode(`Duration : ${Constants.formatMilliseconds(track.duration_ms)}`);
+      td1.appendChild(text1);
+      tr1.appendChild(td1);
+      tableBody.appendChild(tr1);
+
+      
+      // bodyLines.forEach((body: any, i: any) => {
+      //   const colors = tooltip.labelColors[i];
+
+      //   const span = document.createElement('span');
+      //   span.style.background = colors.backgroundColor;
+      //   span.style.borderColor = colors.borderColor;
+      //   span.style.borderWidth = '2px';
+      //   span.style.marginRight = '10px';
+
+      //   span.style.height = '10px';
+      //   span.style.width = '10px';
+      //   span.style.display = 'inline-block';
+
+      //   const tr = document.createElement('tr');
+      //   tr.style.backgroundColor = 'inherit';
+      //   tr.style.borderWidth = '0';
+      //   const td = document.createElement('td');
+      //   td.style.borderWidth = '0';
+
+      //   const text = document.createTextNode(body);
+
+      //   td.appendChild(span);
+      //   td.appendChild(text);
+      //   tr.appendChild(td);
+      //   tableBody.appendChild(tr);
+      // });
+
+      const tableFooter = document.createElement('tfooter');
+      const trFooter = document.createElement('tr');
+      trFooter.innerHTML = `</br>`;
+      tableFooter.appendChild(trFooter);
       //for features
       bodyLines.forEach((body: any, i: any) => {
         const colors = tooltip.labelColors[i];
-
         const span = document.createElement('span');
         span.style.background = colors.backgroundColor;
         span.style.borderColor = colors.borderColor;
         span.style.borderWidth = '2px';
         span.style.marginRight = '10px';
-
         span.style.height = '10px';
         span.style.width = '10px';
         span.style.display = 'inline-block';
-
-        const tr = document.createElement('tr');
-        tr.style.backgroundColor = 'inherit';
-        tr.style.borderWidth = '0';
+        const trFooter = document.createElement('tr');
+        trFooter.style.backgroundColor = 'inherit';
+        trFooter.style.borderWidth = '0';
         const td = document.createElement('td');
         td.style.borderWidth = '0';
-
         const text = document.createTextNode(body);
-
         td.appendChild(span);
         td.appendChild(text);
-        tr.appendChild(td);
-        tableBody.appendChild(tr);
+        trFooter.appendChild(td);
+        tableFooter.appendChild(trFooter);
       });
-
-      const tableFooter = document.createElement('tfooter');
-      const trFooter = document.createElement('tr');
-      trFooter.style.backgroundColor = 'inherit';
-      trFooter.style.borderWidth = '0';
-      // trFooter.innerHTML =
-      //   `</br> <span> Avarage Unit/Order: </span>
-      //   </br> <b>` +
-      //   (this.selectedDate.code == 'DAY' ? this.orders.dailyData.avarageUnitByOrder : this.selectedDate.code == 'WEEK' ? this.orders.weeklyData.avarageUnitByOrder : this.orders.monthlyData.avarageUnitByOrder) +
-      //   `</b></br></br> ` +
-      //   `<span> Avarage Sales/Order: </span>
-      //   </br> <b>` +
-      //   (this.selectedDate.code == 'DAY' ? this.orders.dailyData.avarageSalesByOrder : this.selectedDate.code == 'WEEK' ? this.orders.weeklyData.avarageSalesByOrder : this.orders.monthlyData.avarageSalesByOrder) +
-      //   `</b></br></br> ` +
-      //   `<span> Total Sales: </span>
-      //   </br> <b>` +
-      //   (this.selectedDate.code == 'DAY' ? this.orders.dailyData.totalSales : this.selectedDate.code == 'WEEK' ? this.orders.weeklyData.totalSales : this.orders.monthlyData.totalSales) +
-      //   `</b>`;
-      // tableFooter.appendChild(trFooter);
 
       const tableRoot = tooltipEl.querySelector('table');
 
