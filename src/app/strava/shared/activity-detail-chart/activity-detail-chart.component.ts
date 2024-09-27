@@ -150,7 +150,11 @@ export class ActivityDetailChartComponent implements OnInit {
     this.pairedTracks.forEach((pltrack, index) => {
       if(isNaN(pltrack.track.duration_ms)) {
         pltrack.track.duration_ms=Constants.convertToMilliseconds(pltrack.track.duration_ms) ;
-      } 
+      } ;
+      if(!pltrack.track.audio_features){
+        pltrack.track.audio_features=pltrack.audio_features;
+        pltrack.track = Constants.typeCastTrackJson(pltrack);
+      }
       //duration
       this.chartData.labels.push(index + 1);
       //tempo

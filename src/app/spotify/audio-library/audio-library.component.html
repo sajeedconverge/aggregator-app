@@ -4,18 +4,23 @@
 <p-confirmDialog />
 
 <div class="palylist_table">
-    <p-table [value]="audioTracks" [rows]="pageSize" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+    <!-- <p-table [value]="audioTracks" [rows]="pageSize" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
         (onPage)="onPageChange($event)" [totalRecords]="audioTracks.length" [paginator]="true" paginatorPosition="top"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" sortField="name" (sortOrder)="1"
         [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
         (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)" [lazy]="true"
-        (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta">
+        (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta"> -->
+    <p-table [value]="audioTracks"  [totalRecords]="audioTracks.length" sortField="name"
+        (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
+        (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)" [lazy]="true"
+        (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <div></div>
                 <h3>Audio Library</h3>
                 <div class="flex flex-row align-items-center">
+                    <p-dropdown [options]="rowsPerPageOptions" (onChange)="onLimitChange($event)" pTooltip="Tracks limit" tooltipPosition="bottom"></p-dropdown>
                     <div>
                         <p-button [rounded]="true" severity="success" icon="pi pi-refresh"
                             [disabled]="!showSummaryGraph && !showDetailedGraph" (onClick)="refreshGraphs()"

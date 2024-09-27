@@ -4,6 +4,7 @@ import { SpotifyService } from './spotify.service';
 import { AccountService } from '../../../user/shared/services/account.service';
 import { ProviderTokenRequest } from '../../../user/shared/models/user-models';
 import { AuthService } from '../../../user/shared/services/auth.service';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -125,27 +126,52 @@ export class SpotifyAuthorizationService {
     const refreshToken: string = sessionStorage.getItem('spotify-refresh-token') || '';
 
     var body = new URLSearchParams();
-    body.set('grant_type', 'refresh_token');
-    body.set('refresh_token', refreshToken);
-    body.set('client_id', Constants.spotifySettings.clientId);
 
-    this.spotifyService.getSpotifyAccessTokenUrl().subscribe((res) => {
-      if (res.statusCode === 200) {
-        const tokenUrl: string = res.payload;
-        this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
-          if (res) {
-            //console.log("refresh access token", res);
-            sessionStorage.setItem('spotify-bearer-token', res.access_token);
+    if (!Constants.spotifySettings.clientId) {
+      this.spotifyService.getSpotifyData().subscribe((res) => {
+        if (res.statusCode === 200) {
+          Constants.spotifySettings = res.payload;
+          Constants.spotifyHeader = new HttpHeaders({
+            //'Authorization': 'Basic ' + btoa('a3470aef0a5e4ca5bcb06600c262f026' + ':' + '25e7aab330324d8ba368c08e7b4a5800'),
+            'Authorization': 'Basic ' + btoa(Constants.spotifySettings.clientId + ':' + Constants.spotifySettings.clientSecret),
+            'Content-Type': 'application/x-www-form-urlencoded',
+          });
 
-            const currentDateTime = new Date();
-            const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
-            //console.log(currentDateTime, tokenExpiryTime);
-            sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
-          };
-        })
-      };
-    });
+          body.set('grant_type', 'refresh_token');
+          body.set('refresh_token', refreshToken);
+          body.set('client_id', Constants.spotifySettings.clientId);
+        };
+      });
+    } else {
+      body.set('grant_type', 'refresh_token');
+      body.set('refresh_token', refreshToken);
+      body.set('client_id', Constants.spotifySettings.clientId);
+    };
+
+
+    setTimeout(() => {
+      this.spotifyService.getSpotifyAccessTokenUrl().subscribe((res) => {
+        if (res.statusCode === 200) {
+          const tokenUrl: string = res.payload;
+          this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
+            if (res) {
+              //console.log("refresh access token", res);
+              sessionStorage.setItem('spotify-bearer-token', res.access_token);
+
+              const currentDateTime = new Date();
+              const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
+              //console.log(currentDateTime, tokenExpiryTime);
+              //sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
+              sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toString());
+            };
+          })
+        };
+      });
+    }, 2000);
+
   }
+
+
   //To check sbt expiry and refresh the access token
   checkExpiryAndRefreshToken() {
     const sbtExpiryTime = sessionStorage.getItem('sbt-expiry-time');
