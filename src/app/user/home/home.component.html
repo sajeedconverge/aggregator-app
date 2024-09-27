@@ -85,6 +85,12 @@
             <div class="flex flex-row justify-content-between">
                 <h3>Activity Details</h3>
                 <div>
+                    <p-button class="pr-3 btn-grp-custom" [outlined]="!showActivityGraph" size="small"
+                        (onClick)="showActivityGraphChanged()" pTooltip="Activity Detail Graph" tooltipPosition="bottom">
+                        <span class="material-symbols-outlined">
+                            show_chart
+                        </span>
+                    </p-button>
                     <p-button pTooltip="Save" tooltipPosition="bottom" severity="success" [disabled]="isADSaved"
                         (click)="saveActivityDetails()" icon="pi pi-save" iconPos="right" />
 
@@ -97,6 +103,9 @@
                 </div>
             </div>
 
+            <div  *ngIf="showActivityGraph">
+                <app-activity-detail-chart [activityDetails]="activityDetails[0]" [pairedTracks]="pairedTracks" ></app-activity-detail-chart>
+            </div>
         </ng-template>
         <ng-template pTemplate="header">
             <tr>

@@ -22,6 +22,7 @@ import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
+import { ActivityDetailChartComponent } from '../../strava/shared/activity-detail-chart/activity-detail-chart.component';
 
 
 @Component({
@@ -40,7 +41,8 @@ import { Title } from '@angular/platform-browser';
     ToastModule,
     BadgeModule,
     TooltipModule,
-    RoundPipe
+    RoundPipe,
+    ActivityDetailChartComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -71,6 +73,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   ];
   isStravaLinked: boolean = true;
   isADSaved: boolean = false;
+  showActivityGraph: boolean = false;
+
+
 
   constructor(
     private stravaAuthService: StravaAuthorizationService,
@@ -626,6 +631,81 @@ export class HomeComponent implements OnInit, OnDestroy {
   formatTrackDuration(durationMs: number) {
     return Constants.formatDuration(durationMs);
   }
+
+  showActivityGraphChanged(){
+    this.showActivityGraph=!this.showActivityGraph;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

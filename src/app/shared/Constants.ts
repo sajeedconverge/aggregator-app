@@ -359,7 +359,19 @@ export class Constants {
         return primeNGColors[randomIndex];
     }
 
-
+public static convertToMilliseconds(time: string): number {
+    const parts = time.split(':'); // Split the string by ':'
+  
+    // Parse hours, minutes, and seconds (convert to integers)
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
+    const seconds = parseInt(parts[2], 10);
+  
+    // Convert the time components to milliseconds
+    const milliseconds = (hours * 3600 + minutes * 60 + seconds) * 1000;
+  
+    return milliseconds;
+  }
 
 
 
