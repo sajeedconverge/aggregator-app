@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { SpotifyService } from '../shared/services/spotify.service';
 import { SpotifyAuthorizationService } from '../shared/services/spotify-authorization.service';
 import { Constants } from '../../shared/Constants';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { MessagesModule } from 'primeng/messages';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { Router } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
@@ -120,8 +120,13 @@ export class PlaylistDetailsComponent implements OnInit {
   offset: number = 0;
   totalItemsCount: number = 0;
   dataMessage:string='';
+  @ViewChild('tableRef') table!: Table;
 
 
+
+
+
+  
 
   constructor(
     private spotifyService: SpotifyService,
@@ -186,7 +191,6 @@ export class PlaylistDetailsComponent implements OnInit {
       if (res.statusCode === 200) {
         Constants.spotifySettings = res.payload;
         Constants.spotifyHeader = new HttpHeaders({
-          //'Authorization': 'Basic ' + btoa('a3470aef0a5e4ca5bcb06600c262f026' + ':' + '25e7aab330324d8ba368c08e7b4a5800'),
           'Authorization': 'Basic ' + btoa(Constants.spotifySettings.clientId + ':' + Constants.spotifySettings.clientSecret),
           'Content-Type': 'application/x-www-form-urlencoded',
         });
@@ -300,39 +304,14 @@ export class PlaylistDetailsComponent implements OnInit {
           };
           });
           setTimeout(() => {
-            // if (this.nonSavedTrackIds.length > 0) {
-            //   var severalIds = this.nonSavedTrackIds.join(',');
-            //   //console.log(severalIds);
-            //   this.spotifyService.getSeveralAudioFeaturesUrl().subscribe((safUrlResponse) => {
-            //     if (safUrlResponse.statusCode === 200) {
-            //       var safUrl = safUrlResponse.payload + severalIds;
-            //       this.spotifyService.SpotifyCommonGetApi(safUrl, spotifyAccessToken).subscribe((safResponse) => {
+            if (this.table) {
+              var sortEvent: any = {
 
-            //         safResponse.audio_features.forEach((audioFeature: any) => {
-            //           var matchedSong = this.playlistTracks.find(song => song.track.id === audioFeature.id);
-            //           matchedSong.audio_features = audioFeature;
-
-            //           //add track to db with it's features
-            //           var trackJson = Constants.typeCastTrackJson(matchedSong);
-            //           var postTrackRequest: PostTrackRequest = {
-            //             providerTrackId: matchedSong.track.id,
-            //             trackData: JSON.stringify(trackJson)
-            //           };
-            //           this.spotifyService.postTrack(postTrackRequest).subscribe(postTrackRes => {
-            //             if (postTrackRes.statusCode === 200) {
-            //               // console.log("track added successfully.", matchedSong.track.name);
-            //               matchedSong.audio_features.tempo = Math.round(matchedSong.audio_features.tempo);
-            //               matchedSong.audio_features.loudness = Math.round(matchedSong.audio_features.loudness * (-10));
-            //               matchedSong.audio_features.energy = Math.round(matchedSong.audio_features.energy * (100));
-            //               matchedSong.audio_features.danceability = Math.round(matchedSong.audio_features.danceability * (100));
-            //             };
-            //           });
-
-            //         });
-            //       });
-            //     };
-            //   });
-            // };
+                field: this.table?.sortField,
+                order: this.table?.sortOrder
+              };
+              this.tableSorted(sortEvent);
+            };
             this.isLoading = false;
           }, (this.playlistTracks.length>25)? 8000 :5000);
         } else {
@@ -532,8 +511,8 @@ export class PlaylistDetailsComponent implements OnInit {
     //console.log('dragIndex :', event.dragIndex, 'dropIndex :', event.dropIndex)
 
     // Remove the item from the drag index and insert it at the drop index
-    const movedItem = this.playlistTracks.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
-    this.playlistTracks.splice(event.dropIndex, 0, movedItem);  // Insert the moved item at dropIndex
+    //const movedItem = this.playlistTracks.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
+    //this.playlistTracks.splice(event.dropIndex, 0, movedItem);  // Insert the moved item at dropIndex
 
     // //temp code 
     // var reOrderedTracks = this.playlistTracks.map(plTrack => { return plTrack.track.name });

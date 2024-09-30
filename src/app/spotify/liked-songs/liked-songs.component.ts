@@ -203,11 +203,6 @@ export class LikedSongsComponent implements OnInit {
     });
   }
 
-  // rowSelectionEvent() {
-  //   // console.log('this.selectedTrackIds', this.selectedTrackIds);
-  //   this.showDetailedGraph = false;
-  //   this.showSummaryGraph = false;
-  // }
 
   getLikedSongs(offset: number, limit: number) {
     this.isLoading = true;

@@ -531,6 +531,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   fetchActivitiesFromDb() {
     this.showDetails = false;
     this.isADSaved = false;
+    this.showActivityGraph = false;
 
     this.isLoading = true;
     var unfilteredActivites: any[] = [];
@@ -632,8 +633,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     return Constants.formatDuration(durationMs);
   }
 
-  showActivityGraphChanged(){
-    this.showActivityGraph=!this.showActivityGraph;
+  showActivityGraphChanged() {
+    this.showActivityGraph = !this.showActivityGraph;
   }
 
 

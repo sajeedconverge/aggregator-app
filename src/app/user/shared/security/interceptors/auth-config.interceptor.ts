@@ -31,6 +31,11 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
         },
       });
     }
+  };
+  if((url.includes('accounts.spotify.com'))){
+     //console.log('spotify api called !');
+    
+    //debugger;
   }
 
   return next(req);

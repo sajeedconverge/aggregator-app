@@ -24,7 +24,8 @@ export const appConfig: ApplicationConfig = {
             id: GoogleLoginProvider.PROVIDER_ID,
             provider: new GoogleLoginProvider(
               '370637677190-aep1ner5nsm5c6tm64pj6fueact5rlan.apps.googleusercontent.com'
-            )
+            ),
+            use_fedcm_for_prompt:true
           },
           {
             id: FacebookLoginProvider.PROVIDER_ID,

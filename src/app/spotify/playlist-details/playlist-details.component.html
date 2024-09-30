@@ -11,7 +11,7 @@
         
         <p-table [value]="playlistTracks" [lazy]="true" (onLazyLoad)="onPageChange($event)" [rows]="pageSize"
         [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]" [totalRecords]="totalItemsCount"
-        [paginator]="true" sortField="added_at" (sortOrder)="1"
+        [paginator]="true" sortField="added_at" (sortOrder)="1" #tableRef
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" paginatorPosition="top"
          [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered($event)"
         (onSort)="tableSorted($event)">
