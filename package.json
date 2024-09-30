@@ -22,6 +22,8 @@
     "@angular/router": "^18.0.0",
     "@angular/ssr": "^18.0.3",
     "@auth0/angular-jwt": "^5.2.0",
+    "@sentry/angular": "^8.32.0",
+    "@sentry/browser": "^8.32.0",
     "chart.js": "^4.4.4",
     "material-icons": "^1.13.12",
     "primeflex": "^3.3.1",

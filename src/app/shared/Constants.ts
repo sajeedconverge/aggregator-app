@@ -4,7 +4,7 @@ import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "..
 
 export class Constants {
 
-     public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
+    public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
     //  public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     public static spotifySettings: SpotifySettings = {
@@ -373,7 +373,27 @@ export class Constants {
         return milliseconds;
     }
 
+    public static requestMediaKeySystemAccess() {
+        const config = [{
+            initDataTypes: ['cenc'],
+            videoCapabilities: [
+                { contentType: 'video/mp4; codecs="avc1.42E01E"', robustness: 'HW_SECURE_DECODE' }, // Change as needed
+                { contentType: 'video/mp4; codecs="avc1.64001E"', robustness: 'SW_SECURE_CRYPTO' } // Example for additional codec
+            ],
+            audioCapabilities: [
+                { contentType: 'audio/mp4; codecs="mp4a.40.2"', robustness: 'SW_SECURE_CRYPTO' }
+            ]
+        }];
 
+        navigator.requestMediaKeySystemAccess('com.widevine.alpha', config)
+            .then(keySystemAccess => {
+                // Proceed with DRM operations
+                console.log('MediaKeySystemAccess granted:', keySystemAccess);
+            })
+            .catch(error => {
+                console.error('MediaKeySystemAccess request failed:', error);
+            });
+    }
 
 
 

@@ -158,6 +158,7 @@ export class AudioLibraryComponent implements OnInit {
     this.title.setTitle('AudioActive - Audio Library')
     //this.spotifyAuthService.refreshSpotifyAccessToken();
     //this.getAllAudio()
+    Constants.requestMediaKeySystemAccess();
   }
 
   ngOnInit(): void {
