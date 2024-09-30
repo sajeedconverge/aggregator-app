@@ -22,6 +22,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
+import { UriPipe } from "../../shared/common-pipes/uri.pipe";
 
 
 
@@ -45,11 +46,9 @@ import { Title } from '@angular/platform-browser';
     InputTextModule,
     TooltipModule,
     ButtonGroupModule,
-    RoundPipe
-
-
-
-  ],
+    RoundPipe,
+    UriPipe
+],
   templateUrl: './playlist-details.component.html',
   styleUrl: './playlist-details.component.css',
   providers: [
@@ -121,6 +120,18 @@ export class PlaylistDetailsComponent implements OnInit {
   totalItemsCount: number = 0;
   dataMessage:string='';
   @ViewChild('tableRef') table!: Table;
+  showPreview: boolean = false;
+  currentTrack: any;
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -704,7 +715,10 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
 
-
+  showPreviewPopup(track: any) {
+    this.showPreview = true;
+    this.currentTrack = track.track;
+  }
 
 
 

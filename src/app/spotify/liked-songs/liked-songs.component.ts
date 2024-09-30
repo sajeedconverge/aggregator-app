@@ -25,6 +25,7 @@ import { Title } from '@angular/platform-browser';
 import { PaginatorModule } from 'primeng/paginator';
 import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
 import { TracksData, TrackType } from '../shared/models/graph-models';
+import { UriPipe } from "../../shared/common-pipes/uri.pipe";
 
 @Component({
   selector: 'app-liked-songs',
@@ -46,12 +47,8 @@ import { TracksData, TrackType } from '../shared/models/graph-models';
     RoundPipe,
     PaginatorModule,
     TrackSummaryGraphComponent,
-
-
-
-
-
-  ],
+    UriPipe
+],
   templateUrl: './liked-songs.component.html',
   styleUrl: './liked-songs.component.css',
   providers: [
@@ -130,7 +127,8 @@ export class LikedSongsComponent implements OnInit {
     tracks: []
   };
   @ViewChild('tableRef') table!: Table;
-
+  showPreview: boolean = false;
+  currentTrack: any;
 
 
 
@@ -878,7 +876,10 @@ export class LikedSongsComponent implements OnInit {
 
   }
 
-
+  showPreviewPopup(track: any) {
+    this.showPreview = true;
+    this.currentTrack = track.track;
+  }
 
 
 

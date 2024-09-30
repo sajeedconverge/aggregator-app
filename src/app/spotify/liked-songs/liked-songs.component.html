@@ -75,13 +75,6 @@
                 </div> -->
 
             </div>
-            <!-- <div>
-                <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
-            </div> -->
-            <!-- <p-paginator (onPageChange)="onPageChange($event)" [rows]="pageSize" [rowsPerPageOptions]="[10, 25, 50]"
-                [totalRecords]="totalLikedSongsCount" [showCurrentPageReport]="true" [showPageLinks]="true"
-                [showJumpToPageDropdown]="false" class=""
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tracks" /> -->
 
         </ng-template>
 
@@ -91,6 +84,9 @@
                 </th>
                 <th style="width: 4rem">
                     <p-tableHeaderCheckbox />
+                </th>
+                <th style="width:80px">
+                    Preview
                 </th>
                 <th style="width:80px">
                 </th>
@@ -131,6 +127,9 @@
                 </td>
                 <td>
                     <p-tableCheckbox [value]="track" />
+                </td>
+                <td>
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true" (onClick)="showPreviewPopup(track)" />
                 </td>
                 <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
@@ -220,3 +219,34 @@
     </div>
 
 </p-dialog>
+
+
+<p-dialog class="track_preview_dialog" [modal]="true" [draggable]="false" [(visible)]="showPreview" [closable]="true"
+    [style]="{ width: '50rem' }">
+    <div class="">
+        <iframe [src]="currentTrack?.uri | uri" width="600" height="230" frameborsrcder="0" allowtransparency="true"
+            allow="encrypted-media"></iframe>
+    </div>
+</p-dialog>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

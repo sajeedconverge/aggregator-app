@@ -79,6 +79,9 @@
                 <th style="width:80px">
                 </th>
                 <th style="width:80px">
+                    Preview
+                </th>
+                <th style="width:80px">
                 </th>
                 <th pSortableColumn="track.name">
                     Title
@@ -114,6 +117,9 @@
             <tr [pReorderableRow]="index">
                 <td>
                     <span class="pi pi-bars" pReorderableRowHandle></span>
+                </td>
+                <td>
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true" (onClick)="showPreviewPopup(track)" />
                 </td>
                 <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
@@ -163,3 +169,32 @@
         <p-button label="Save" (onClick)="createNewPlaylist()" [disabled]="playlistNameInput.invalid" />
     </div>
 </p-dialog>
+
+<p-dialog class="track_preview_dialog" [modal]="true" [draggable]="false" [(visible)]="showPreview" [closable]="true"
+    [style]="{ width: '50rem' }">
+    <div class="">
+        <iframe [src]="currentTrack?.uri | uri" width="600" height="230" frameborsrcder="0" allowtransparency="true"
+            allow="encrypted-media"></iframe>
+    </div>
+</p-dialog>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

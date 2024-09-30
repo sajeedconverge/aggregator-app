@@ -789,7 +789,7 @@ export class AudioLibraryComponent implements OnInit {
       this.showSummaryGraphChanged(true);
     } else if (this.showDetailedGraph) {
       this.showGraphChanged(true);
-    }
+    };
   }
 
   showPreviewPopup(track: any) {

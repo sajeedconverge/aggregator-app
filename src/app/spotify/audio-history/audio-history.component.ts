@@ -23,6 +23,7 @@ import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
 import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
 import { TracksData, TrackType } from '../shared/models/graph-models';
+import { UriPipe } from "../../shared/common-pipes/uri.pipe";
 
 @Component({
   selector: 'app-audio-history',
@@ -43,9 +44,8 @@ import { TracksData, TrackType } from '../shared/models/graph-models';
     ButtonGroupModule,
     RoundPipe,
     TrackSummaryGraphComponent,
-
-
-  ],
+    UriPipe
+],
   templateUrl: './audio-history.component.html',
   styleUrl: './audio-history.component.css',
   providers: [
@@ -118,7 +118,13 @@ export class AudioHistoryComponent implements OnInit {
   tracksData: TracksData = {
     trackType: TrackType.RecentlyPlayed,
     tracks: []
-  }
+  };
+  showPreview: boolean = false;
+  currentTrack: any;
+
+
+
+
 
 
 
@@ -751,7 +757,10 @@ export class AudioHistoryComponent implements OnInit {
     }, 200);
   }
 
-
+  showPreviewPopup(track: any) {
+    this.showPreview = true;
+    this.currentTrack = track.track;
+  }
 
 
 
