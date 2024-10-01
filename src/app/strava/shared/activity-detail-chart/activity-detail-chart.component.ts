@@ -37,8 +37,8 @@ export class ActivityDetailChartComponent implements OnInit {
   chartOptions: any;
   totalTime: any;
   totalTracks: number = 0;
-  totalDistance:number=0;
-  averagePace:string='';
+  totalDistance: number = 0;
+  averagePace: string = '';
 
   @Input() activityDetails!: any;
   @Input() pairedTracks!: any[];
@@ -55,35 +55,76 @@ export class ActivityDetailChartComponent implements OnInit {
     console.log("chart pairedTracks", this.pairedTracks);
 
     this.chartTitle = this.activityDetails.name;
-    this.totalTime=Constants.formatDuration(this.activityDetails.elapsed_time*1000);
+    this.totalTime = Constants.formatDuration(this.activityDetails.elapsed_time * 1000);
     this.totalTracks = this.pairedTracks.length;
-    this.totalDistance=(this.activityDetails.distance/1000);
+    this.totalDistance = (this.activityDetails.distance / 1000);
+
+    // this.chartOptions = {
+    //   animation: {
+    //     duration: 0
+    //   },
+    //   interaction: {
+    //     mode: 'index',
+    //     intersect: false
+    //   },
+    //   plugins: {
+    //     legend: {
+    //       labels: {
+    //         color: this.textColor,
+    //         usePointStyle: true,
+    //         boxHeight: 15,
+    //         pointStyleWidth: 17,
+    //         padding: 14
+    //       }
+    //     },
+    //     tooltip: {
+    //       enabled: false,
+    //       position: 'nearest',
+    //       external: this.externalTooltipHandler
+    //     }
+    //   },
+    //   responsive: true,
+    //   scales: {
+    //     x: {
+    //       stacked: true,
+    //       ticks: {
+    //         color: this.textColorSecondary
+    //       },
+    //       grid: {
+    //         color: this.surfaceBorder
+    //       }
+    //     },
+    //     y: {
+    //       ticks: {
+    //         color: this.textColorSecondary
+    //       },
+    //       grid: {
+    //         color: this.surfaceBorder
+    //       }
+    //     }
+    //   }
+    // };
+
 
     this.chartOptions = {
-      animation: {
-        duration: 0
-      },
-      interaction: {
-        mode: 'index',
-        intersect: false
-      },
+      maintainAspectRatio: false,
+      aspectRatio: 0.8,
       plugins: {
-        legend: {
-          labels: {
-            color: this.textColor,
-            usePointStyle: true,
-            boxHeight: 15,
-            pointStyleWidth: 17,
-            padding: 14
-          }
-        },
-        tooltip: {
-          enabled: false,
-          position: 'nearest',
-          external: this.externalTooltipHandler
-        }
-      },
-      responsive: true,
+            legend: {
+              labels: {
+                color: this.textColor,
+                usePointStyle: true,
+                boxHeight: 15,
+                pointStyleWidth: 17,
+                padding: 14
+              }
+            },
+            tooltip: {
+              enabled: false,
+              position: 'nearest',
+              external: this.externalTooltipHandler
+            }
+          },
       scales: {
         x: {
           stacked: true,
@@ -91,23 +132,29 @@ export class ActivityDetailChartComponent implements OnInit {
             color: this.textColorSecondary
           },
           grid: {
-            color: this.surfaceBorder
+            color: this.surfaceBorder,
+            drawBorder: false
           }
         },
         y: {
+          stacked: true,
           ticks: {
             color: this.textColorSecondary
           },
           grid: {
-            color: this.surfaceBorder
+            color: this.surfaceBorder,
+            drawBorder: false
           }
         }
       }
     };
+
+
+
     this.populateGraph();
   }
 
-  populateGraph(){
+  populateGraph() {
     var totalPaceMs = 0;
     this.chartData = {
       labels: [],
@@ -148,11 +195,11 @@ export class ActivityDetailChartComponent implements OnInit {
     };
     //to populate graph
     this.pairedTracks.forEach((pltrack, index) => {
-      if(isNaN(pltrack.track.duration_ms)) {
-        pltrack.track.duration_ms=Constants.convertToMilliseconds(pltrack.track.duration_ms) ;
-      } ;
-      if(!pltrack.track.audio_features){
-        pltrack.track.audio_features=pltrack.audio_features;
+      if (isNaN(pltrack.track.duration_ms)) {
+        pltrack.track.duration_ms = Constants.convertToMilliseconds(pltrack.track.duration_ms);
+      };
+      if (!pltrack.track.audio_features) {
+        pltrack.track.audio_features = pltrack.audio_features;
         pltrack.track = Constants.typeCastTrackJson(pltrack);
       }
       //duration
@@ -173,7 +220,7 @@ export class ActivityDetailChartComponent implements OnInit {
       //calculate pace
       totalPaceMs += Constants.convertToMilliseconds(pltrack.pace);
     });
-    this.averagePace=Constants.formatMilliseconds( (totalPaceMs/this.totalTracks) );
+    this.averagePace = Constants.formatMilliseconds((totalPaceMs / this.totalTracks));
   }
 
 
@@ -318,7 +365,7 @@ export class ActivityDetailChartComponent implements OnInit {
       const trEmpty = document.createElement('tr');
       trEmpty.innerHTML = `</br>`;
       tableBody.appendChild(trEmpty);
-      
+
       //for starting time
       const tr = document.createElement('tr');
       tr.style.backgroundColor = 'inherit';

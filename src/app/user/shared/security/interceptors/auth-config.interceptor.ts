@@ -1,5 +1,5 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { throwError } from 'rxjs';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { catchError, delay, throwError } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { inject } from '@angular/core';
@@ -32,10 +32,28 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
       });
     }
   };
-  if((url.includes('accounts.spotify.com'))){
-     //console.log('spotify api called !');
-    
+  if ((url.includes('accounts.spotify.com')) || (url.includes('api.spotify.com'))) {
+    //console.log('spotify api called !');
+
     //debugger;
+
+    return next(req).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // Handle 401 errors specifically
+        if (error.status === 401) {
+         /// console.log(error);
+          // Try refreshing the token using the AuthService
+          spotifyAuthService.refreshSpotifyAccessToken();
+          
+
+        }
+        
+          return next(req);
+        
+      })
+    );
+
+
   }
 
   return next(req);

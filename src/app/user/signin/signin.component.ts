@@ -164,13 +164,13 @@ export class SigninComponent implements OnInit {
       this.accountService.login(this.UserRequest).subscribe((res) => {
         if (res.statusCode === 200) {
 
-          console.log('login success', res);
+          //  console.log('login success', res);
           //initial login process to store user data
           this.authService.setAccessToken(res.payload.token);
           this.authService.setUserEmail(res.payload.email);
           this.authService.setSpotifyRefreshToken(res.payload.spotifyRefreshToken);
           this.authService.setStravaRefreshToken(res.payload.stravaRefreshToken);
-          console.log(res);
+          //  console.log(res);
 
           setTimeout(() => {
             this.isLoading = false;

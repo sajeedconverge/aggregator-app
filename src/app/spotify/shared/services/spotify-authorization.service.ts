@@ -33,7 +33,7 @@ export class SpotifyAuthorizationService {
 
         const spotifyWindow = window.open(url, '_blank', `width=${width},height=${height},top=${top},left=${left}`);
         if (!spotifyWindow) {
-          console.error('Failed to open the window');
+          // console.error('Failed to open the window');
           return;
         }
 
@@ -75,7 +75,7 @@ export class SpotifyAuthorizationService {
             //console.log('userId', userId);
             this.spotifyService.mapSpotifyUser(userId, spotifyUserId).subscribe((mapRes) => {
               if (mapRes.statusCode === 200) {
-                console.log('spotify User mapped successfully.');
+                //  console.log('spotify User mapped successfully.');
 
               }
             })
@@ -114,7 +114,7 @@ export class SpotifyAuthorizationService {
             }
 
             this.accountService.storeProviderRefreshToken(tokenRequest).subscribe((res) => {
-              console.log(res);
+              // console.log(res);
             });
           };
         })
@@ -140,16 +140,31 @@ export class SpotifyAuthorizationService {
           body.set('grant_type', 'refresh_token');
           body.set('refresh_token', refreshToken);
           body.set('client_id', Constants.spotifySettings.clientId);
+
+          this.spotifyService.getSpotifyAccessTokenUrl().subscribe((res) => {
+            if (res.statusCode === 200) {
+              const tokenUrl: string = res.payload;
+              this.spotifyService.generateSpotifyAccessToken(tokenUrl, body).subscribe((res) => {
+                if (res) {
+                  //console.log("refresh access token", res);
+                  sessionStorage.setItem('spotify-bearer-token', res.access_token);
+    
+                  const currentDateTime = new Date();
+                  const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
+                  //console.log(currentDateTime, tokenExpiryTime);
+                  //sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toISOString());
+                  sessionStorage.setItem('sbt-expiry-time', tokenExpiryTime.toString());
+                };
+              })
+            };
+          });
         };
       });
     } else {
       body.set('grant_type', 'refresh_token');
       body.set('refresh_token', refreshToken);
       body.set('client_id', Constants.spotifySettings.clientId);
-    };
 
-
-    setTimeout(() => {
       this.spotifyService.getSpotifyAccessTokenUrl().subscribe((res) => {
         if (res.statusCode === 200) {
           const tokenUrl: string = res.payload;
@@ -167,7 +182,8 @@ export class SpotifyAuthorizationService {
           })
         };
       });
-    }, 2000);
+    };
+
 
   }
 

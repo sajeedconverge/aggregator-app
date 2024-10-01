@@ -114,16 +114,16 @@ export class RegisterComponent {
   }
 
   onSubmit() {
-    this.isLoading=true;
+    this.isLoading = true;
     if (this.registerForm.valid) {
       this.UserRequest = this.registerForm.value;
       this.accountService.register(this.UserRequest).subscribe((res) => {
         if (res.statusCode === 200) {
-          console.log('register success', res);
+          //  console.log('register success', res);
           window.location.reload();
           //this.router.navigate(['/']);
         };
-        this.isLoading=false;
+        this.isLoading = false;
       });
     };
 
@@ -132,7 +132,7 @@ export class RegisterComponent {
 
   signOut(): any { //for logging out
     this.socialAuthService.signOut();
-    console.log('logged out');
+    //   console.log('logged out');
   }
 
 }
