@@ -11,16 +11,30 @@
         (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)"> -->
     <p-table [value]="likedSongs" [lazy]="true" (onLazyLoad)="onPageChange($event)" [rows]="pageSize"
         [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]" [totalRecords]="totalLikedSongsCount"
-        [paginator]="true" sortField="added_at" (sortOrder)="1" #tableRef
+        [paginator]="true"  #tableRef
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" paginatorPosition="top"
         [(selection)]="selectedTracksList" [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered($event)"
-        (onSort)="tableSorted($event)" >
+        (onSort)="tableSorted($event)">
 
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <div></div>
                 <h3>Liked Songs</h3>
                 <div class="flex flex-row align-items-center">
+                    <!-- <div>
+                        <input type="text" placeholder="Search Tracks" pInputText [(ngModel)]="searchText" />
+                        <p-button icon="pi pi-search" severity="primary" (onClick)="op.toggle($event)" [disabled]="!(searchText.length>2)"/>
+                        <p-overlayPanel #op>
+                            <div class="flex flex-column gap-3 w-25rem">
+                                <div>
+                                    <span class="font-medium text-900 block mb-2">Searched Track</span>
+                                    <ul class="list-none p-0 m-0 flex flex-column gap-3">
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </p-overlayPanel>
+                    </div> -->
                     <div class="flex flex-row align-items-center" *ngIf="likedSongs.length > 0">
                         <div>
                             <p-button [rounded]="true" severity="success" icon="pi pi-refresh "
@@ -75,9 +89,7 @@
                 </div> -->
 
             </div>
-
         </ng-template>
-
         <ng-template pTemplate="header">
             <tr>
                 <th style="width:80px">
@@ -129,7 +141,8 @@
                     <p-tableCheckbox [value]="track" />
                 </td>
                 <td>
-                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true" (onClick)="showPreviewPopup(track)" />
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true"
+                        (onClick)="showPreviewPopup(track)" />
                 </td>
                 <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
@@ -228,25 +241,3 @@
             allow="encrypted-media ; autoplay"></iframe>
     </div>
 </p-dialog>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

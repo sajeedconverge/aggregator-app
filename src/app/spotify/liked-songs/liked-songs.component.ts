@@ -26,6 +26,9 @@ import { PaginatorModule } from 'primeng/paginator';
 import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
 import { TracksData, TrackType } from '../shared/models/graph-models';
 import { UriPipe } from "../../shared/common-pipes/uri.pipe";
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+
+
 
 @Component({
   selector: 'app-liked-songs',
@@ -47,7 +50,14 @@ import { UriPipe } from "../../shared/common-pipes/uri.pipe";
     RoundPipe,
     PaginatorModule,
     TrackSummaryGraphComponent,
-    UriPipe
+    UriPipe,
+    OverlayPanelModule
+
+
+
+
+
+
 ],
   templateUrl: './liked-songs.component.html',
   styleUrl: './liked-songs.component.css',
@@ -129,7 +139,7 @@ export class LikedSongsComponent implements OnInit {
   @ViewChild('tableRef') table!: Table;
   showPreview: boolean = false;
   currentTrack: any;
-
+  searchText:string='';
 
 
 
@@ -557,7 +567,7 @@ export class LikedSongsComponent implements OnInit {
     // this.showSummaryGraph = false;
 
     const getFieldValue = (obj: any, field: string) => {
-      return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
+      return field?.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
     };
 
     this.likedSongs.sort((a, b) => {

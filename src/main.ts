@@ -5,7 +5,7 @@ import { AppComponent } from './app/app.component';
 import * as Sentry from "@sentry/browser";
 
 Sentry.init({
-  dsn: 'spotify',
+  //dsn: 'spotify',
   tracesSampleRate: 1.0,
   // integrations: [
   //     new BrowserTracing()  
