@@ -359,9 +359,41 @@ export class Constants {
         return primeNGColors[randomIndex];
     }
 
+    public static convertToMilliseconds(time: string): number {
+        const parts = time.split(':'); // Split the string by ':'
 
+        // Parse hours, minutes, and seconds (convert to integers)
+        const hours = parseInt(parts[0], 10);
+        const minutes = parseInt(parts[1], 10);
+        const seconds = parseInt(parts[2], 10);
 
+        // Convert the time components to milliseconds
+        const milliseconds = (hours * 3600 + minutes * 60 + seconds) * 1000;
 
+        return milliseconds;
+    }
+
+    public static requestMediaKeySystemAccess() {
+        const config = [{
+            initDataTypes: ['cenc'],
+            videoCapabilities: [
+                { contentType: 'video/mp4; codecs="avc1.42E01E"', robustness: 'HW_SECURE_DECODE' }, // Change as needed
+                { contentType: 'video/mp4; codecs="avc1.64001E"', robustness: 'SW_SECURE_CRYPTO' } // Example for additional codec
+            ],
+            audioCapabilities: [
+                { contentType: 'audio/mp4; codecs="mp4a.40.2"', robustness: 'SW_SECURE_CRYPTO' }
+            ]
+        }];
+
+        navigator.requestMediaKeySystemAccess('com.widevine.alpha', config)
+            .then(keySystemAccess => {
+                // Proceed with DRM operations
+                console.log('MediaKeySystemAccess granted:', keySystemAccess);
+            })
+            .catch(error => {
+                console.error('MediaKeySystemAccess request failed:', error);
+            });
+    }
 
 
 

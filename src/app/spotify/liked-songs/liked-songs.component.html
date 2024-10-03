@@ -11,7 +11,7 @@
         (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)"> -->
     <p-table [value]="likedSongs" [lazy]="true" (onLazyLoad)="onPageChange($event)" [rows]="pageSize"
         [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]" [totalRecords]="totalLikedSongsCount"
-        [paginator]="true" sortField="added_at" (sortOrder)="1"
+        [paginator]="true"  #tableRef
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" paginatorPosition="top"
         [(selection)]="selectedTracksList" [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered($event)"
         (onSort)="tableSorted($event)">
@@ -21,6 +21,20 @@
                 <div></div>
                 <h3>Liked Songs</h3>
                 <div class="flex flex-row align-items-center">
+                    <!-- <div>
+                        <input type="text" placeholder="Search Tracks" pInputText [(ngModel)]="searchText" />
+                        <p-button icon="pi pi-search" severity="primary" (onClick)="op.toggle($event)" [disabled]="!(searchText.length>2)"/>
+                        <p-overlayPanel #op>
+                            <div class="flex flex-column gap-3 w-25rem">
+                                <div>
+                                    <span class="font-medium text-900 block mb-2">Searched Track</span>
+                                    <ul class="list-none p-0 m-0 flex flex-column gap-3">
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </p-overlayPanel>
+                    </div> -->
                     <div class="flex flex-row align-items-center" *ngIf="likedSongs.length > 0">
                         <div>
                             <p-button [rounded]="true" severity="success" icon="pi pi-refresh "
@@ -68,23 +82,23 @@
             </div>
             <div>
                 <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" />
-            </div>
-            <div>
-                <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
-            </div>
-            <!-- <p-paginator (onPageChange)="onPageChange($event)" [rows]="pageSize" [rowsPerPageOptions]="[10, 25, 50]"
-                [totalRecords]="totalLikedSongsCount" [showCurrentPageReport]="true" [showPageLinks]="true"
-                [showJumpToPageDropdown]="false" class=""
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tracks" /> -->
 
+                <!-- <div *ngIf="showSummaryGraph">
+                    <app-track-summary-graph [tracksData]="tracksData"
+                        [selectedTracksList]="selectedTracksList"></app-track-summary-graph>
+                </div> -->
+
+            </div>
         </ng-template>
-
         <ng-template pTemplate="header">
             <tr>
                 <th style="width:80px">
                 </th>
                 <th style="width: 4rem">
                     <p-tableHeaderCheckbox />
+                </th>
+                <th style="width:80px">
+                    Preview
                 </th>
                 <th style="width:80px">
                 </th>
@@ -125,6 +139,10 @@
                 </td>
                 <td>
                     <p-tableCheckbox [value]="track" />
+                </td>
+                <td>
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true"
+                        (onClick)="showPreviewPopup(track)" />
                 </td>
                 <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
@@ -213,4 +231,13 @@
         </p-table>
     </div>
 
+</p-dialog>
+
+
+<p-dialog class="track_preview_dialog" [modal]="true" [draggable]="false" [(visible)]="showPreview" [closable]="true"
+    [style]="{ width: '50rem' }">
+    <div class="">
+        <iframe [src]="currentTrack?.uri | uri" width="600" height="230" frameborsrcder="0" allowtransparency="true"
+            allow="encrypted-media ; autoplay"></iframe>
+    </div>
 </p-dialog>

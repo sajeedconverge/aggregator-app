@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessagesModule } from 'primeng/messages';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -23,6 +23,12 @@ import { SpotifyService } from '../shared/services/spotify.service';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
 import { PaginatorModule } from 'primeng/paginator';
+import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
+import { TracksData, TrackType } from '../shared/models/graph-models';
+import { UriPipe } from "../../shared/common-pipes/uri.pipe";
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+
+
 
 @Component({
   selector: 'app-liked-songs',
@@ -43,13 +49,16 @@ import { PaginatorModule } from 'primeng/paginator';
     ButtonGroupModule,
     RoundPipe,
     PaginatorModule,
+    TrackSummaryGraphComponent,
+    UriPipe,
+    OverlayPanelModule
 
 
 
 
 
 
-  ],
+],
   templateUrl: './liked-songs.component.html',
   styleUrl: './liked-songs.component.css',
   providers: [
@@ -123,6 +132,22 @@ export class LikedSongsComponent implements OnInit {
   offset: number = 0;
   totalLikedSongsCount: number = 0;
   dataMessage: string = '';
+  tracksData: TracksData = {
+    trackType: TrackType.LikedSongs,
+    tracks: []
+  };
+  @ViewChild('tableRef') table!: Table;
+  showPreview: boolean = false;
+  currentTrack: any;
+  searchText:string='';
+
+
+
+
+
+
+
+
 
   constructor(
     private spotifyService: SpotifyService,
@@ -186,11 +211,6 @@ export class LikedSongsComponent implements OnInit {
     });
   }
 
-  // rowSelectionEvent() {
-  //   // console.log('this.selectedTrackIds', this.selectedTrackIds);
-  //   this.showDetailedGraph = false;
-  //   this.showSummaryGraph = false;
-  // }
 
   getLikedSongs(offset: number, limit: number) {
     this.isLoading = true;
@@ -293,7 +313,18 @@ export class LikedSongsComponent implements OnInit {
                 //   };
                 // });
               });
+              this.tracksData.tracks = this.likedSongs;
               setTimeout(() => {
+                //debugger;
+                if (this.table) {
+                  var sortEvent: any = {
+
+                    field: this.table?.sortField,
+                    order: this.table?.sortOrder
+                  };
+                  this.tableSorted(sortEvent);
+                };
+
                 //console.log('nonSavedTrackIds', this.nonSavedTrackIds);
                 // if (this.nonSavedTrackIds.length > 0) {
                 //   var severalIds = this.nonSavedTrackIds.join(',');
@@ -333,7 +364,7 @@ export class LikedSongsComponent implements OnInit {
                 this.dataMessage = 'No tracks found in liked songs.';
                 this.isLoading = false;
 
-              }, 3000);
+              }, (this.likedSongs.length>25)? 8000 :5000);
             } else {
               this.isLoading = false;
             }
@@ -515,8 +546,8 @@ export class LikedSongsComponent implements OnInit {
     //console.log('dragIndex :', event.dragIndex, 'dropIndex :', event.dropIndex)
 
     // Remove the item from the drag index and insert it at the drop index
-    const movedItem = this.likedSongs.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
-    this.likedSongs.splice(event.dropIndex, 0, movedItem);  // Insert the moved item at dropIndex
+    //const movedItem = this.likedSongs.splice(event.dragIndex, 1)[0];  // Remove the item at dragIndex
+    //this.likedSongs.splice(event.dropIndex, 0, movedItem);  // Insert the moved item at dropIndex
 
     // //temp code 
     // var reOrderedTracks = this.playlistTracks.map(plTrack => { return plTrack.track.name });
@@ -536,7 +567,7 @@ export class LikedSongsComponent implements OnInit {
     // this.showSummaryGraph = false;
 
     const getFieldValue = (obj: any, field: string) => {
-      return field.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
+      return field?.split('.').reduce((value, key) => value ? value[key] : undefined, obj);
     };
 
     this.likedSongs.sort((a, b) => {
@@ -855,7 +886,10 @@ export class LikedSongsComponent implements OnInit {
 
   }
 
-
+  showPreviewPopup(track: any) {
+    this.showPreview = true;
+    this.currentTrack = track.track;
+  }
 
 
 

@@ -1,0 +1,42 @@
+<div class="card">
+    <div class="card-header gap-3">
+        <div class="card-title">
+            <h4>{{chartTitle}}</h4>
+        </div>
+        <!-- <p-dropdown [options]="featureRanges" [(ngModel)]="selectedDate" placeholder="Monthly" optionLabel="name" [showClear]="false" styleClass="w-9rem" (onChange)="onDateChangeBarChart()"></p-dropdown> -->
+    </div>
+    <div class="chart-info mb-3 flex align-items-center gap-5 flex-wrap">
+        <div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Total Tracks</h6>
+            <p class="m-0 p-0 font-bold">
+                {{ totalTracks }}
+            </p>
+        </div>
+        <div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Total Time</h6>
+            <p class="m-0 p-0 font-bold">
+                {{ totalTime }}
+            </p>
+        </div>
+         <div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Total Distance</h6>
+            <p class="m-0 p-0 font-bold">
+                {{ totalDistance | number:'1.2-2'}} km
+            </p>
+        </div>
+        <div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Avg. pace</h6>
+            <p class="m-0 p-0 font-bold">
+                {{ averagePace }} /km
+            </p>
+        </div>
+        <!--<div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Avg. units/orders item</h6>
+            <p class="m-0 p-0 font-bold">
+                {{ selectedDate.code == 'DAY' ? orders.dailyData.avarageUnitByOrder : selectedDate.code == 'WEEK' ? orders.weeklyData.avarageUnitByOrder : orders.monthlyData.avarageUnitByOrder }}
+            </p>
+        </div> -->
+    </div>
+    <p-chart type="bar" height="530" [data]="chartData" [options]="chartOptions"></p-chart>
+</div>
+

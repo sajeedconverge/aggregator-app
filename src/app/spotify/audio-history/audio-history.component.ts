@@ -21,6 +21,9 @@ import { PostTrackAnalysisRequest, PostTrackRequest } from '../shared/models/spo
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
+import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
+import { TracksData, TrackType } from '../shared/models/graph-models';
+import { UriPipe } from "../../shared/common-pipes/uri.pipe";
 
 @Component({
   selector: 'app-audio-history',
@@ -39,11 +42,10 @@ import { Title } from '@angular/platform-browser';
     InputTextModule,
     TooltipModule,
     ButtonGroupModule,
-    RoundPipe
-
-
-
-  ],
+    RoundPipe,
+    TrackSummaryGraphComponent,
+    UriPipe
+],
   templateUrl: './audio-history.component.html',
   styleUrl: './audio-history.component.css',
   providers: [
@@ -107,12 +109,36 @@ export class AudioHistoryComponent implements OnInit {
   };
   pattern = '\\S+.*';
   reOrderedTracks: string[] = [];
-  @ViewChild('tableRef') tableRef!: Table;
+  @ViewChild('tableRef') table!: Table;
   tracksListVisible: boolean = false;
   selectedPlaylist: any;
   userPlaylists: any[] = [];
   nonSavedTrackIds: string[] = [];
-  dataMessage:string='';
+  dataMessage: string = '';
+  tracksData: TracksData = {
+    trackType: TrackType.RecentlyPlayed,
+    tracks: []
+  };
+  showPreview: boolean = false;
+  currentTrack: any;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   constructor(
     private spotifyService: SpotifyService,
@@ -138,7 +164,7 @@ export class AudioHistoryComponent implements OnInit {
 
   getRecentAudio() {
     this.isLoading = true;
-    this.dataMessage='Loading data...';
+    this.dataMessage = 'Loading data...';
     this.selectedTracksList = [];
     this.spotifyService.getSpotifyRecentlyPlayedLimitUrl(this.limit).subscribe((urlResponse) => {
       if (urlResponse.statusCode === 200) {
@@ -151,7 +177,7 @@ export class AudioHistoryComponent implements OnInit {
           console.log('hisotryTracks', this.hisotryTracks);
 
 
-          this.hisotryTracks.forEach((pltrack,index) => {
+          this.hisotryTracks.forEach((pltrack, index) => {
             pltrack.artist = pltrack.track?.artists[0]?.name;
             pltrack.color = Constants.generateRandomPrimeNGColor();
             // audio features
@@ -200,17 +226,28 @@ export class AudioHistoryComponent implements OnInit {
             //     this.isLoading = true;
             //   };
             // });
-            if(index==(this.hisotryTracks.length-1)){
-              this.dataMessage='No tracks found in the audio history.'
+            if (index == (this.hisotryTracks.length - 1)) {
+              this.dataMessage = 'No tracks found in the audio history.'
             };
 
           });
+          this.tracksData.tracks = this.hisotryTracks;
+
           setTimeout(() => {
+            // debugger;
+            if (this.table) {
+              var sortEvent: any = {
+
+                field: this.table?.sortField,
+                order: this.table?.sortOrder
+              };
+              this.tableSorted(sortEvent);
+            };
             this.isLoading = false;
-          }, 3000);
+          },(this.hisotryTracks.length>25)? 8000 :5000);
         })
-      }else{
-        this.dataMessage='No tracks found in audio history.';
+      } else {
+        this.dataMessage = 'No tracks found in audio history.';
       };
     })
   }
@@ -707,14 +744,23 @@ export class AudioHistoryComponent implements OnInit {
   }
 
   refreshGraphs() {
-    if (this.showSummaryGraph) {
-      this.showSummaryGraphChanged(true);
-    } else if (this.showDetailedGraph) {
-      this.showGraphChanged(true);
-    }
+    // if (this.showSummaryGraph) {
+    //   this.showSummaryGraphChanged(true);
+    // } else if (this.showDetailedGraph) {
+    //   this.showGraphChanged(true);
+    // }
+    this.showSummaryGraph = false;
+    this.isLoading = true;
+    setTimeout(() => {
+      this.showSummaryGraph = true;
+      this.isLoading = false;
+    }, 200);
   }
 
-
+  showPreviewPopup(track: any) {
+    this.showPreview = true;
+    this.currentTrack = track.track;
+  }
 
 
 

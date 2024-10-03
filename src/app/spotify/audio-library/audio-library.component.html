@@ -4,18 +4,23 @@
 <p-confirmDialog />
 
 <div class="palylist_table">
-    <p-table [value]="audioTracks" [rows]="pageSize" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+    <!-- <p-table [value]="audioTracks" [rows]="pageSize" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
         (onPage)="onPageChange($event)" [totalRecords]="audioTracks.length" [paginator]="true" paginatorPosition="top"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" sortField="name" (sortOrder)="1"
         [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
         (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)" [lazy]="true"
-        (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta">
+        (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta"> -->
+    <p-table [value]="audioTracks"  [totalRecords]="audioTracks.length" sortField="name"
+        (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
+        (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)" [lazy]="true"
+        (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <div></div>
                 <h3>Audio Library</h3>
                 <div class="flex flex-row align-items-center">
+                    <p-dropdown [options]="rowsPerPageOptions" (onChange)="onLimitChange($event)" pTooltip="Tracks limit" tooltipPosition="bottom"></p-dropdown>
                     <div>
                         <p-button [rounded]="true" severity="success" icon="pi pi-refresh"
                             [disabled]="!showSummaryGraph && !showDetailedGraph" (onClick)="refreshGraphs()"
@@ -66,9 +71,9 @@
             <div>
                 <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" />
             </div>
-            <div>
+            <!-- <div>
                 <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
-            </div>
+            </div> -->
             <!-- <div>
                 <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="pageSize" [rowsPerPageOptions]="[10, 25, 50]" [totalRecords]="120"
                     [showCurrentPageReport]="true" [showPageLinks]="true" [showJumpToPageDropdown]="false"
@@ -82,6 +87,9 @@
                 </th>
                 <th style="width: 4rem">
                     <p-tableHeaderCheckbox />
+                </th>
+                <th style="width:80px">
+                    Preview
                 </th>
                 <th style="width:80px">
                 </th>
@@ -134,15 +142,15 @@
                 <td>
                     <p-tableCheckbox [value]="track" />
                 </td>
+                <td>
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true" (onClick)="showPreviewPopup(track)" />
+                </td>
                 <td><img [src]="track.album?.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
                 <td>
                     <p-button class="anchor_btn" [label]="track?.name" [link]="true"
                         (onClick)="navigateToTrackDetails(track.name,track.id)" />
                 </td>
-                <!-- <td>
-                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="success" [outlined]="true" (onClick)="showPreviewPopup(track)" />
-                </td> -->
                 <td>{{track.artists[0].name}}</td>
                 <td>{{ formatTrackDuration(track?.duration_ms) }}</td>
                 <td>{{ track.audio_features?.tempo | round}}</td>
@@ -220,10 +228,10 @@
 </p-dialog>
 
 
-<p-dialog header="Track Preview" [modal]="true" [draggable]="false" [(visible)]="showPreview" [closable]="true"
+<p-dialog class="track_preview_dialog" [modal]="true" [draggable]="false" [(visible)]="showPreview" [closable]="true"
     [style]="{ width: '50rem' }">
     <div class="">
-        <iframe [src]="currentTrack?.uri | uri" width="600" height="250" frameborsrcder="0" allowtransparency="true"
-            allow="encrypted-media"></iframe>
+        <iframe [src]="currentTrack?.uri | uri" width="600" height="230" frameborsrcder="0" allowtransparency="true"
+            allow="encrypted-media ; autoplay" sandbox="allow-scripts allow-same-origin" ></iframe>
     </div>
 </p-dialog>

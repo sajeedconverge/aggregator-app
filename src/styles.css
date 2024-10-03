@@ -80,7 +80,44 @@ body{
     position: relative;
 }
 
+.track_preview_dialog .p-dialog{
+    box-shadow: none;
+    background: transparent;
+}
+.track_preview_dialog .p-dialog-header {
+    position: absolute;
+    padding: 0;
+    right: -15px;
+    top: -15px;
+    border-radius: 26px;
+    width: 2rem;
+    height: 2rem;
+    text-align: center;
+}
+.track_preview_dialog .p-dialog-header-icons{
+    width:2rem;
+}
+.track_preview_dialog .p-dialog-header-icons button{
+    padding: 0;
+    margin: 0 auto;
+}
 
+.track_preview_dialog .p-dialog-content {
+    padding: 0;
+    border-radius: 16px;
+    border: 0px;
+    background: transparent;
+    transition: 0.2s linear;
+}
+.track_preview_dialog .p-dialog-content > div{
+    height: 242px;
+    overflow: hidden;
+}
+.track_preview_dialog .p-dialog-content iframe{
+    width: 100%;
+    border: 0px;
+    height: 235px;
+}
 
 
 

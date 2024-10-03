@@ -6,6 +6,10 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { authConfigInterceptor } from './user/shared/security/interceptors/auth-config.interceptor';
 import { MessageService } from 'primeng/api';
 import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
+import * as Sentry from '@sentry/angular';
+
+
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,7 +18,12 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authConfigInterceptor]), withFetch()),
     provideAnimationsAsync(),
     MessageService,
-
+    {
+      provide: Sentry.init,
+      useFactory: () => (Sentry.init({
+        dsn: ''
+      }))
+    },
     {
       provide: 'SocialAuthServiceConfig',
       useValue: {
@@ -24,7 +33,8 @@ export const appConfig: ApplicationConfig = {
             id: GoogleLoginProvider.PROVIDER_ID,
             provider: new GoogleLoginProvider(
               '370637677190-aep1ner5nsm5c6tm64pj6fueact5rlan.apps.googleusercontent.com'
-            )
+            ),
+            use_fedcm_for_prompt: true
           },
           {
             id: FacebookLoginProvider.PROVIDER_ID,

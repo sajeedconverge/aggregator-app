@@ -57,11 +57,15 @@
                 </div>
             </div>
             <div>
-                <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" />
+                <!-- <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" /> -->
+            
+                <div  *ngIf="showSummaryGraph">
+                    <app-track-summary-graph [tracksData]="tracksData" [selectedTracksList]="selectedTracksList"></app-track-summary-graph>
+                </div>
             </div>
-            <div><p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
-
-            </div>
+            <!-- <div>
+                <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
+            </div> -->
         </ng-template>
 
         <ng-template pTemplate="header">
@@ -70,6 +74,9 @@
                 </th>
                 <th style="width: 4rem">
                     <p-tableHeaderCheckbox />
+                </th>
+                <th style="width:80px">
+                    Preview
                 </th>
                 <th style="width:80px">
                 </th>
@@ -114,6 +121,9 @@
                 </td>
                 <td>
                     <p-tableCheckbox [value]="track" />
+                </td>
+                <td>
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true" (onClick)="showPreviewPopup(track)" />
                 </td>
                 <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
@@ -200,3 +210,18 @@
     </div>
 
 </p-dialog>
+
+
+<p-dialog class="track_preview_dialog" [modal]="true" [draggable]="false" [(visible)]="showPreview" [closable]="true"
+    [style]="{ width: '50rem' }">
+    <div class="">
+        <iframe [src]="currentTrack?.uri | uri" width="600" height="230" frameborsrcder="0" allowtransparency="true"
+            allow="encrypted-media ; autoplay"></iframe>
+    </div>
+</p-dialog>
+
+
+
+
+
+

@@ -44,7 +44,7 @@ import { SpotifyService } from './spotify/shared/services/spotify.service';
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  isIframe = false;
+  // isIframe = false;
   isUserLoggedIn = false;
   private readonly _destroying$ = new Subject<void>();
   sidebarVisible: boolean = false;
@@ -155,5 +155,9 @@ export class AppComponent implements OnInit {
   }
 
   
+
+
+
+
 
 }

@@ -24,6 +24,7 @@ import { Title } from '@angular/platform-browser';
 import { PaginatorModule } from 'primeng/paginator';
 import { debounceTime, distinctUntilChanged, ignoreElements } from 'rxjs';
 import { UriPipe } from "../../shared/common-pipes/uri.pipe";
+import { DropdownModule } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-audio-library',
@@ -44,7 +45,8 @@ import { UriPipe } from "../../shared/common-pipes/uri.pipe";
     ButtonGroupModule,
     RoundPipe,
     PaginatorModule,
-    UriPipe
+    UriPipe,
+    DropdownModule,
   ],
   templateUrl: './audio-library.component.html',
   styleUrl: './audio-library.component.css',
@@ -131,7 +133,7 @@ export class AudioLibraryComponent implements OnInit {
   showPreview: boolean = false;
   currentTrack: any;
   dataMessage: string = '';
-
+  rowsPerPageOptions: number[] = [10, 25, 50];
 
 
 
@@ -156,6 +158,7 @@ export class AudioLibraryComponent implements OnInit {
     this.title.setTitle('AudioActive - Audio Library')
     //this.spotifyAuthService.refreshSpotifyAccessToken();
     //this.getAllAudio()
+    Constants.requestMediaKeySystemAccess();
   }
 
   ngOnInit(): void {
@@ -187,6 +190,7 @@ export class AudioLibraryComponent implements OnInit {
             return pltrack.jsonData;
           });
           console.log('this.audioTracks', this.audioTracks);
+
           //To fetch audio analysis for each track
           // var tracksIds = this.audioTracks.map(plTrack => { return plTrack.id });
           // // console.log(tracksIds);
@@ -233,19 +237,6 @@ export class AudioLibraryComponent implements OnInit {
     };
     this.isLoading = false;
   }
-
-  onPageChange(event: any) {
-    // this.showDetailedGraph = false;
-    // this.showSummaryGraph = false;
-    this.pageSize = event.rows;
-    // debugger;
-    //this.pageNumber = event.page+1;
-    if (this.filterRequest) {
-      this.getAllAudio();
-    };
-
-  }
-
 
   // rowSelectionEvent() {
   //   // console.log('this.selectedTrackIds', this.selectedTrackIds);
@@ -480,7 +471,7 @@ export class AudioLibraryComponent implements OnInit {
       this.isLoading = false;
       this.showDetailedGraph = true;
       //console.log('data', this.data);
-    }, 3000);
+    }, 5000);
   }
 
   tableReordered(event: any) {
@@ -755,6 +746,20 @@ export class AudioLibraryComponent implements OnInit {
     };
   }
 
+  onLimitChange(event: any) {
+    // debugger;
+    this.pageSize = event.value;
+    this.isLoading = true;
+    this.audioTracks = [];
+    //this.filterRequest.sortField = event.sortField ? event.sortField : this.filterRequest.sortField;
+    //this.filterRequest.sortOrder = event.sortOrder;
+    this.filterRequest.pageSize =  this.pageSize;
+    if (this.filterRequest) {
+      this.getAllAudio();
+    };
+
+  }
+
   loadData(event: any) {
     // debugger;
     this.isLoading = true;
@@ -772,7 +777,7 @@ export class AudioLibraryComponent implements OnInit {
 
     this.filterRequest.sortField = event.sortField ? event.sortField : this.filterRequest.sortField;
     this.filterRequest.sortOrder = event.sortOrder;
-    this.filterRequest.pageSize = event.rows
+    this.filterRequest.pageSize = event.rows ? event.rows : this.pageSize;
 
     if (this.filterRequest) {
       this.getAllAudio();
@@ -785,7 +790,7 @@ export class AudioLibraryComponent implements OnInit {
       this.showSummaryGraphChanged(true);
     } else if (this.showDetailedGraph) {
       this.showGraphChanged(true);
-    }
+    };
   }
 
   showPreviewPopup(track: any) {
