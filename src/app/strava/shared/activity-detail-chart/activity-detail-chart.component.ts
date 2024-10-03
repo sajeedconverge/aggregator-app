@@ -59,72 +59,31 @@ export class ActivityDetailChartComponent implements OnInit {
     this.totalTracks = this.pairedTracks.length;
     this.totalDistance = (this.activityDetails.distance / 1000);
 
-    // this.chartOptions = {
-    //   animation: {
-    //     duration: 0
-    //   },
-    //   interaction: {
-    //     mode: 'index',
-    //     intersect: false
-    //   },
-    //   plugins: {
-    //     legend: {
-    //       labels: {
-    //         color: this.textColor,
-    //         usePointStyle: true,
-    //         boxHeight: 15,
-    //         pointStyleWidth: 17,
-    //         padding: 14
-    //       }
-    //     },
-    //     tooltip: {
-    //       enabled: false,
-    //       position: 'nearest',
-    //       external: this.externalTooltipHandler
-    //     }
-    //   },
-    //   responsive: true,
-    //   scales: {
-    //     x: {
-    //       stacked: true,
-    //       ticks: {
-    //         color: this.textColorSecondary
-    //       },
-    //       grid: {
-    //         color: this.surfaceBorder
-    //       }
-    //     },
-    //     y: {
-    //       ticks: {
-    //         color: this.textColorSecondary
-    //       },
-    //       grid: {
-    //         color: this.surfaceBorder
-    //       }
-    //     }
-    //   }
-    // };
-
-
     this.chartOptions = {
-      maintainAspectRatio: false,
-      aspectRatio: 0.8,
+      animation: {
+        duration: 0
+      },
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
       plugins: {
-            legend: {
-              labels: {
-                color: this.textColor,
-                usePointStyle: true,
-                boxHeight: 15,
-                pointStyleWidth: 17,
-                padding: 14
-              }
-            },
-            tooltip: {
-              enabled: false,
-              position: 'nearest',
-              external: this.externalTooltipHandler
-            }
-          },
+        legend: {
+          labels: {
+            color: this.textColor,
+            usePointStyle: true,
+            boxHeight: 15,
+            pointStyleWidth: 17,
+            padding: 14
+          }
+        },
+        tooltip: {
+          enabled: false,
+          position: 'nearest',
+          external: this.externalTooltipHandler
+        }
+      },
+      responsive: true,
       scales: {
         x: {
           stacked: true,
@@ -132,24 +91,62 @@ export class ActivityDetailChartComponent implements OnInit {
             color: this.textColorSecondary
           },
           grid: {
-            color: this.surfaceBorder,
-            drawBorder: false
+            color: this.surfaceBorder
           }
         },
         y: {
-          stacked: true,
           ticks: {
             color: this.textColorSecondary
           },
           grid: {
-            color: this.surfaceBorder,
-            drawBorder: false
+            color: this.surfaceBorder
           }
         }
       }
     };
 
-
+    // this.chartOptions = {
+    //   maintainAspectRatio: false,
+    //   aspectRatio: 0.8,
+    //   plugins: {
+    //         legend: {
+    //           labels: {
+    //             color: this.textColor,
+    //             usePointStyle: true,
+    //             boxHeight: 15,
+    //             pointStyleWidth: 17,
+    //             padding: 14
+    //           }
+    //         },
+    //         tooltip: {
+    //           enabled: false,
+    //           position: 'nearest',
+    //           external: this.externalTooltipHandler
+    //         }
+    //       },
+    //   scales: {
+    //     x: {
+    //       stacked: true,
+    //       ticks: {
+    //         color: this.textColorSecondary
+    //       },
+    //       grid: {
+    //         color: this.surfaceBorder,
+    //         drawBorder: false
+    //       }
+    //     },
+    //     y: {
+    //       stacked: true,
+    //       ticks: {
+    //         color: this.textColorSecondary
+    //       },
+    //       grid: {
+    //         color: this.surfaceBorder,
+    //         drawBorder: false
+    //       }
+    //     }
+    //   }
+    // };
 
     this.populateGraph();
   }

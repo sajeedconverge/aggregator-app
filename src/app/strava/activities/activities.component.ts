@@ -256,7 +256,15 @@ export class ActivitiesComponent implements OnInit {
   }
 
 
-  getActivityDetails(activityId: number, activityTime: any, isSaved: boolean) {}
+  getActivityDetails(activityId: number, activityTime: any, isSaved: boolean) {
+    var activityData: any = {
+      activityId: activityId,
+      activityTime: activityTime,
+      isSaved: isSaved
+    };
+    sessionStorage.setItem('activity-data',JSON.stringify(activityData));
+    this.router.navigate(['/strava/activity-details']);
+  }
 
 
 

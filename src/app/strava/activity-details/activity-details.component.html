@@ -1,1 +1,141 @@
-<p>activity-details works!</p>
+<p-toast></p-toast>
+@if(isLoading) {
+<app-progress-bar></app-progress-bar>
+}
+
+@if(!isStravaLinked) {
+<div class="m-2 p-1">
+    <div class="card">
+        <p-messages [(value)]="messages" [enableService]="false" />
+    </div>
+</div>
+}@else {
+
+
+<!-- Activity Details -->
+<div *ngIf="!showAudioFeatures" class="palylist_table">
+    <p-table #dt2 [value]="pairedTracks" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }"
+        [sortField]="'start_time'" [sortOrder]="1">
+        <ng-template pTemplate="caption">
+
+            <div class="flex flex-row justify-content-between">
+                <h3>Activity Details</h3>
+                <div>
+                    <p-button class="pr-3 btn-grp-custom" [outlined]="!showActivityGraph" size="small"
+                        (onClick)="showActivityGraphChanged()" pTooltip="Activity Detail Graph" tooltipPosition="bottom">
+                        <span class="material-symbols-outlined">
+                            show_chart
+                        </span>
+                    </p-button>
+                    <p-button pTooltip="Save" tooltipPosition="bottom" severity="success" [disabled]="isADSaved"
+                        (click)="saveActivityDetails()" icon="pi pi-save" iconPos="right" />
+
+                    <p-button (click)="navigateToActivities()" class="ml-2" pTooltip="Back" tooltipPosition="bottom"
+                        size="small" pTooltip="Back" tooltipPosition="bottom">
+                        <span class="material-symbols-outlined">
+                            undo
+                        </span>
+                    </p-button>
+                </div>
+            </div>
+
+            <div  *ngIf="showActivityGraph">
+                <app-activity-detail-chart [activityDetails]="activityDetails[0]" [pairedTracks]="pairedTracks" ></app-activity-detail-chart>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Name</th>
+                <th>Artist </th>
+                <th>Tempo</th>
+                <!-- <th>Duration</th> -->
+                <th>Distance Start</th>
+                <th>Distance End</th>
+                <th>Distance</th>
+                <th>Moving Time</th>
+                <th>Pace </th>
+                <th>Speed</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-track>
+            <tr>
+                <td>{{track.start_time | date: 'hh:mm:ss a'}}</td>
+                <td>{{track.played_at | date: 'hh:mm:ss a'}}</td>
+                <td>
+                    <p-button class="anchor_btn" [disabled]="track?.track?.name==='No Track'"
+                        (click)="getAudioFeatures(track.track?.id,track.isSaved)" [label]="track.track?.name"
+                        [link]="true" />
+                </td>
+                <td>{{ track.track?.artists[0]?.name }}</td>
+                <td>
+                    <!-- first choice for saved track and second for track from api -->
+                    {{track.isSaved ? (track.track?.audio_features?.tempo | round) : (track.audio_features?.tempo |
+                    round)}}
+                </td>
+                <!-- <td>{{track.duration_mins}}</td> -->
+                <td>{{track.distance_start | number:'1.2-2'}} km</td>
+                <td>{{track.distance_end | number:'1.2-2'}} km</td>
+                <td>{{track.distance | number:'1.2-2' }} km</td>
+                <td>{{track.moving_time}}</td>
+                <td>{{track.pace }} /km</td>
+                <td>{{track.speed | number:'1.2-2'}} km/hr</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+
+
+
+<!-- Audio Features -->
+<div *ngIf="showAudioFeatures">
+    <p-table #dt3 [value]="audioFeatures" styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template pTemplate="caption">
+
+            <div class="flex flex-row justify-content-between">
+                <h3>Audio Features</h3>
+                <p-button (click)="showAudioFeatures=false" pTooltip="Back" tooltipPosition="bottom" size="small">
+                    <span class="material-symbols-outlined">
+                        undo
+                    </span></p-button>
+            </div>
+
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Danceability</th>
+                <th>Energy</th>
+                <th>Key </th>
+                <th>Loudness</th>
+                <th>Speechiness</th>
+                <th>Acousticness</th>
+                <th>Liveness</th>
+                <th>Valence</th>
+                <th>Tempo</th>
+                <th>Duration</th>
+                <!-- <th>Track Href</th>
+                <th>Analysis Url</th> -->
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-audioFeature>
+            <tr>
+                <td>{{ audioFeature.danceability }}</td>
+                <td>{{ audioFeature.energy }}</td>
+                <td>{{ audioFeature.key }}</td>
+                <td>{{ audioFeature.loudness }}</td>
+                <td>{{ audioFeature.speechiness }}</td>
+                <td>{{ audioFeature.acousticness }}</td>
+                <td>{{ audioFeature.liveness }}</td>
+                <td>{{ audioFeature.valence }}</td>
+                <td>{{ audioFeature.tempo | round}}</td>
+                <td>{{ formatTrackDuration(audioFeature.duration_ms) }}</td>
+                <!-- <td>{{ audioFeature.track_href }}</td>
+                <td>{{ audioFeature.analysis_url }}</td> -->
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+}
