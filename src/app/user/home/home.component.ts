@@ -454,7 +454,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   clear(table: Table) {
     table.clear();
-    //this.searchValue = '' 
   }
 
   saveActivityDetails() {
