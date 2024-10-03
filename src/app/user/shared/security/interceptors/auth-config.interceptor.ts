@@ -41,7 +41,7 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
         if (error.status === 401) {
 
           spotifyAuthService.refreshSpotifyAccessToken();
-          debugger;
+          // debugger;
           // Retry the request with the new token
 
           //
