@@ -16,12 +16,16 @@ import { ActivityDetailChartComponent } from '../shared/activity-detail-chart/ac
 import { Title } from '@angular/platform-browser';
 import { SpotifyAuthorizationService } from '../../spotify/shared/services/spotify-authorization.service';
 import { SpotifyService } from '../../spotify/shared/services/spotify.service';
-import { AuthService } from '../../user/shared/services/auth.service';
 import { StravaService } from '../shared/services/strava.service';
 import { Constants } from '../../shared/Constants';
 import { PostActivityDetailRequest } from '../shared/models/strava-models';
 import { PairedTrackJsonObject, TrackMetricRequest, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
 import { Router } from '@angular/router';
+import { InputSwitchModule } from 'primeng/inputswitch';
+
+
+
+
 
 @Component({
   selector: 'app-activity-details',
@@ -41,6 +45,7 @@ import { Router } from '@angular/router';
     TooltipModule,
     RoundPipe,
     ActivityDetailChartComponent,
+    InputSwitchModule
   ],
   templateUrl: './activity-details.component.html',
   styleUrl: './activity-details.component.css',
@@ -377,55 +382,6 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   saveActivityDetails() {
     this.isLoading = true;
     //to store activity detail and track json
@@ -464,6 +420,7 @@ export class ActivityDetailsComponent implements OnInit {
         played_at: pt.played_at,
         speed: pt.speed,
         start_time: pt.start_time,
+        isOmitted: pt.isOmitted ? pt.isOmitted : false
       };
 
       this.spotifyService.postTrackMetric(trackMetric).subscribe((postMetricResponse) => {
@@ -534,6 +491,16 @@ export class ActivityDetailsComponent implements OnInit {
   navigateToActivities() {
     this.router.navigate(['/strava/activities']);
   }
+
+  changeOmissionStatus(event: any, trackId: string) {
+    this.pairedTracks.forEach(pt => {
+      if (pt.track.id === trackId) {
+        pt.isOmitted = event.checked;
+      }
+    });
+  }
+
+
 
 
 }
