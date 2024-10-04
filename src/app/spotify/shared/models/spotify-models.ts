@@ -37,6 +37,7 @@ export interface PairedTrackJsonObject {
     trackid: string
     track?: any
     isOmitted:boolean
+    tempo:number
 }
 
 export interface PostTrackAnalysisRequest {

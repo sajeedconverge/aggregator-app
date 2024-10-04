@@ -72,7 +72,7 @@ export class ActivityDetailsComponent implements OnInit {
   };
   recentAudio: any[] = [];
   activityStreams: any;
-
+  toBeUpdated: boolean = false;
 
 
 
@@ -170,6 +170,7 @@ export class ActivityDetailsComponent implements OnInit {
 
         this.pairedTracks.forEach(pt => {
           pt.isSaved = true; //Boolean value to differenciate that it is from db
+
           if (pt.track) {
             //removed the api calls from the track (Code improvization)
             pt.track = JSON.parse(pt.track)
@@ -188,8 +189,12 @@ export class ActivityDetailsComponent implements OnInit {
               duration_ms: pt.duration_mins,
             }
           };
-          this.isADSaved = true;
-        })
+          if (pt.isOmitted) {
+            pt.isOmitted = JSON.parse(pt.isOmitted);
+          };
+
+        });
+        this.isADSaved = true;
         console.log("this.pairedTracks", this.pairedTracks);
 
         this.isLoading = false;
@@ -496,9 +501,73 @@ export class ActivityDetailsComponent implements OnInit {
     this.pairedTracks.forEach(pt => {
       if (pt.track.id === trackId) {
         pt.isOmitted = event.checked;
-      }
+      };
     });
   }
+
+
+  updateActivityDetail() {
+    console.log("updated activityDetails", this.activityDetails);
+    
+
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

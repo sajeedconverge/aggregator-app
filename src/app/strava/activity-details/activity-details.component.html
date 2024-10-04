@@ -20,7 +20,16 @@
 
             <div class="flex flex-row justify-content-between">
                 <h3>Activity Details</h3>
-                <div>
+                <div class="flex">
+                    <div *ngIf="isADSaved">
+                        <p-button class="pr-2" icon="pi pi-minus-circle" pTooltip="Omit Tracks"
+                            tooltipPosition="bottom" (onClick)="toBeUpdated=true"  >
+                        </p-button>
+                        <p-button severity="warning" class="pr-2" icon="pi pi-pencil" pTooltip="Update Changes"
+                            tooltipPosition="bottom" [disabled]="!toBeUpdated" (onClick)="updateActivityDetail()">
+                        </p-button>
+                    </div>
+
                     <p-button class="pr-3 btn-grp-custom" [outlined]="!showActivityGraph" size="small"
                         (onClick)="showActivityGraphChanged()" pTooltip="Activity Detail Graph"
                         tooltipPosition="bottom">
@@ -84,16 +93,17 @@
                 <td>{{track.moving_time}}</td>
                 <td>{{track.pace }} /km</td>
                 <td>{{track.speed | number:'1.2-2'}} km/hr</td>
-                @if(isADSaved){
+                @if(isADSaved && !toBeUpdated){
                 <td>
                     <div class="flex flex-row justify-content-center">
                         <span class="pi pi-check" *ngIf="track.isOmitted"></span>
                         <span class="pi pi-times" *ngIf="!track.isOmitted"></span>
                     </div>
                 </td>
-                }@else {
+                }
+                @if(!isADSaved || toBeUpdated){
                 <td>
-                    <p-inputSwitch (onChange)="changeOmissionStatus($event,track.track.id)"/>
+                    <p-inputSwitch [(ngModel)]="track.isOmitted"  (onChange)="changeOmissionStatus($event,track.track.id)" />
                 </td>
                 }
 
