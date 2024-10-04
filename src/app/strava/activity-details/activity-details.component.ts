@@ -176,7 +176,7 @@ export class ActivityDetailsComponent implements OnInit {
             pt.track = JSON.parse(pt.track)
           } else {
             pt.track = {
-              id: pt.trackId,
+              id: pt.trackid,
               name: 'No Track',
               audio_features: {
                 tempo: 0
@@ -192,9 +192,9 @@ export class ActivityDetailsComponent implements OnInit {
           if (pt.isOmitted) {
             pt.isOmitted = JSON.parse(pt.isOmitted);
           };
-
+          this.isADSaved = true;
         });
-        this.isADSaved = true;
+        
         console.log("this.pairedTracks", this.pairedTracks);
 
         this.isLoading = false;
@@ -509,7 +509,55 @@ export class ActivityDetailsComponent implements OnInit {
   updateActivityDetail() {
     console.log("updated activityDetails", this.activityDetails);
     
+    this.isLoading = true;
+    //to store activity detail and track json
+    var pairedTrackJsonArray: PairedTrackJsonObject[] = [];
+    this.pairedTracks.forEach(pt => {
+      var PTrackJson = Constants.typeCastPairedTrackJson(pt);
+      pairedTrackJsonArray.push(PTrackJson);
+      
+      //to add trackMetrics
+      var trackMetric: TrackMetricRequest = {
+        id: 'f46876c9-aa8d-42c3-b6a7-5892c2aa445d',
+        userId: 'f46876c9-aa8d-42c3-b6a7-5892c2aa445d',
+        providerActivityId: this.activityDetails[0].id,
+        providerTrackId: pt.track.id,
+        distance: pt.distance,
+        distance_start: pt.distance_start,
+        distance_end: pt.distance_end,
+        duration_mins: pt.duration_mins,
+        moving_time: pt.moving_time,
+        pace: pt.pace,
+        played_at: pt.played_at,
+        speed: pt.speed,
+        start_time: pt.start_time,
+        isOmitted: pt.isOmitted ? pt.isOmitted : false
+      };
 
+      this.spotifyService.updateTrackMetric(trackMetric).subscribe((postMetricResponse) => {
+        if (postMetricResponse.statusCode === 200) {
+          console.log('metric posted successfully.');
+
+        };
+      });
+    });
+    var activityDetailJson = Constants.typeCastActivityDetailJson(this.activityDetails[0])
+    activityDetailJson.audio = pairedTrackJsonArray;
+    var activityDetailRequest: PostActivityDetailRequest = {
+      providerActivityId: activityDetailJson.id,
+      jsonData: JSON.stringify(activityDetailJson)
+    };
+    this.stravaService.updateActivityDetail(activityDetailRequest).subscribe((adResponse) => {
+      this.isLoading = true;
+      if (adResponse.statusCode === 200) {
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Activity details saved successfully.' });
+        console.log("actvity detail added successfully.");
+
+        this.isADSaved = true;
+        this.isLoading = false;
+        this.navigateToActivities();
+      };
+    });
 
   }
 
