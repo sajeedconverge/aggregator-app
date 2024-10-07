@@ -24,6 +24,12 @@ import { Title } from '@angular/platform-browser';
 import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
 import { TracksData, TrackType } from '../shared/models/graph-models';
 import { UriPipe } from "../../shared/common-pipes/uri.pipe";
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { ProjectionsGraphComponent } from '../shared/projections-graph/projections-graph.component';
+
+
+
+
 
 @Component({
   selector: 'app-audio-history',
@@ -45,11 +51,12 @@ import { UriPipe } from "../../shared/common-pipes/uri.pipe";
     RoundPipe,
     TrackSummaryGraphComponent,
     UriPipe
-],
+  ],
   templateUrl: './audio-history.component.html',
   styleUrl: './audio-history.component.css',
   providers: [
-    ConfirmationService
+    ConfirmationService,
+    DialogService
   ]
 })
 export class AudioHistoryComponent implements OnInit {
@@ -121,7 +128,7 @@ export class AudioHistoryComponent implements OnInit {
   };
   showPreview: boolean = false;
   currentTrack: any;
-
+  ref: DynamicDialogRef | undefined;
 
 
 
@@ -147,7 +154,8 @@ export class AudioHistoryComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     private confirmationService: ConfirmationService,
-    private title: Title
+    private title: Title,
+    public dialogService: DialogService,
   ) {
     this.title.setTitle('AudioActive - Recently Played')
     this.spotifyAuthService.refreshSpotifyAccessToken();
@@ -244,7 +252,7 @@ export class AudioHistoryComponent implements OnInit {
               this.tableSorted(sortEvent);
             };
             this.isLoading = false;
-          },(this.hisotryTracks.length>25)? 8000 :5000);
+          }, (this.hisotryTracks.length > 25) ? 8000 : 5000);
         })
       } else {
         this.dataMessage = 'No tracks found in audio history.';
@@ -762,7 +770,20 @@ export class AudioHistoryComponent implements OnInit {
     this.currentTrack = track.track;
   }
 
+  showProjections() {
+    this.ref = this.dialogService.open(ProjectionsGraphComponent, {
+      header: 'Tracks Projections',
+      width: '50vw',
+      contentStyle: { overflow: 'auto' },
+      data: {
+        tracks: this.selectedTracksList
+      },
+    });
 
+    this.ref.onClose.subscribe((data: any) => {
+
+    });
+  }
 
 
 
