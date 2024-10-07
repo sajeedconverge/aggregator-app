@@ -1,0 +1,77 @@
+<p-toast></p-toast>
+@if(isLoading) {
+<app-progress-bar></app-progress-bar>
+}
+
+@if(!isStravaLinked) {
+<div class="m-2 p-1">
+    <div class="card">
+        <p-messages [(value)]="messages" [enableService]="false" />
+    </div>
+</div>
+}@else {
+
+<!-- Activities List -->
+<div >
+    <p-table #dt1 [value]="athleteActivities" styleClass="p-datatable-gridlines" sortMode="multiple" [rows]="10"
+        [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [totalRecords]="athleteActivities.length"
+        [paginator]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [tableStyle]="{ 'min-width': '50rem' }" [sortField]="'start_date'" [sortOrder]="-1">
+        <ng-template pTemplate="caption">
+            <div class="flex justify-content-between">
+                <h2>Activities</h2>
+                <div>
+                    <p-button severity="info" (click)="FetchActivitiesFromStrava()" icon="pi pi-file-import"
+                        iconPos="right" pTooltip="Fetch activities" tooltipPosition="bottom" />
+                    <p-button class="ml-2" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear(dt1)"
+                        pTooltip="Clear sorting(s)" tooltipPosition="bottom" />
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="name">
+                    Activity Name <p-sortIcon field="name" />
+                </th>
+                <th pSortableColumn="start_date">Start Date <p-sortIcon field="start_date" /></th>
+                <th pSortableColumn="end_date">End Date <p-sortIcon field="end_date" /></th>
+                <th pSortableColumn="sport_type">Sport Type <p-sortIcon field="sport_type" /></th>
+                <th pSortableColumn="distance">Distance<p-sortIcon field="distance" /></th>
+                <th pSortableColumn="elapsed_time">Duration<p-sortIcon field="elapsed_time" /></th>
+                <th pSortableColumn="average_speed">Avg Speed<p-sortIcon field="average_speed" /></th>
+                <th pSortableColumn="max_speed">Max Speed<p-sortIcon field="max_speed" /></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-activity>
+            <tr>
+                <td>
+                    <div class="flex flex-row justify-content-between">
+                        <p-button class="anchor_btn"
+                            (click)="getActivityDetails(activity.id,activity.start_date,activity.isSaved)"
+                            [label]="activity.name" [link]="true" />
+
+                        <!-- <p-badge></p-badge> -->
+                        <i *ngIf="!activity.isSaved" pBadge style="font-size: 2rem; margin: auto;" [value]="'New'"
+                            severity="danger"></i>
+                    </div>
+                </td>
+                <td>{{ activity.start_date | date:'MMM d, y, h:mm:ss a' }}</td>
+                <td>{{ activity.end_date | date:'MMM d, y, h:mm:ss a' }}</td>
+                <td>{{ activity.sport_type }}</td>
+                <!-- <td>{{ activity.distance | number:'1.2-2' }} km</td> -->
+                <td>{{ activity.distance_km | number:'1.2-2' }} km</td>
+                <!-- <td>{{ activity.elapsed_time }}</td> -->
+                <td>{{ activity.duration_mins }}</td>
+                <td>{{ activity.average_speed | number:'1.2-2'}} km/hr</td>
+                <td>{{ activity.max_speed | number:'1.2-2'}} km/hr</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="10">No activities found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+}

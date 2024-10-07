@@ -310,6 +310,9 @@ export class Constants {
     }
 
     public static typeCastPairedTrackJson(pairedTrack: any): PairedTrackJsonObject {
+        var audioFeatures = (pairedTrack.audio_features) ?
+            pairedTrack.audio_features.tempo : pairedTrack.track.audio_features.tempo
+
         var PairedTrackJson: PairedTrackJsonObject = {
             distance: pairedTrack.distance,
             distance_end: pairedTrack.distance_end,
@@ -321,7 +324,8 @@ export class Constants {
             speed: pairedTrack.speed,
             start_time: pairedTrack.start_time,
             trackid: pairedTrack.track.id,
-            //track:pairedTrack.track
+            isOmitted: pairedTrack.isOmitted ? pairedTrack.isOmitted : false,
+            tempo: Math.round(audioFeatures)
         };
         return PairedTrackJson;
     }

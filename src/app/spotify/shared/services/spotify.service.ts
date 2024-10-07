@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Constants } from '../../../shared/Constants';
 import { ResponseModel } from '../../../shared/shared-models';
-import { SpotifyAuthorizationService } from './spotify-authorization.service';
 import { FilterRequest, PostTrackAnalysisRequest, PostTrackRequest, TrackMetricRequest } from '../models/spotify-models';
 
 @Injectable({
@@ -152,7 +151,9 @@ export class SpotifyService {
       );
   }
 
-
+  updateTrackMetric(request: TrackMetricRequest): Observable<ResponseModel> {
+    return this.http.put<any>(Constants.baseServerUrl + 'Spotify/UpdateTrackMetric', request, { headers: this.headers });
+  }
 
 
 

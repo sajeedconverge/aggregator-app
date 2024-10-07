@@ -126,6 +126,9 @@ export class StravaService {
       );
   }
 
+  updateActivityDetail(request: PostActivityDetailRequest): Observable<any> {
+    return this.http.put<any>(Constants.baseServerUrl + 'Strava/UpdateActivityDetail', request, { headers: this.headers });
+  }
 
 
 

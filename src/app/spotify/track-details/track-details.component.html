@@ -46,6 +46,7 @@
                 <th>Distance</th>
                 <th>Pace</th>
                 <th>Speed</th>
+                <th>Omit</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-trackDetail>
@@ -54,6 +55,12 @@
                 <td>{{ trackDetail?.distance | number:'1.2-2' }} km</td>
                 <td>{{ trackDetail?.pace }} /km</td>
                 <td>{{ trackDetail?.speed | number:'1.2-2'}} km/hr</td>
+                <td>
+                    <!-- <div class="flex flex-row justify-content-center"> -->
+                        <span class="pi pi-check" *ngIf="trackDetail.isOmitted"></span>
+                        <span class="pi pi-times" *ngIf="!trackDetail.isOmitted"></span>
+                    <!-- </div> -->
+                </td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

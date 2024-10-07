@@ -36,6 +36,8 @@ export interface PairedTrackJsonObject {
     start_time: any
     trackid: string
     track?: any
+    isOmitted:boolean
+    tempo:number
 }
 
 export interface PostTrackAnalysisRequest {
@@ -71,8 +73,8 @@ export interface AnalysisTrackDetail {
 }
 
 export interface TrackMetricRequest {
-    id: string
-    userId: string
+    id: any
+    userId: any
     providerActivityId: number
     providerTrackId: string
     distance: number
@@ -84,6 +86,7 @@ export interface TrackMetricRequest {
     played_at: string
     speed: number
     start_time: string
+    isOmitted:boolean
 }
 
 
