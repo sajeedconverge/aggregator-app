@@ -73,8 +73,8 @@ export interface AnalysisTrackDetail {
 }
 
 export interface TrackMetricRequest {
-    id: string
-    userId: string
+    id: any
+    userId: any
     providerActivityId: number
     providerTrackId: string
     distance: number

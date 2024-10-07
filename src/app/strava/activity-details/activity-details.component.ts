@@ -22,6 +22,7 @@ import { PostActivityDetailRequest } from '../shared/models/strava-models';
 import { PairedTrackJsonObject, TrackMetricRequest, PostTrackRequest } from '../../spotify/shared/models/spotify-models';
 import { Router } from '@angular/router';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { AuthService } from '../../user/shared/services/auth.service';
 
 
 
@@ -98,7 +99,8 @@ export class ActivityDetailsComponent implements OnInit {
     private primengConfig: PrimeNGConfig,
     private messageService: MessageService,
     private title: Title,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.title.setTitle('AudioActive - ActivityDetails');
     this.spotifyAuthService.checkExpiryAndRefreshToken();
@@ -194,7 +196,7 @@ export class ActivityDetailsComponent implements OnInit {
           };
           this.isADSaved = true;
         });
-        
+
         console.log("this.pairedTracks", this.pairedTracks);
 
         this.isLoading = false;
@@ -363,7 +365,7 @@ export class ActivityDetailsComponent implements OnInit {
       this.isLoading = false;
     } else {
       //To get audio feature every song played during the activity
-      result[0].tracks.forEach((track) => {
+      result[0].tracks.forEach((track, index) => {
         if (track.track.name !== 'No Track') {
           this.spotifyService.getSpotifyAudioFeaturesUrl(track.track.id).subscribe((res) => {
             if (res.statusCode === 200) {
@@ -378,6 +380,14 @@ export class ActivityDetailsComponent implements OnInit {
             };
           });
         };
+        //code to remove tracks whose start time lies before previous track's end time
+        // if (index > 0) {
+          
+        //   if (new Date(result[0].tracks[index].start_time) < new Date(result[0].tracks[index - 1].played_at)) {
+        //     console.log('erronous track', result[0].tracks[index]);
+        //     result[0].tracks.splice(index , 1);
+        //   }
+        // };
       });
     };
     this.pairedResult = result;
@@ -508,18 +518,18 @@ export class ActivityDetailsComponent implements OnInit {
 
   updateActivityDetail() {
     console.log("updated activityDetails", this.activityDetails);
-    
+
     this.isLoading = true;
     //to store activity detail and track json
     var pairedTrackJsonArray: PairedTrackJsonObject[] = [];
     this.pairedTracks.forEach(pt => {
       var PTrackJson = Constants.typeCastPairedTrackJson(pt);
       pairedTrackJsonArray.push(PTrackJson);
-      
+
       //to add trackMetrics
       var trackMetric: TrackMetricRequest = {
         id: 'f46876c9-aa8d-42c3-b6a7-5892c2aa445d',
-        userId: 'f46876c9-aa8d-42c3-b6a7-5892c2aa445d',
+        userId: this.authService.getUserIdFromToken(),
         providerActivityId: this.activityDetails[0].id,
         providerTrackId: pt.track.id,
         distance: pt.distance,

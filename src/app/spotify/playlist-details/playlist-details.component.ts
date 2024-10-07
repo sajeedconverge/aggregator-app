@@ -275,6 +275,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
               };
             });
+            
             // //To get track analysis
             // this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
 
@@ -311,7 +312,7 @@ export class PlaylistDetailsComponent implements OnInit {
             //   };
             // });
           if(index==(this.playlistTracks.length-1)){
-            this.dataMessage='No tracks found in the current playlist.'
+            this.dataMessage='No tracks found in the current playlist.';
           };
           });
           setTimeout(() => {
@@ -326,7 +327,7 @@ export class PlaylistDetailsComponent implements OnInit {
             this.isLoading = false;
           }, (this.playlistTracks.length>25)? 8000 :5000);
         } else {
-
+          this.dataMessage='No tracks found in the current playlist.';
           this.isLoading = false;
         }
       });
