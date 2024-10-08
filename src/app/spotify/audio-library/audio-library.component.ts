@@ -25,6 +25,8 @@ import { PaginatorModule } from 'primeng/paginator';
 import { debounceTime, distinctUntilChanged, ignoreElements } from 'rxjs';
 import { UriPipe } from "../../shared/common-pipes/uri.pipe";
 import { DropdownModule } from 'primeng/dropdown';
+import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
+import { TracksData, TrackType } from '../shared/models/graph-models';
 
 @Component({
   selector: 'app-audio-library',
@@ -47,6 +49,16 @@ import { DropdownModule } from 'primeng/dropdown';
     PaginatorModule,
     UriPipe,
     DropdownModule,
+    TrackSummaryGraphComponent,
+
+
+
+
+
+
+
+
+
   ],
   templateUrl: './audio-library.component.html',
   styleUrl: './audio-library.component.css',
@@ -134,7 +146,10 @@ export class AudioLibraryComponent implements OnInit {
   currentTrack: any;
   dataMessage: string = '';
   rowsPerPageOptions: number[] = [10, 25, 50];
-
+  tracksData: TracksData = {
+    trackType: TrackType.AudioLibrary,
+    tracks: []
+  };
 
 
 
@@ -190,6 +205,8 @@ export class AudioLibraryComponent implements OnInit {
             return pltrack.jsonData;
           });
           console.log('this.audioTracks', this.audioTracks);
+          this.tracksData.tracks = this.audioTracks;
+
 
           //To fetch audio analysis for each track
           // var tracksIds = this.audioTracks.map(plTrack => { return plTrack.id });
@@ -753,7 +770,7 @@ export class AudioLibraryComponent implements OnInit {
     this.audioTracks = [];
     //this.filterRequest.sortField = event.sortField ? event.sortField : this.filterRequest.sortField;
     //this.filterRequest.sortOrder = event.sortOrder;
-    this.filterRequest.pageSize =  this.pageSize;
+    this.filterRequest.pageSize = this.pageSize;
     if (this.filterRequest) {
       this.getAllAudio();
     };
@@ -786,11 +803,17 @@ export class AudioLibraryComponent implements OnInit {
   }
 
   refreshGraphs() {
-    if (this.showSummaryGraph) {
-      this.showSummaryGraphChanged(true);
-    } else if (this.showDetailedGraph) {
-      this.showGraphChanged(true);
-    };
+    // if (this.showSummaryGraph) {
+    //   this.showSummaryGraphChanged(true);
+    // } else if (this.showDetailedGraph) {
+    //   this.showGraphChanged(true);
+    // };
+    this.showSummaryGraph = false;
+    this.isLoading = true;
+    setTimeout(() => {
+      this.showSummaryGraph = true;
+      this.isLoading = false;
+    }, 200);
   }
 
   showPreviewPopup(track: any) {

@@ -112,7 +112,7 @@ export class StravaService {
       );
   }
 
-  getActivityDetailsByTrackId(trackId:string): Observable<any> {
+  getActivityDetailsByTrackId(trackId: string): Observable<any> {
     return this.http.get<any>(Constants.baseServerUrl + `Strava/GetActivityDetailsByTrackId?trackId=${trackId}`, { headers: this.headers })
       .pipe(
         map(response => {
@@ -129,6 +129,16 @@ export class StravaService {
   updateActivityDetail(request: PostActivityDetailRequest): Observable<any> {
     return this.http.put<any>(Constants.baseServerUrl + 'Strava/UpdateActivityDetail', request, { headers: this.headers });
   }
+
+  getTempoStatisticsByTempo(tempo: number) {
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetTempoStatisticByTempo?tempo=${tempo}`, { headers: this.headers });
+  }
+
+
+
+
+
+
 
 
 

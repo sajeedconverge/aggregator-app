@@ -58,7 +58,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 
 
-],
+  ],
   templateUrl: './liked-songs.component.html',
   styleUrl: './liked-songs.component.css',
   providers: [
@@ -139,7 +139,7 @@ export class LikedSongsComponent implements OnInit {
   @ViewChild('tableRef') table!: Table;
   showPreview: boolean = false;
   currentTrack: any;
-  searchText:string='';
+  searchText: string = '';
 
 
 
@@ -364,7 +364,7 @@ export class LikedSongsComponent implements OnInit {
                 this.dataMessage = 'No tracks found in liked songs.';
                 this.isLoading = false;
 
-              }, (this.likedSongs.length>25)? 8000 :5000);
+              }, (this.likedSongs.length > 25) ? 8000 : 5000);
             } else {
               this.isLoading = false;
             }
@@ -866,11 +866,17 @@ export class LikedSongsComponent implements OnInit {
   }
 
   refreshGraphs() {
-    if (this.showSummaryGraph) {
-      this.showSummaryGraphChanged(true);
-    } else if (this.showDetailedGraph) {
-      this.showGraphChanged(true);
-    }
+    // if (this.showSummaryGraph) {
+    //   this.showSummaryGraphChanged(true);
+    // } else if (this.showDetailedGraph) {
+    //   this.showGraphChanged(true);
+    // };
+    this.showSummaryGraph = false;
+    this.isLoading = true;
+    setTimeout(() => {
+      this.showSummaryGraph = true;
+      this.isLoading = false;
+    }, 200);
   }
 
   onPageChange(event: any) {

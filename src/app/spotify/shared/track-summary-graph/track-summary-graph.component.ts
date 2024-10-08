@@ -32,13 +32,13 @@ export class TrackSummaryGraphComponent {
     { name: 'Max', code: 'MONTH' }
   ];
   selectedDate: any;
-  
+
   chartTitle: string = '';
   //main chart data
   chartData: any;
   chartOptions: any;
   totalTime: any;
-  totalTracks:number=0;
+  totalTracks: number = 0;
 
   @Input() tracksData!: TracksData;
   @Input() selectedTracksList!: any[];
@@ -167,36 +167,64 @@ export class TrackSummaryGraphComponent {
     };
     var durationSum = 0;
     if (this.selectedTracksList.length > 0) {
-      var selectedTracks = this.tracksData.tracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
-      selectedTracks = selectedTracks.reduce((acc, current) => {
-        const x = acc.find((item: any) => item.track.id === current.track.id);
-        if (!x) {
-          acc.push(current);
-        }
-        return acc;
-      }, []);
+      //For Audio Library only
+      if (this.tracksData.trackType === TrackType.AudioLibrary) {
+        var selectedTracks = this.tracksData.tracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.id === ht.id));
+        selectedTracks = selectedTracks.reduce((acc, current) => {
+          const x = acc.find((item: any) => item.id === current.id);
+          if (!x) {
+            acc.push(current);
+          }
+          return acc;
+        }, []);
+      } else {
+        //For Rest of the components
+        var selectedTracks = this.tracksData.tracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+        selectedTracks = selectedTracks.reduce((acc, current) => {
+          const x = acc.find((item: any) => item.track.id === current.track.id);
+          if (!x) {
+            acc.push(current);
+          }
+          return acc;
+        }, []);
+      };
+
       selectedTracks.forEach((pltrack, index) => {
+        var eligibleTrack:any;
+        if (this.tracksData.trackType === TrackType.AudioLibrary){
+          eligibleTrack=pltrack;
+        }else{
+          eligibleTrack=pltrack.track;
+        };
         durationSum = durationSum + ((pltrack.audio_features.duration_ms));
         this.totalTime = Constants.formatMilliseconds(durationSum);
         //duration
         this.chartData.labels.push(index + 1);
         //tempo
         this.chartData.datasets[0].data.push(pltrack.audio_features.tempo);
-        this.chartData.datasets[0].tracks.push(pltrack.track);
+        this.chartData.datasets[0].tracks.push(eligibleTrack);
         //loudness
         this.chartData.datasets[1].data.push(pltrack.audio_features.loudness);
-        this.chartData.datasets[1].tracks.push(pltrack.track);
+        this.chartData.datasets[1].tracks.push(eligibleTrack);
         //energy
         this.chartData.datasets[2].data.push(pltrack.audio_features.energy);
-        this.chartData.datasets[2].tracks.push(pltrack.track);
+        this.chartData.datasets[2].tracks.push(eligibleTrack);
         //danceability
         this.chartData.datasets[3].data.push(pltrack.audio_features.danceability);
-        this.chartData.datasets[3].tracks.push(pltrack.track);
+        this.chartData.datasets[3].tracks.push(eligibleTrack);
       });
-     // console.log('this.chartData', this.chartData);
+
+      // console.log('this.chartData', this.chartData);
     } else {
       var durationSum = 0;
       this.tracksData.tracks.forEach((pltrack, index) => {
+
+        var eligibleTrack:any;
+        if (this.tracksData.trackType === TrackType.AudioLibrary){
+          eligibleTrack=pltrack;
+        }else{
+          eligibleTrack=pltrack.track;
+        };
 
         durationSum = durationSum + ((pltrack.audio_features.duration_ms));
         this.totalTime = Constants.formatMilliseconds(durationSum);
@@ -204,21 +232,21 @@ export class TrackSummaryGraphComponent {
         this.chartData.labels.push(index + 1);
         //tempo
         this.chartData.datasets[3].data.push(pltrack.audio_features.tempo);
-        this.chartData.datasets[3].tracks.push(pltrack.track);
+        this.chartData.datasets[3].tracks.push(eligibleTrack);
         //loudness
         this.chartData.datasets[2].data.push(pltrack.audio_features.loudness);
-        this.chartData.datasets[2].tracks.push(pltrack.track);
+        this.chartData.datasets[2].tracks.push(eligibleTrack);
         //energy
         this.chartData.datasets[0].data.push(pltrack.audio_features.energy);
-        this.chartData.datasets[0].tracks.push(pltrack.track);
+        this.chartData.datasets[0].tracks.push(eligibleTrack);
         //danceability
         this.chartData.datasets[1].data.push(pltrack.audio_features.danceability);
-        this.chartData.datasets[1].tracks.push(pltrack.track);
+        this.chartData.datasets[1].tracks.push(eligibleTrack);
       });
       //console.log('this.chartData',this.chartData);
     };
 
-    this.totalTracks = (this.selectedTracksList.length>0)? this.selectedTracksList.length:this.tracksData.tracks.length;
+    this.totalTracks = (this.selectedTracksList.length > 0) ? this.selectedTracksList.length : this.tracksData.tracks.length;
   }
 
 
@@ -285,7 +313,8 @@ export class TrackSummaryGraphComponent {
 
         const th = document.createElement('th');
         th.style.borderWidth = '0';
-        trackIndex = (Number(title) - 1)
+        trackIndex = (Number(title) - 1);
+        
         th.innerText = context.tooltip.dataPoints[0].dataset.tracks[trackIndex].name;
         track = context.tooltip.dataPoints[0].dataset.tracks[trackIndex];
 
@@ -300,14 +329,19 @@ export class TrackSummaryGraphComponent {
       const trEmpty = document.createElement('tr');
       trEmpty.innerHTML = `</br>`;
       tableBody.appendChild(trEmpty);
-      
+
       //for starting time
       const tr = document.createElement('tr');
       tr.style.backgroundColor = 'inherit';
       tr.style.borderWidth = '0';
       const td = document.createElement('td');
       td.style.borderWidth = '0';
-      var trackStartTime = trackIndex === 0 ? 0 : this.tracksData.tracks.slice(0, trackIndex).reduce((sum, track) => sum + track.track.duration_ms, 0);
+      if (this.tracksData.trackType === TrackType.AudioLibrary){
+        var trackStartTime = trackIndex === 0 ? 0 : this.tracksData.tracks.slice(0, trackIndex).reduce((sum, track) => sum + track.duration_ms, 0);
+      }else{
+        var trackStartTime = trackIndex === 0 ? 0 : this.tracksData.tracks.slice(0, trackIndex).reduce((sum, track) => sum + track.track.duration_ms, 0);
+      }
+     
       const text = document.createTextNode(`Start : ${Constants.formatMilliseconds(trackStartTime)}`);
       td.appendChild(text);
       tr.appendChild(td);
@@ -320,7 +354,7 @@ export class TrackSummaryGraphComponent {
       tr1.style.paddingBottom = '10px';
       const td1 = document.createElement('td1');
       td.style.borderWidth = '0';
-      const text1 = document.createTextNode(`Duration : ${Constants.formatMilliseconds( track.duration_ms)}`);
+      const text1 = document.createTextNode(`Duration : ${Constants.formatMilliseconds(track.duration_ms)}`);
       td1.appendChild(text1);
       tr1.appendChild(td1);
       tableBody.appendChild(tr1);

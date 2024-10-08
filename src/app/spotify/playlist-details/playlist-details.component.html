@@ -43,10 +43,7 @@
                                 </p-button>
                             </p-buttonGroup> -->
                             <p-button class=" btn-grp-custom" [outlined]="!showSummaryGraph" size="small" (onClick)="showSummaryGraphChanged(false)"
-                            pTooltip="Summary Graph" tooltipPosition="bottom">
-                            <span class="material-symbols-outlined">
-                                show_chart
-                            </span>
+                            pTooltip="Summary Graph" tooltipPosition="bottom" icon="pi pi-chart-bar">
                         </p-button>
                         </div>
                         <p-button class="mr-2" severity="warning" (click)="confirmUpdatePlaylist()" icon="pi pi-save"
@@ -67,7 +64,12 @@
                 </div>
             </div>
             <div>
-                <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" />
+                <!-- <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" /> -->
+           
+                <div *ngIf="showSummaryGraph">
+                    <app-track-summary-graph [tracksData]="tracksData"
+                        [selectedTracksList]="[]"></app-track-summary-graph>
+                </div>
             </div>
             <!-- <div>
                 <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
