@@ -4,11 +4,14 @@ import { ChartModule } from 'primeng/chart';
 import { DropdownModule } from 'primeng/dropdown';
 import { TracksData, TrackType } from '../models/graph-models';
 import { Constants } from '../../../shared/Constants';
+import { StravaService } from '../../../strava/shared/services/strava.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-track-summary-graph',
   standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
     ChartModule,
     DropdownModule,
@@ -27,26 +30,29 @@ export class TrackSummaryGraphComponent {
 
   // dropdown date ranges
   featureRanges: any[] = [
-    { name: 'Average', code: 'DAY' },
-    { name: 'Min', code: 'WEEK' },
-    { name: 'Max', code: 'MONTH' }
+    { name: 'Average', id: 1 },
+    { name: 'Min', id: 2 },
+    { name: 'Max', id: 3 }
   ];
-  selectedDate: any;
-
+  selectedDate: any = { name: 'Average', id: 1 };
   chartTitle: string = '';
   //main chart data
   chartData: any;
   chartOptions: any;
   totalTime: any;
   totalTracks: number = 0;
-
   @Input() tracksData!: TracksData;
   @Input() selectedTracksList!: any[];
+  aggregateDistance: number = 0;
+  paceText: string = '';
+  aggregatePace: string = '00:00:00';
+
+
 
 
 
   constructor(
-
+    private stravaService: StravaService
   ) {
 
   }
@@ -73,6 +79,7 @@ export class TrackSummaryGraphComponent {
       default:
         break;
     };
+    this.getTempoStats();
 
     this.chartOptions = {
       animation: {
@@ -190,12 +197,12 @@ export class TrackSummaryGraphComponent {
       // };
 
       this.selectedTracksList.forEach((pltrack, index) => {
-      // selectedTracks.forEach((pltrack, index) => {
-        var eligibleTrack:any;
-        if (this.tracksData.trackType === TrackType.AudioLibrary){
-          eligibleTrack=pltrack;
-        }else{
-          eligibleTrack=pltrack.track;
+        // selectedTracks.forEach((pltrack, index) => {
+        var eligibleTrack: any;
+        if (this.tracksData.trackType === TrackType.AudioLibrary) {
+          eligibleTrack = pltrack;
+        } else {
+          eligibleTrack = pltrack.track;
         };
         durationSum = durationSum + ((pltrack.audio_features.duration_ms));
         this.totalTime = Constants.formatMilliseconds(durationSum);
@@ -220,11 +227,12 @@ export class TrackSummaryGraphComponent {
       var durationSum = 0;
       this.tracksData.tracks.forEach((pltrack, index) => {
 
-        var eligibleTrack:any;
-        if (this.tracksData.trackType === TrackType.AudioLibrary){
-          eligibleTrack=pltrack;
-        }else{
-          eligibleTrack=pltrack.track;
+        var eligibleTrack: any;
+        if (this.tracksData.trackType === TrackType.AudioLibrary) {
+          eligibleTrack = pltrack;
+        } else {
+          eligibleTrack = pltrack.track;
+
         };
 
         durationSum = durationSum + ((pltrack.audio_features.duration_ms));
@@ -251,19 +259,77 @@ export class TrackSummaryGraphComponent {
   }
 
 
+  getTempoStats() {
+    var tempos = this.tracksData.tracks.map(track => { return track.audio_features.tempo });
+    tempos = [...new Set(tempos)];
+    this.stravaService.getTempoStatisticsByMultiTempos(tempos).subscribe((temposRes) => {
+      if (temposRes.statusCode === 200) {
+        // console.log('tempo stats', temposRes.payload);
+
+        this.tracksData.tracks.forEach(track => {
+          var duration_ms = 0;
+          if (this.tracksData.trackType === TrackType.AudioLibrary) {
+            duration_ms = track.duration_ms;
+          } else {
+            duration_ms = track.track.duration_ms;
+          };
+
+          track.tempoStatistic = temposRes.payload.find((stat: any) => stat.tempo === track.audio_features.tempo);
+          if (track.tempoStatistic) {
+            track.minDistance = (track.tempoStatistic?.minSpeed * (Constants.convertMsToHours(duration_ms)));
+            track.avgDistance = (track.tempoStatistic?.avgSpeed * (Constants.convertMsToHours(duration_ms)));
+            track.maxDistance = (track.tempoStatistic?.maxSpeed * (Constants.convertMsToHours(duration_ms)));
+          };
+
+          if (this.tracksData.trackType != TrackType.AudioLibrary) {
+            track.track.tempoStatistic = track.tempoStatistic;
+            track.track.minDistance = track.minDistance;
+            track.track.avgDistance = track.avgDistance;
+            track.track.maxDistance = track.maxDistance;
+          };
+        });
+        // console.log('modified tracks', this.tracksData.tracks);
+        this.onDateChangeBarChart();
+      };
+    });
+  }
 
 
 
+  //sum function for main chart data
+  sumOf(array: any[]) {
+    let sum: number = 0;
+    array.forEach((a) => (sum += a));
+    return sum;
+  }
 
-
-
-
-
-
-
-
-
-
+  onDateChangeBarChart() {
+    switch (this.selectedDate.name) {
+      case 'Average':
+        this.paceText = 'Avg. Pace';
+        this.aggregateDistance = this.tracksData.tracks.reduce((acc, track) => {
+          return acc + (track.avgDistance || 0);
+        }, 0);
+        this.aggregatePace = Constants.sumPace(this.tracksData.tracks, this.selectedDate.name);
+        break;
+      case 'Min':
+        this.paceText = 'Min. Pace';
+        this.aggregateDistance = this.tracksData.tracks.reduce((acc, track) => {
+          return acc + (track.minDistance || 0);
+        }, 0);
+        this.aggregatePace = Constants.sumPace(this.tracksData.tracks, this.selectedDate.name);
+        break;
+      case 'Max':
+        this.paceText = 'Max. Pace';
+        this.aggregateDistance = this.tracksData.tracks.reduce((acc, track) => {
+          return acc + (track.maxDistance || 0);
+        }, 0);
+        this.aggregatePace = Constants.sumPace(this.tracksData.tracks, this.selectedDate.name);
+        break;
+      default:
+        break;
+    };
+  }
 
   getOrCreateTooltip = (chart: any) => {
     let tooltipEl = chart.canvas.parentNode.querySelector('div');
@@ -315,7 +381,7 @@ export class TrackSummaryGraphComponent {
         const th = document.createElement('th');
         th.style.borderWidth = '0';
         trackIndex = (Number(title) - 1);
-        
+
         th.innerText = context.tooltip.dataPoints[0].dataset.tracks[trackIndex].name;
         track = context.tooltip.dataPoints[0].dataset.tracks[trackIndex];
 
@@ -337,12 +403,12 @@ export class TrackSummaryGraphComponent {
       tr.style.borderWidth = '0';
       const td = document.createElement('td');
       td.style.borderWidth = '0';
-      if (this.tracksData.trackType === TrackType.AudioLibrary){
+      if (this.tracksData.trackType === TrackType.AudioLibrary) {
         var trackStartTime = trackIndex === 0 ? 0 : this.tracksData.tracks.slice(0, trackIndex).reduce((sum, track) => sum + track.duration_ms, 0);
-      }else{
+      } else {
         var trackStartTime = trackIndex === 0 ? 0 : this.tracksData.tracks.slice(0, trackIndex).reduce((sum, track) => sum + track.track.duration_ms, 0);
       }
-     
+
       const text = document.createTextNode(`Start : ${Constants.formatMilliseconds(trackStartTime)}`);
       td.appendChild(text);
       tr.appendChild(td);
@@ -359,6 +425,74 @@ export class TrackSummaryGraphComponent {
       td1.appendChild(text1);
       tr1.appendChild(td1);
       tableBody.appendChild(tr1);
+
+      debugger;
+      //only if TempoStatistic Exists
+      if (track.tempoStatistic) {
+        var distance: number = 0;
+        var pace: string = '';
+        var speed: number = 0;
+        switch (this.selectedDate.name) {
+          case 'Average':
+            distance = track.avgDistance;
+            pace = track.tempoStatistic.avgPace;
+            speed = track.tempoStatistic.avgSpeed;
+            break;
+          case 'Min':
+            distance = track.minDistance;
+            pace = track.tempoStatistic.minPace;
+            speed = track.tempoStatistic.minSpeed;
+            break;
+          case 'Max':
+            distance = track.maxDistance;
+            pace = track.tempoStatistic.maxPace;
+            speed = track.tempoStatistic.maxSpeed;
+            break;
+          default:
+            break;
+        };
+        distance = parseFloat(distance.toFixed(2));
+        speed = parseFloat(speed.toFixed(2));
+
+        //For Distance 
+        const trDist = document.createElement('tr');
+        trDist.style.backgroundColor = 'inherit';
+        trDist.style.borderWidth = '0';
+        trDist.style.paddingBottom = '10px';
+        const tdDist = document.createElement('td');
+        td.style.borderWidth = '0';
+        const textD = document.createTextNode(`Distance : ${distance} km`);
+        tdDist.appendChild(textD);
+        trDist.appendChild(tdDist);
+        tableBody.appendChild(trDist);
+
+        //For Pace 
+        const trPace = document.createElement('tr');
+        trPace.style.backgroundColor = 'inherit';
+        trPace.style.borderWidth = '0';
+        trPace.style.paddingBottom = '10px';
+        const tdPace = document.createElement('td');
+        td.style.borderWidth = '0';
+        const textP = document.createTextNode(`Pace : ${pace} /km`);
+        tdPace.appendChild(textP);
+        trPace.appendChild(tdPace);
+        tableBody.appendChild(trPace);
+
+        //For Speed 
+        const trSpeed = document.createElement('tr');
+        trSpeed.style.backgroundColor = 'inherit';
+        trSpeed.style.borderWidth = '0';
+        trSpeed.style.paddingBottom = '10px';
+        const tdSpeed = document.createElement('td');
+        td.style.borderWidth = '0';
+        const textS = document.createTextNode(`Speed : ${speed} km/hr`);
+        tdSpeed.appendChild(textS);
+        trSpeed.appendChild(tdSpeed);
+        tableBody.appendChild(trSpeed);
+
+      };
+
+
 
       const tableFooter = document.createElement('tfooter');
       const trFooter = document.createElement('tr');
@@ -410,152 +544,6 @@ export class TrackSummaryGraphComponent {
     tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //sum function for main chart data
-  sumOf(array: any[]) {
-    let sum: number = 0;
-    array.forEach((a) => (sum += a));
-    return sum;
-  }
-
-  onDateChangeBarChart() {
-    const documentStyle = getComputedStyle(document.documentElement);
-    // const monthlyData = {
-    //   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-    //   datasets: [
-    //     {
-    //       label: 'Orders',
-    //       data: this.orders.monthlyData.orders,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-color'),
-    //       borderRadius: 12
-    //     },
-    //     {
-    //       label: 'Units',
-    //       data: this.orders.monthlyData.orderUnits,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-light-color'),
-    //       borderRadius: 12
-    //     }
-    //   ]
-    // };
-
-    // const dailyData = {
-    //   labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
-    //   datasets: [
-    //     {
-    //       label: 'Orders',
-    //       data: this.orders.dailyData.orders,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-color'),
-    //       borderRadius: 6
-    //     },
-    //     {
-    //       label: 'Units',
-    //       data: this.orders.dailyData.orderUnits,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-light-color'),
-    //       borderRadius: 6
-    //     }
-    //   ]
-    // };
-
-    // const weeklyData = {
-    //   labels: [
-    //     'Week 1',
-    //     'Week 2',
-    //     'Week 3',
-    //     'Week 4',
-    //     'Week 5',
-    //     'Week 6',
-    //     'Week 7',
-    //     'Week 8',
-    //     'Week 9',
-    //     'Week 10',
-    //     'Week 11',
-    //     'Week 12',
-    //     'Week 13',
-    //     'Week 14',
-    //     'Week 15',
-    //     'Week 16',
-    //     'Week 17',
-    //     'Week 18',
-    //     'Week 19',
-    //     'Week 20',
-    //     'Week 21',
-    //     'Week 22',
-    //     'Week 23',
-    //     'Week 24'
-    //   ],
-    //   datasets: [
-    //     {
-    //       label: 'Orders',
-    //       data: this.orders.weeklyData.orders,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-color'),
-    //       borderRadius: 6
-    //     },
-    //     {
-    //       label: 'Units',
-    //       data: this.orders.weeklyData.orderUnits,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-light-color'),
-    //       borderRadius: 6
-    //     }
-    //   ]
-    // };
-
-    // let newBarData = { ...this.chartData };
-    // switch (this.selectedDate.name) {
-    //   case 'Monthly':
-    //     newBarData = monthlyData;
-    //     break;
-    //   case 'Weekly':
-    //     newBarData = weeklyData;
-    //     break;
-    //   case 'Daily':
-    //     newBarData = dailyData;
-    //     break;
-    //   default:
-    //     break;
-    // }
-
-    this.chartData = {};
-  }
 
 
 

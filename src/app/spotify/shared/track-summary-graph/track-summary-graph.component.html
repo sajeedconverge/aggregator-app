@@ -3,9 +3,8 @@
         <div class="card-title">
             <h4>{{chartTitle}}</h4>
         </div>
-        <p-dropdown [options]="featureRanges" [(ngModel)]="selectedDate" placeholder="Monthly" optionLabel="name"
-            [showClear]="false" styleClass="w-9rem">
-             <!-- (onChange)="onDateChangeBarChart()"> -->
+        <p-dropdown [options]="featureRanges"  [(ngModel)]="selectedDate"  optionLabel="name"
+            [showClear]="false" styleClass="w-9rem" (onChange)="onDateChangeBarChart()"> 
         </p-dropdown>
     </div>
     <div class="chart-info mb-3 flex align-items-center gap-5 flex-wrap">
@@ -21,19 +20,19 @@
                 {{ totalTime }}
             </p>
         </div>
-        <!-- <div class="info">
-            <h6 class="m-0 mb-1 text-color-secondary font-normal">Total Sales</h6>
+         <div class="info">
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">Total Distance</h6>
             <p class="m-0 p-0 font-bold">
-                {{ selectedDate.code == 'DAY' ? orders.dailyData.totalSales : selectedDate.code == 'WEEK' ? orders.weeklyData.totalSales : orders.monthlyData.totalSales }}
+                {{ aggregateDistance| number:'1.2-2' }} km
             </p>
         </div>
         <div class="info">
-            <h6 class="m-0 mb-1 text-color-secondary font-normal">Avg. sales/orders item</h6>
+            <h6 class="m-0 mb-1 text-color-secondary font-normal">{{paceText}}</h6>
             <p class="m-0 p-0 font-bold">
-                {{ selectedDate.code == 'DAY' ? orders.dailyData.avarageSalesByOrder : selectedDate.code == 'WEEK' ? orders.weeklyData.avarageSalesByOrder : orders.monthlyData.avarageSalesByOrder }}
+                {{ aggregatePace }} /km
             </p>
         </div>
-        <div class="info">
+        <!--<div class="info">
             <h6 class="m-0 mb-1 text-color-secondary font-normal">Avg. units/orders item</h6>
             <p class="m-0 p-0 font-bold">
                 {{ selectedDate.code == 'DAY' ? orders.dailyData.avarageUnitByOrder : selectedDate.code == 'WEEK' ? orders.weeklyData.avarageUnitByOrder : orders.monthlyData.avarageUnitByOrder }}

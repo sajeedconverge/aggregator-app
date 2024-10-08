@@ -403,7 +403,35 @@ export class Constants {
         return ms / (1000 * 60 * 60); // Convert milliseconds to hours
     }
 
+    // Convert hh:mm:ss string to milliseconds
+    private static toMilliseconds(timeString: string): number {
+        const [hours, minutes, seconds] = timeString.split(':').map(Number);
+        return (hours * 3600 + minutes * 60 + seconds) * 1000;
+    }
 
+
+    // Static method to sum minPace strings and return the total in hh:mm:ss format
+    static sumPace(tracks: any[], paceType: string): string {
+        const totalMilliseconds = tracks.reduce((acc, track) => {
+            if (track.tempoStatistic) {
+                switch (paceType) {
+                    case 'Min':
+                        return acc + this.toMilliseconds(track.tempoStatistic.minPace);
+                        break;
+                    case 'Max':
+                        return acc + this.toMilliseconds(track.tempoStatistic.maxPace);
+                        break;
+                    case 'Average':
+                        return acc + this.toMilliseconds(track.tempoStatistic.avgPace);
+                        break;
+                    default:
+                        break;
+                };
+            };
+            return acc;
+        }, 0);
+        return this.formatMilliseconds(totalMilliseconds);
+    }
 
 
 

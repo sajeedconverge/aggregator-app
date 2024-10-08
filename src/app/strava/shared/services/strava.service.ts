@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ResponseModel } from '../../../shared/shared-models';
@@ -134,7 +134,12 @@ export class StravaService {
     return this.http.get<any>(Constants.baseServerUrl + `Strava/GetTempoStatisticByTempo?tempo=${tempo}`, { headers: this.headers });
   }
 
-
+  getTempoStatisticsByMultiTempos(tempos: number[]) {
+    var tempoString = tempos.join(',');
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetTempoStatisticsByMultiTempos?tempoString=${tempoString}`, {
+      headers: this.headers,
+    });
+  }
 
 
 
