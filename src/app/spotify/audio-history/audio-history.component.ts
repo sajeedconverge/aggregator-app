@@ -354,9 +354,9 @@ export class AudioHistoryComponent implements OnInit {
       var durationSum = 0;
       if (this.selectedTracksList.length > 0) {
         // this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
-        var selectedTracks = this.hisotryTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+        var selectedTracks = this.hisotryTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => ((selectedTrack.track.id === ht.track.id) && (selectedTrack.played_at === ht.played_at))));
         selectedTracks = selectedTracks.reduce((acc, current) => {
-          const x = acc.find((item: any) => item.track.id === current.track.id);
+          const x = acc.find((item: any) => ((item.track.id === current.track.id)&& (item.played_at === current.played_at)));
           if (!x) {
             acc.push(current);
           }
@@ -383,7 +383,7 @@ export class AudioHistoryComponent implements OnInit {
           this.data2.datasets[3].tracks.push(pltrack.track.name);
           // this.data2.datasets[3].colors.push(pltrack.color);
         });
-        console.log('this.data2', this.data2);
+        // console.log('this.data2', this.data2);
         this.isLoading = false;
       } else {
         this.hisotryTracks.forEach(pltrack => {

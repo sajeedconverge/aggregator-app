@@ -168,28 +168,29 @@ export class TrackSummaryGraphComponent {
     var durationSum = 0;
     if (this.selectedTracksList.length > 0) {
       //For Audio Library only
-      if (this.tracksData.trackType === TrackType.AudioLibrary) {
-        var selectedTracks = this.tracksData.tracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.id === ht.id));
-        selectedTracks = selectedTracks.reduce((acc, current) => {
-          const x = acc.find((item: any) => item.id === current.id);
-          if (!x) {
-            acc.push(current);
-          }
-          return acc;
-        }, []);
-      } else {
-        //For Rest of the components
-        var selectedTracks = this.tracksData.tracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
-        selectedTracks = selectedTracks.reduce((acc, current) => {
-          const x = acc.find((item: any) => item.track.id === current.track.id);
-          if (!x) {
-            acc.push(current);
-          }
-          return acc;
-        }, []);
-      };
+      // if (this.tracksData.trackType === TrackType.AudioLibrary) {
+      //   var selectedTracks = this.tracksData.tracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.id === ht.id));
+      //   selectedTracks = selectedTracks.reduce((acc, current) => {
+      //     const x = acc.find((item: any) => item.id === current.id);
+      //     if (!x) {
+      //       acc.push(current);
+      //     }
+      //     return acc;
+      //   }, []);
+      // } else {
+      //   //For Rest of the components
+      //   var selectedTracks = this.tracksData.tracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+      //   selectedTracks = selectedTracks.reduce((acc, current) => {
+      //     const x = acc.find((item: any) => item.track.id === current.track.id);
+      //     if (!x) {
+      //       acc.push(current);
+      //     }
+      //     return acc;
+      //   }, []);
+      // };
 
-      selectedTracks.forEach((pltrack, index) => {
+      this.selectedTracksList.forEach((pltrack, index) => {
+      // selectedTracks.forEach((pltrack, index) => {
         var eligibleTrack:any;
         if (this.tracksData.trackType === TrackType.AudioLibrary){
           eligibleTrack=pltrack;
