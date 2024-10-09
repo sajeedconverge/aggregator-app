@@ -440,7 +440,7 @@ export class AudioHistoryComponent implements OnInit {
   navigateToTrackDetails(trackName: string, trackId: string) {
     sessionStorage.setItem('track-name', trackName);
     sessionStorage.setItem('track-id', trackId);
-    this.router.navigate(['/spotify/audio-details']);
+    this.router.navigate(['/spotify/audio-history']);
   }
 
   generateChart(playlistTracks: any[]) {

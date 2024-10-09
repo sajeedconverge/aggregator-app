@@ -139,8 +139,6 @@ export class LikedSongsComponent implements OnInit {
   @ViewChild('tableRef') table!: Table;
   showPreview: boolean = false;
   currentTrack: any;
-  searchText: string = '';
-  searchedTracksResult: any[] = [];
 
 
 
@@ -714,7 +712,7 @@ export class LikedSongsComponent implements OnInit {
   navigateToTrackDetails(trackName: string, trackId: string) {
     sessionStorage.setItem('track-name', trackName);
     sessionStorage.setItem('track-id', trackId);
-    this.router.navigate(['/spotify/audio-details']);
+    this.router.navigate(['/spotify/audio-history']);
   }
 
   addTracksToExistingPlaylist() {
@@ -897,17 +895,7 @@ export class LikedSongsComponent implements OnInit {
     this.currentTrack = track.track;
   }
 
-  searchSpotify() {
-    var searchUrl = Constants.spotifySearchUrl(this.searchText);
-    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-    this.spotifyService.SpotifyCommonGetApi(searchUrl, spotifyAccessToken).subscribe((response) => {
-      
-      this.searchedTracksResult = response.tracks.items;
-      console.log(this.searchedTracksResult);
-
-
-    });
-  }
+  
 
 
 

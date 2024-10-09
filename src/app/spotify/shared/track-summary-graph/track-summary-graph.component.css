@@ -14,8 +14,8 @@
 
 .info-span{
 color:#3B82F6;
-scale: 1.5;
-padding-top: 5px;
+padding-top: 10px;
+    font-size: 22px;
 }
 
 ::ng-deep .p-tooltip .p-tooltip-text {

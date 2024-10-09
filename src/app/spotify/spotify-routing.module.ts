@@ -18,11 +18,11 @@ const routes: Routes = [
     component: PlaylistDetailsComponent
   },
   {
-    path: 'audio-details',
+    path: 'audio-history',
     component: TrackDetailsComponent
   },
   {
-    path: 'audio-history',
+    path: 'recently-played',
     component: AudioHistoryComponent
   },
   {

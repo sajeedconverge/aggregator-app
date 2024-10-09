@@ -42,24 +42,12 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
 
           spotifyAuthService.refreshSpotifyAccessToken();
           // debugger;
-          // Retry the request with the new token
 
           console.log('spotify token expired !');
 
-          // retryWhen(errors =>
-          //   errors.pipe(
-          //     mergeMap((error, index) => {
-          //       if (index < 3 && error.status === 401) {
-          //         return throwError(error);  // If retries fail after 3 attempts, throw the error
-          //       }
-          //       return of(error); // Retry up to 3 times
-          //     }),
-          //     delay(1000),  // Wait 1 second before retrying
-          //     take(3)       // Retry at most 3 times
-          //   )
-          // );
-
           return next(req);
+
+
 
         } else {
           // If the error is not 401, propagate it further

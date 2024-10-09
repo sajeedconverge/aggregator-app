@@ -433,8 +433,8 @@ export class Constants {
         return this.formatMilliseconds(totalMilliseconds);
     }
 
-public static spotifySearchUrl(text:string) {
-    return `https://api.spotify.com/v1/search?q=${text}&type=track&limit=50`
+public static spotifySearchUrl(text:string,limit:number) {
+    return `https://api.spotify.com/v1/search?q=${text}&type=track&limit=${limit}`
 }
 
 

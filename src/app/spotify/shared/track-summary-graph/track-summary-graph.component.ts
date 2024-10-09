@@ -365,6 +365,8 @@ export class TrackSummaryGraphComponent {
       tooltipEl.style.position = 'absolute';
       tooltipEl.style.transform = 'translate(-50%, 0)';
       tooltipEl.style.transition = 'all .2s ease';
+      tooltipEl.style.maxWidth='200px';
+      tooltipEl.style.width='200px';
 
       const table = document.createElement('table');
       table.style.margin = '0px';
