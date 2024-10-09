@@ -3,8 +3,8 @@
         <div class="card-title">
             <h4>{{chartTitle}}</h4>
         </div>
-        <p-dropdown [options]="featureRanges"  [(ngModel)]="selectedDate"  optionLabel="name"
-            [showClear]="false" styleClass="w-9rem" (onChange)="onDateChangeBarChart()"> 
+        <p-dropdown [options]="featureRanges" [(ngModel)]="selectedDate" optionLabel="name" [showClear]="false"
+            styleClass="w-9rem" (onChange)="onDateChangeBarChart()">
         </p-dropdown>
     </div>
     <div class="chart-info mb-3 flex align-items-center gap-5 flex-wrap">
@@ -20,7 +20,7 @@
                 {{ totalTime }}
             </p>
         </div>
-         <div class="info">
+        <div class="info">
             <h6 class="m-0 mb-1 text-color-secondary font-normal">Total Distance</h6>
             <p class="m-0 p-0 font-bold">
                 {{ aggregateDistance| number:'1.2-2' }} km
@@ -32,12 +32,12 @@
                 {{ aggregatePace }} /km
             </p>
         </div>
-        <!--<div class="info">
-            <h6 class="m-0 mb-1 text-color-secondary font-normal">Avg. units/orders item</h6>
-            <p class="m-0 p-0 font-bold">
-                {{ selectedDate.code == 'DAY' ? orders.dailyData.avarageUnitByOrder : selectedDate.code == 'WEEK' ? orders.weeklyData.avarageUnitByOrder : orders.monthlyData.avarageUnitByOrder }}
-            </p>
-        </div> -->
+        <div class="info">
+            <span class="pi pi-info-circle info-span" [pTooltip]="dynamicMessage" 
+            tooltipPosition="bottom"></span>
+            
+        </div>
+        
     </div>
     <p-chart type="bar" height="530" [data]="chartData" [options]="chartOptions"></p-chart>
 </div>

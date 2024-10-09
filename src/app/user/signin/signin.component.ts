@@ -22,6 +22,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { StravaAuthorizationService } from '../../strava/shared/services/strava-authorization.service';
 import { SpotifyAuthorizationService } from '../../spotify/shared/services/spotify-authorization.service';
 import { Title } from '@angular/platform-browser';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-signin',
@@ -38,11 +40,11 @@ import { Title } from '@angular/platform-browser';
     DividerModule,
     ProgressBarComponent,
     RegisterComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ToastModule
   ],
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.css',
-
 })
 export class SigninComponent implements OnInit {
   user!: SocialUser;
@@ -65,7 +67,8 @@ export class SigninComponent implements OnInit {
     private fb: FormBuilder,
     private stravaAuthService: StravaAuthorizationService,
     private spotifyAuthService: SpotifyAuthorizationService,
-    private title: Title
+    private title: Title,
+    private messageService: MessageService,
   ) {
     this.title.setTitle('AudioActive');
 
@@ -163,7 +166,6 @@ export class SigninComponent implements OnInit {
       this.UserRequest = this.signinForm.value;
       this.accountService.login(this.UserRequest).subscribe((res) => {
         if (res.statusCode === 200) {
-
           //  console.log('login success', res);
           //initial login process to store user data
           this.authService.setAccessToken(res.payload.token);
@@ -189,9 +191,11 @@ export class SigninComponent implements OnInit {
               }
             });
           }, 1500);
-
-        };
-      });
+        };        
+      }, (error) => { 
+        this.messageService.add({ severity: 'warn', summary: 'Login Failed', detail: 'Invalid user credentials.' });
+       });
+      ;
     };
 
   }

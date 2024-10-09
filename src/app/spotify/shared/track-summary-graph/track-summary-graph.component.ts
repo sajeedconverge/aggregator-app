@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChartModule } from 'primeng/chart';
 import { DropdownModule } from 'primeng/dropdown';
@@ -6,6 +6,16 @@ import { TracksData, TrackType } from '../models/graph-models';
 import { Constants } from '../../../shared/Constants';
 import { StravaService } from '../../../strava/shared/services/strava.service';
 import { CommonModule } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { TooltipModule } from 'primeng/tooltip';
+
+
+
+
+
+
+
 
 @Component({
   selector: 'app-track-summary-graph',
@@ -15,6 +25,10 @@ import { CommonModule } from '@angular/common';
     FormsModule,
     ChartModule,
     DropdownModule,
+    ButtonModule,
+    OverlayPanelModule,
+    TooltipModule,
+
 
 
 
@@ -46,6 +60,9 @@ export class TrackSummaryGraphComponent {
   aggregateDistance: number = 0;
   paceText: string = '';
   aggregatePace: string = '00:00:00';
+  dynamicMessage: string = '';
+
+
 
 
 
@@ -134,7 +151,6 @@ export class TrackSummaryGraphComponent {
   }
 
   showSummaryGraphChanged() {
-
     this.chartData = {
       labels: [],
       datasets: [
@@ -209,17 +225,17 @@ export class TrackSummaryGraphComponent {
         //duration
         this.chartData.labels.push(index + 1);
         //tempo
-        this.chartData.datasets[0].data.push(pltrack.audio_features.tempo);
-        this.chartData.datasets[0].tracks.push(eligibleTrack);
-        //loudness
-        this.chartData.datasets[1].data.push(pltrack.audio_features.loudness);
-        this.chartData.datasets[1].tracks.push(eligibleTrack);
-        //energy
-        this.chartData.datasets[2].data.push(pltrack.audio_features.energy);
-        this.chartData.datasets[2].tracks.push(eligibleTrack);
-        //danceability
-        this.chartData.datasets[3].data.push(pltrack.audio_features.danceability);
+        this.chartData.datasets[3].data.push(pltrack.audio_features.tempo);
         this.chartData.datasets[3].tracks.push(eligibleTrack);
+        //loudness
+        this.chartData.datasets[2].data.push(pltrack.audio_features.loudness);
+        this.chartData.datasets[2].tracks.push(eligibleTrack);
+        //energy
+        this.chartData.datasets[0].data.push(pltrack.audio_features.energy);
+        this.chartData.datasets[0].tracks.push(eligibleTrack);
+        //danceability
+        this.chartData.datasets[1].data.push(pltrack.audio_features.danceability);
+        this.chartData.datasets[1].tracks.push(eligibleTrack);
       });
 
       // console.log('this.chartData', this.chartData);
@@ -289,6 +305,11 @@ export class TrackSummaryGraphComponent {
           };
         });
         // console.log('modified tracks', this.tracksData.tracks);
+        var tempostatTrackCount = (this.tracksData.tracks.filter(track => track.tempoStatistic !== undefined)).length;
+        var count = (tempostatTrackCount > this.selectedTracksList.length && (this.selectedTracksList.length != 0)) ? this.selectedTracksList.length : tempostatTrackCount;
+        this.dynamicMessage = `The average Information corresponds to ${count} tracks.`;
+
+
         this.onDateChangeBarChart();
       };
     });
@@ -426,7 +447,7 @@ export class TrackSummaryGraphComponent {
       tr1.appendChild(td1);
       tableBody.appendChild(tr1);
 
-      debugger;
+
       //only if TempoStatistic Exists
       if (track.tempoStatistic) {
         var distance: number = 0;
@@ -543,6 +564,11 @@ export class TrackSummaryGraphComponent {
     tooltipEl.style.font = tooltip.options.bodyFont.string;
     tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
   };
+
+
+
+
+
 
 
 

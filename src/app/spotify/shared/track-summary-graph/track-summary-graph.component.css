@@ -11,3 +11,14 @@
     justify-content: space-between;
     padding-bottom: 1.15rem;
 }
+
+.info-span{
+color:#3B82F6;
+scale: 1.5;
+padding-top: 5px;
+}
+
+::ng-deep .p-tooltip .p-tooltip-text {
+    background-color: #3B82F6;
+    color: #ffffff;
+}

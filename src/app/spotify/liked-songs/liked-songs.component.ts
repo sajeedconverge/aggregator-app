@@ -140,7 +140,7 @@ export class LikedSongsComponent implements OnInit {
   showPreview: boolean = false;
   currentTrack: any;
   searchText: string = '';
-
+  searchedTracksResult: any[] = [];
 
 
 
@@ -897,7 +897,17 @@ export class LikedSongsComponent implements OnInit {
     this.currentTrack = track.track;
   }
 
+  searchSpotify() {
+    var searchUrl = Constants.spotifySearchUrl(this.searchText);
+    const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+    this.spotifyService.SpotifyCommonGetApi(searchUrl, spotifyAccessToken).subscribe((response) => {
+      
+      this.searchedTracksResult = response.tracks.items;
+      console.log(this.searchedTracksResult);
 
+
+    });
+  }
 
 
 

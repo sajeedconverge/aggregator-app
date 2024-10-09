@@ -44,7 +44,7 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
           // debugger;
           // Retry the request with the new token
 
-          //
+          console.log('spotify token expired !');
 
           // retryWhen(errors =>
           //   errors.pipe(

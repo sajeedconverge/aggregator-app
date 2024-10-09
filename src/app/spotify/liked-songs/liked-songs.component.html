@@ -20,20 +20,35 @@
                 <div></div>
                 <h3>Liked Songs</h3>
                 <div class="flex flex-row align-items-center">
-                    <!-- <div>
+                    <div>
                         <input type="text" placeholder="Search Tracks" pInputText [(ngModel)]="searchText" />
-                        <p-button icon="pi pi-search" severity="primary" (onClick)="op.toggle($event)" [disabled]="!(searchText.length>2)"/>
+                        <p-button icon="pi pi-search" severity="primary" (onClick)="op.toggle($event); searchSpotify()"
+                            [disabled]="!(searchText.length>2)" />
                         <p-overlayPanel #op>
                             <div class="flex flex-column gap-3 w-25rem">
                                 <div>
-                                    <span class="font-medium text-900 block mb-2">Searched Track</span>
-                                    <ul class="list-none p-0 m-0 flex flex-column gap-3">
-
+                                    <span class="font-medium text-900 block mb-2">Searched Tracks</span>
+                                    <ul class="list-none p-0 m-0 flex flex-column gap-3" style="overflow-y:auto;">
+                                        <li *ngFor="let track of searchedTracksResult"
+                                            class="flex align-items-center gap-2">
+                                            <img [src]="track.album.images[0].url"
+                                                style="width: 32px;border-radius: 50%;" />
+                                            <div>
+                                                <span class="font-medium">{{ track.name }}</span>
+                                                <div class="text-sm text-color-secondary">{{ track.artists[0].name }}
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="flex align-items-center gap-2 text-color-secondary ml-auto text-sm">
+                                                <p-button icon="pi pi-plus" [rounded]="true" severity="success"
+                                                    pTooltip="Add to Liked Songs" tooltipPosition="bottom" />
+                                            </div>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
                         </p-overlayPanel>
-                    </div> -->
+                    </div>
                     <div class="flex flex-row align-items-center" *ngIf="likedSongs.length > 0">
                         <div>
                             <p-button [rounded]="true" severity="success" icon="pi pi-refresh "
