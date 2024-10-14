@@ -387,6 +387,55 @@ export class ActivityDetailChartComponent implements OnInit {
       tr1.appendChild(td1);
       tableBody.appendChild(tr1);
 
+      //debugger;
+      {
+        var distance: number = this.pairedTracks[trackIndex].distance;
+        var pace: string = this.pairedTracks[trackIndex].pace;
+        var speed: number = this.pairedTracks[trackIndex].speed;
+
+        distance = parseFloat(distance.toFixed(2));
+        speed = parseFloat(speed.toFixed(2));
+
+        //For Distance 
+        const trDist = document.createElement('tr');
+        trDist.style.backgroundColor = 'inherit';
+        trDist.style.borderWidth = '0';
+        trDist.style.paddingBottom = '10px';
+        const tdDist = document.createElement('td');
+        td.style.borderWidth = '0';
+        const textD = document.createTextNode(`Distance : ${distance} km`);
+        tdDist.appendChild(textD);
+        trDist.appendChild(tdDist);
+        tableBody.appendChild(trDist);
+
+        //For Pace 
+        const trPace = document.createElement('tr');
+        trPace.style.backgroundColor = 'inherit';
+        trPace.style.borderWidth = '0';
+        trPace.style.paddingBottom = '10px';
+        const tdPace = document.createElement('td');
+        td.style.borderWidth = '0';
+        const textP = document.createTextNode(`Pace : ${pace} /km`);
+        tdPace.appendChild(textP);
+        trPace.appendChild(tdPace);
+        tableBody.appendChild(trPace);
+
+        //For Speed 
+        const trSpeed = document.createElement('tr');
+        trSpeed.style.backgroundColor = 'inherit';
+        trSpeed.style.borderWidth = '0';
+        trSpeed.style.paddingBottom = '10px';
+        const tdSpeed = document.createElement('td');
+        td.style.borderWidth = '0';
+        const textS = document.createTextNode(`Speed : ${speed} km/hr`);
+        tdSpeed.appendChild(textS);
+        trSpeed.appendChild(tdSpeed);
+        tableBody.appendChild(trSpeed);
+
+      };
+
+
+      // break 
       const tableFooter = document.createElement('tfooter');
       const trFooter = document.createElement('tr');
       trFooter.innerHTML = `</br>`;

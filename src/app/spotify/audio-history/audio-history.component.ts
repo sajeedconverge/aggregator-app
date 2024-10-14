@@ -24,6 +24,12 @@ import { Title } from '@angular/platform-browser';
 import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
 import { TracksData, TrackType } from '../shared/models/graph-models';
 import { UriPipe } from "../../shared/common-pipes/uri.pipe";
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { ProjectionsGraphComponent } from '../shared/projections-graph/projections-graph.component';
+
+
+
+
 
 @Component({
   selector: 'app-audio-history',
@@ -45,11 +51,12 @@ import { UriPipe } from "../../shared/common-pipes/uri.pipe";
     RoundPipe,
     TrackSummaryGraphComponent,
     UriPipe
-],
+  ],
   templateUrl: './audio-history.component.html',
   styleUrl: './audio-history.component.css',
   providers: [
-    ConfirmationService
+    ConfirmationService,
+    DialogService
   ]
 })
 export class AudioHistoryComponent implements OnInit {
@@ -121,7 +128,7 @@ export class AudioHistoryComponent implements OnInit {
   };
   showPreview: boolean = false;
   currentTrack: any;
-
+  ref: DynamicDialogRef | undefined;
 
 
 
@@ -147,7 +154,8 @@ export class AudioHistoryComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     private confirmationService: ConfirmationService,
-    private title: Title
+    private title: Title,
+    public dialogService: DialogService,
   ) {
     this.title.setTitle('AudioActive - Recently Played')
     this.spotifyAuthService.refreshSpotifyAccessToken();
@@ -199,6 +207,9 @@ export class AudioHistoryComponent implements OnInit {
                       pltrack.audio_features.loudness = Math.round(pltrack.audio_features.loudness * (-10));
                       pltrack.audio_features.energy = Math.round(pltrack.audio_features.energy * (100));
                       pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
+                    }, error => {
+                      this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                      this.isLoading = false;
                     });
                   };
                 });
@@ -244,7 +255,10 @@ export class AudioHistoryComponent implements OnInit {
               this.tableSorted(sortEvent);
             };
             this.isLoading = false;
-          },(this.hisotryTracks.length>25)? 8000 :5000);
+          }, (this.hisotryTracks.length > 25) ? 8000 : 5000);
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
         })
       } else {
         this.dataMessage = 'No tracks found in audio history.';
@@ -346,9 +360,9 @@ export class AudioHistoryComponent implements OnInit {
       var durationSum = 0;
       if (this.selectedTracksList.length > 0) {
         // this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
-        var selectedTracks = this.hisotryTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+        var selectedTracks = this.hisotryTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => ((selectedTrack.track.id === ht.track.id) && (selectedTrack.played_at === ht.played_at))));
         selectedTracks = selectedTracks.reduce((acc, current) => {
-          const x = acc.find((item: any) => item.track.id === current.track.id);
+          const x = acc.find((item: any) => ((item.track.id === current.track.id)&& (item.played_at === current.played_at)));
           if (!x) {
             acc.push(current);
           }
@@ -375,7 +389,7 @@ export class AudioHistoryComponent implements OnInit {
           this.data2.datasets[3].tracks.push(pltrack.track.name);
           // this.data2.datasets[3].colors.push(pltrack.color);
         });
-        console.log('this.data2', this.data2);
+        // console.log('this.data2', this.data2);
         this.isLoading = false;
       } else {
         this.hisotryTracks.forEach(pltrack => {
@@ -432,7 +446,7 @@ export class AudioHistoryComponent implements OnInit {
   navigateToTrackDetails(trackName: string, trackId: string) {
     sessionStorage.setItem('track-name', trackName);
     sessionStorage.setItem('track-id', trackId);
-    this.router.navigate(['/spotify/audio-details']);
+    this.router.navigate(['/spotify/audio-history']);
   }
 
   generateChart(playlistTracks: any[]) {
@@ -633,6 +647,9 @@ export class AudioHistoryComponent implements OnInit {
                     //console.log("track added successfully.", pltrack.track.name);
                   };
                 });
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });
@@ -667,6 +684,9 @@ export class AudioHistoryComponent implements OnInit {
                     pltrack.audioAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
                   };
                 });
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });
@@ -687,6 +707,9 @@ export class AudioHistoryComponent implements OnInit {
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
           console.log(this.userPlaylists);
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
         });
         this.isLoading = false;
       };
@@ -762,7 +785,20 @@ export class AudioHistoryComponent implements OnInit {
     this.currentTrack = track.track;
   }
 
+  showProjections() {
+    this.ref = this.dialogService.open(ProjectionsGraphComponent, {
+      header: 'Tracks Projections',
+      width: '50vw',
+      contentStyle: { overflow: 'auto' },
+      data: {
+        tracks: this.selectedTracksList
+      },
+    });
 
+    this.ref.onClose.subscribe((data: any) => {
+
+    });
+  }
 
 
 

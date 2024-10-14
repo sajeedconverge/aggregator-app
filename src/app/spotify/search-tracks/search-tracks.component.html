@@ -1,0 +1,121 @@
+@if(isLoading) {
+<app-progress-bar></app-progress-bar>
+}
+<p-confirmDialog />
+<p-toast></p-toast> 
+
+<div class="palylist_table">
+    <p-table [value]="searchedTracks" [rows]="limit" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+        (onPage)="onPageChange($event)" [totalRecords]="totalCount" [paginator]="false" paginatorPosition="top"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" sortField="added_at"
+        (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" #tableRef>
+        <ng-template pTemplate="caption">
+            <div class="flex flex-row justify-content-center">
+                <!-- <div></div> -->
+
+                <div class="flex flex-row align-items-center track_search">
+                    <input type="text" placeholder="Search Tracks" pInputText [(ngModel)]="searchText"
+                        (keydown.enter)="searchSpotify()" />
+                    <p-button icon="pi pi-search" severity="primary" (onClick)="searchSpotify()"
+                        [disabled]="!(searchText.length>2)" />
+                </div>
+
+                <!-- <div>
+                    <p-button class="pr-2" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clearSearch()"
+                            pTooltip="Clear search results" tooltipPosition="bottom" />
+                </div> -->
+            </div>
+
+            
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:80px">
+                    Preview
+                </th>
+                <th style="width:80px">
+                </th>
+                <th pSortableColumn="track.name">
+                    Title
+                    <!-- <p-sortIcon field="track.name" /> -->
+                </th>
+                <th pSortableColumn="artist">
+                    Artist
+                    <!-- <p-sortIcon field="artist" /> -->
+                </th>
+                <th pSortableColumn="track.duration_ms">
+                    Duration
+                    <!-- <p-sortIcon field="track.duration_ms" /> -->
+                </th>
+                <th pSortableColumn="audio_features.tempo">
+                    Tempo
+                    <!-- <p-sortIcon field="audio_features.tempo" /> -->
+                </th>
+                <th pSortableColumn="audio_features.danceability">
+                    Danceability
+                    <!-- <p-sortIcon field="audio_features.danceability" /> -->
+                </th>
+                <th pSortableColumn="audio_features.energy">
+                    Energy
+                    <!-- <p-sortIcon field="audio_features.energy" /> -->
+                </th>
+                <th pSortableColumn="audio_features.loudness">
+                    Loudness
+                    <!-- <p-sortIcon field="audio_features.loudness" /> -->
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-track let-index="rowIndex">
+            <tr>
+                <td>
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true"
+                        (onClick)="showPreviewPopup(track)" />
+                </td>
+                <td><img [src]="track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
+                </td>
+                <td>
+                    <p-button class="anchor_btn" [label]="track.name" [link]="true"
+                        (onClick)="navigateToTrackDetails(track.name,track.id)" />
+                </td>
+                <td>{{track.artists[0].name}}</td>
+                <td>{{ formatTrackDuration(track.duration_ms) }}</td>
+                <td>{{ track?.audio_features?.tempo | round}}</td>
+                <td>{{ track?.audio_features?.danceability }}</td>
+                <td>{{ track?.audio_features?.energy }}</td>
+                <td>{{ track?.audio_features?.loudness }}</td>
+                <td>
+                    <div class="track_Detail_actionbtn">
+                        @if (track.isLiked) {
+                        <p-button icon="bi bi-heart-fill" [rounded]="true" [text]="true" [raised]="true"
+                            severity="danger" />
+                        }@else {
+                        <p-button icon="bi bi-heart" [rounded]="true" [text]="true" [raised]="true" severity="danger" />
+                        }
+                        <p-button icon="bi bi-music-note-list" [rounded]="true" [text]="true" [raised]="true"
+                            severity="warning" />
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr class="">
+                <td colspan="12" class="text-center">
+                    {{dataMessage}}
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+</div>
+
+<p-dialog class="track_preview_dialog" [modal]="true" [draggable]="false" [(visible)]="showPreview" [closable]="true"
+    [style]="{ width: '50rem' }">
+    <div class="">
+        <iframe [src]="currentTrack?.uri | uri" width="600" height="230" frameborsrcder="0" allowtransparency="true"
+            allow="encrypted-media ; autoplay"></iframe>
+    </div>
+</p-dialog>

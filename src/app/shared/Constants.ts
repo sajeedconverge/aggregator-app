@@ -5,7 +5,7 @@ import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "..
 export class Constants {
 
     // public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
-    public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
+     public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     public static spotifySettings: SpotifySettings = {
         clientId: "",
@@ -398,6 +398,152 @@ export class Constants {
                 console.error('MediaKeySystemAccess request failed:', error);
             });
     }
+
+    public static convertMsToHours(ms: number): number {
+        return ms / (1000 * 60 * 60); // Convert milliseconds to hours
+    }
+
+    // Convert hh:mm:ss string to milliseconds
+    private static toMilliseconds(timeString: string): number {
+        const [hours, minutes, seconds] = timeString.split(':').map(Number);
+        return (hours * 3600 + minutes * 60 + seconds) * 1000;
+    }
+
+
+    // Static method to sum minPace strings and return the total in hh:mm:ss format
+    static sumPace(tracks: any[], paceType: string): string {
+        const totalMilliseconds = tracks.reduce((acc, track) => {
+            if (track.tempoStatistic) {
+                switch (paceType) {
+                    case 'Min':
+                        return acc + this.toMilliseconds(track.tempoStatistic.minPace);
+                        break;
+                    case 'Max':
+                        return acc + this.toMilliseconds(track.tempoStatistic.maxPace);
+                        break;
+                    case 'Average':
+                        return acc + this.toMilliseconds(track.tempoStatistic.avgPace);
+                        break;
+                    default:
+                        break;
+                };
+            };
+            return acc;
+        }, 0);
+        return this.formatMilliseconds(totalMilliseconds);
+    }
+
+    public static spotifySearchUrl(text: string, limit: number) {
+        return `https://api.spotify.com/v1/search?q=${text}&type=track&limit=${limit}`
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

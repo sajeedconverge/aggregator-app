@@ -1,23 +1,47 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChartModule } from 'primeng/chart';
 import { DropdownModule } from 'primeng/dropdown';
 import { TracksData, TrackType } from '../models/graph-models';
 import { Constants } from '../../../shared/Constants';
+import { StravaService } from '../../../strava/shared/services/strava.service';
+import { CommonModule } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { TooltipModule } from 'primeng/tooltip';
+import { Message, MessageService } from 'primeng/api';
+import { MessagesModule } from 'primeng/messages';
+import { error } from 'console';
+
+
+
+
+
+
+
 
 @Component({
   selector: 'app-track-summary-graph',
   standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
     ChartModule,
     DropdownModule,
+    ButtonModule,
+    OverlayPanelModule,
+    TooltipModule,
+    MessagesModule,
+
+
+
 
 
 
   ],
   templateUrl: './track-summary-graph.component.html',
-  styleUrl: './track-summary-graph.component.css'
+  styleUrl: './track-summary-graph.component.css',
+  providers: [MessageService]
 })
 export class TrackSummaryGraphComponent {
   documentStyle = getComputedStyle(document.documentElement);
@@ -27,26 +51,34 @@ export class TrackSummaryGraphComponent {
 
   // dropdown date ranges
   featureRanges: any[] = [
-    { name: 'Average', code: 'DAY' },
-    { name: 'Min', code: 'WEEK' },
-    { name: 'Max', code: 'MONTH' }
+    { name: 'Average', id: 1 },
+    { name: 'Min', id: 2 },
+    { name: 'Max', id: 3 }
   ];
-  selectedDate: any;
-  
+  selectedDate: any = { name: 'Average', id: 1 };
   chartTitle: string = '';
   //main chart data
   chartData: any;
   chartOptions: any;
   totalTime: any;
-  totalTracks:number=0;
-
+  totalTracks: number = 0;
   @Input() tracksData!: TracksData;
   @Input() selectedTracksList!: any[];
+  aggregateDistance: number = 0;
+  paceText: string = '';
+  aggregatePace: string = '00:00:00';
+  dynamicMessage: string = '';
+  tempoStatCount:number=-1;
+  messages: Message[] = [
+    { severity: 'warn', detail: 'Audio Active has not collected sufficient data to project statistics.' },
+  ];
+
+
 
 
 
   constructor(
-
+    private stravaService: StravaService
   ) {
 
   }
@@ -73,6 +105,7 @@ export class TrackSummaryGraphComponent {
       default:
         break;
     };
+    this.getTempoStats();
 
     this.chartOptions = {
       animation: {
@@ -127,7 +160,6 @@ export class TrackSummaryGraphComponent {
   }
 
   showSummaryGraphChanged() {
-
     this.chartData = {
       labels: [],
       datasets: [
@@ -167,36 +199,66 @@ export class TrackSummaryGraphComponent {
     };
     var durationSum = 0;
     if (this.selectedTracksList.length > 0) {
-      var selectedTracks = this.tracksData.tracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
-      selectedTracks = selectedTracks.reduce((acc, current) => {
-        const x = acc.find((item: any) => item.track.id === current.track.id);
-        if (!x) {
-          acc.push(current);
-        }
-        return acc;
-      }, []);
-      selectedTracks.forEach((pltrack, index) => {
+      //For Audio Library only
+      // if (this.tracksData.trackType === TrackType.AudioLibrary) {
+      //   var selectedTracks = this.tracksData.tracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.id === ht.id));
+      //   selectedTracks = selectedTracks.reduce((acc, current) => {
+      //     const x = acc.find((item: any) => item.id === current.id);
+      //     if (!x) {
+      //       acc.push(current);
+      //     }
+      //     return acc;
+      //   }, []);
+      // } else {
+      //   //For Rest of the components
+      //   var selectedTracks = this.tracksData.tracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => selectedTrack.track.id === ht.track.id));
+      //   selectedTracks = selectedTracks.reduce((acc, current) => {
+      //     const x = acc.find((item: any) => item.track.id === current.track.id);
+      //     if (!x) {
+      //       acc.push(current);
+      //     }
+      //     return acc;
+      //   }, []);
+      // };
+
+      this.selectedTracksList.forEach((pltrack, index) => {
+        // selectedTracks.forEach((pltrack, index) => {
+        var eligibleTrack: any;
+        if (this.tracksData.trackType === TrackType.AudioLibrary) {
+          eligibleTrack = pltrack;
+        } else {
+          eligibleTrack = pltrack.track;
+        };
         durationSum = durationSum + ((pltrack.audio_features.duration_ms));
         this.totalTime = Constants.formatMilliseconds(durationSum);
         //duration
         this.chartData.labels.push(index + 1);
         //tempo
-        this.chartData.datasets[0].data.push(pltrack.audio_features.tempo);
-        this.chartData.datasets[0].tracks.push(pltrack.track);
+        this.chartData.datasets[3].data.push(pltrack.audio_features.tempo);
+        this.chartData.datasets[3].tracks.push(eligibleTrack);
         //loudness
-        this.chartData.datasets[1].data.push(pltrack.audio_features.loudness);
-        this.chartData.datasets[1].tracks.push(pltrack.track);
+        this.chartData.datasets[2].data.push(pltrack.audio_features.loudness);
+        this.chartData.datasets[2].tracks.push(eligibleTrack);
         //energy
-        this.chartData.datasets[2].data.push(pltrack.audio_features.energy);
-        this.chartData.datasets[2].tracks.push(pltrack.track);
+        this.chartData.datasets[0].data.push(pltrack.audio_features.energy);
+        this.chartData.datasets[0].tracks.push(eligibleTrack);
         //danceability
-        this.chartData.datasets[3].data.push(pltrack.audio_features.danceability);
-        this.chartData.datasets[3].tracks.push(pltrack.track);
+        this.chartData.datasets[1].data.push(pltrack.audio_features.danceability);
+        this.chartData.datasets[1].tracks.push(eligibleTrack);
       });
-     // console.log('this.chartData', this.chartData);
+
+      // console.log('this.chartData', this.chartData);
     } else {
       var durationSum = 0;
       this.tracksData.tracks.forEach((pltrack, index) => {
+
+        var eligibleTrack: any;
+        if (this.tracksData.trackType === TrackType.AudioLibrary) {
+          eligibleTrack = pltrack;
+        } else {
+          eligibleTrack = pltrack.track;
+
+        };
 
         durationSum = durationSum + ((pltrack.audio_features.duration_ms));
         this.totalTime = Constants.formatMilliseconds(durationSum);
@@ -204,37 +266,106 @@ export class TrackSummaryGraphComponent {
         this.chartData.labels.push(index + 1);
         //tempo
         this.chartData.datasets[3].data.push(pltrack.audio_features.tempo);
-        this.chartData.datasets[3].tracks.push(pltrack.track);
+        this.chartData.datasets[3].tracks.push(eligibleTrack);
         //loudness
         this.chartData.datasets[2].data.push(pltrack.audio_features.loudness);
-        this.chartData.datasets[2].tracks.push(pltrack.track);
+        this.chartData.datasets[2].tracks.push(eligibleTrack);
         //energy
         this.chartData.datasets[0].data.push(pltrack.audio_features.energy);
-        this.chartData.datasets[0].tracks.push(pltrack.track);
+        this.chartData.datasets[0].tracks.push(eligibleTrack);
         //danceability
         this.chartData.datasets[1].data.push(pltrack.audio_features.danceability);
-        this.chartData.datasets[1].tracks.push(pltrack.track);
+        this.chartData.datasets[1].tracks.push(eligibleTrack);
       });
       //console.log('this.chartData',this.chartData);
     };
 
-    this.totalTracks = (this.selectedTracksList.length>0)? this.selectedTracksList.length:this.tracksData.tracks.length;
+    this.totalTracks = (this.selectedTracksList.length > 0) ? this.selectedTracksList.length : this.tracksData.tracks.length;
+  }
+
+
+  getTempoStats() {
+    var tempos = this.tracksData.tracks.map(track => { return track.audio_features.tempo });
+    tempos = [...new Set(tempos)];
+    
+    this.stravaService.getTempoStatisticsByMultiTempos(tempos).subscribe((temposRes) => {
+      if (temposRes.statusCode === 200) {
+        // console.log('tempo stats', temposRes.payload);
+        this.tempoStatCount=0;
+        this.tracksData.tracks.forEach(track => {
+          var duration_ms = 0;
+          if (this.tracksData.trackType === TrackType.AudioLibrary) {
+            duration_ms = track.duration_ms;
+          } else {
+            duration_ms = track.track.duration_ms;
+          };
+
+          track.tempoStatistic = temposRes.payload.find((stat: any) => stat.tempo === track.audio_features.tempo);
+          if (track.tempoStatistic) {
+            track.minDistance = (track.tempoStatistic?.minSpeed * (Constants.convertMsToHours(duration_ms)));
+            track.avgDistance = (track.tempoStatistic?.avgSpeed * (Constants.convertMsToHours(duration_ms)));
+            track.maxDistance = (track.tempoStatistic?.maxSpeed * (Constants.convertMsToHours(duration_ms)));
+          };
+
+          if (this.tracksData.trackType != TrackType.AudioLibrary) {
+            track.track.tempoStatistic = track.tempoStatistic;
+            track.track.minDistance = track.minDistance;
+            track.track.avgDistance = track.avgDistance;
+            track.track.maxDistance = track.maxDistance;
+          };
+        });
+        // console.log('modified tracks', this.tracksData.tracks);
+        var tempostatTrackCount = (this.tracksData.tracks.filter(track => track.tempoStatistic !== undefined)).length;
+        var count = (tempostatTrackCount > this.selectedTracksList.length && (this.selectedTracksList.length != 0)) ? this.selectedTracksList.length : tempostatTrackCount;
+        this.tempoStatCount=count;
+        this.dynamicMessage = `The Total Distance and avg. Pace corresponds to ${count} track(s).`;
+
+
+        this.onDateChangeBarChart();
+      }else if(temposRes.statusCode ===404){
+        this.tempoStatCount=0;
+      };
+    },error=>{
+      this.tempoStatCount=0;
+    });
   }
 
 
 
+  //sum function for main chart data
+  sumOf(array: any[]) {
+    let sum: number = 0;
+    array.forEach((a) => (sum += a));
+    return sum;
+  }
 
-
-
-
-
-
-
-
-
-
-
-
+  onDateChangeBarChart() {
+    switch (this.selectedDate.name) {
+      case 'Average':
+        this.paceText = 'Avg. Pace';
+        this.aggregateDistance = this.tracksData.tracks.reduce((acc, track) => {
+          return acc + (track.avgDistance || 0);
+        }, 0);
+        this.aggregatePace = Constants.sumPace(this.tracksData.tracks, this.selectedDate.name);
+        break;
+      case 'Min':
+        this.paceText = 'Min. Pace';
+        this.aggregateDistance = this.tracksData.tracks.reduce((acc, track) => {
+          return acc + (track.minDistance || 0);
+        }, 0);
+        this.aggregatePace = Constants.sumPace(this.tracksData.tracks, this.selectedDate.name);
+        break;
+      case 'Max':
+        this.paceText = 'Max. Pace';
+        this.aggregateDistance = this.tracksData.tracks.reduce((acc, track) => {
+          return acc + (track.maxDistance || 0);
+        }, 0);
+        this.aggregatePace = Constants.sumPace(this.tracksData.tracks, this.selectedDate.name);
+        break;
+      default:
+        break;
+    };
+  }
 
   getOrCreateTooltip = (chart: any) => {
     let tooltipEl = chart.canvas.parentNode.querySelector('div');
@@ -249,6 +380,8 @@ export class TrackSummaryGraphComponent {
       tooltipEl.style.position = 'absolute';
       tooltipEl.style.transform = 'translate(-50%, 0)';
       tooltipEl.style.transition = 'all .2s ease';
+      tooltipEl.style.maxWidth = '200px';
+      tooltipEl.style.width = '200px';
 
       const table = document.createElement('table');
       table.style.margin = '0px';
@@ -285,29 +418,49 @@ export class TrackSummaryGraphComponent {
 
         const th = document.createElement('th');
         th.style.borderWidth = '0';
-        trackIndex = (Number(title) - 1)
+        trackIndex = (Number(title) - 1);
+
         th.innerText = context.tooltip.dataPoints[0].dataset.tracks[trackIndex].name;
         track = context.tooltip.dataPoints[0].dataset.tracks[trackIndex];
 
-        //const text = document.createTextNode(title);
 
-        //th.appendChild(text);
+        if (track.tempoStatistic?.isProjected) {
+          // Create a span for the "Projected" tag
+          const projectedTag = document.createElement('span');
+          projectedTag.innerText = "Projected";
+          projectedTag.style.backgroundColor = "green";  // Green background
+          projectedTag.style.color = "white";            // White text
+          projectedTag.style.padding = "2px 5px";        // Padding for the tag
+          projectedTag.style.borderRadius = "3px";       // Rounded corners
+          projectedTag.style.marginLeft = "10px";        // Space between name and tag
+
+          // Append the tag to the th element
+          th.appendChild(projectedTag);
+        };
+
         tr.appendChild(th);
         tableHead.appendChild(tr);
       });
+
+
       const tableBody = document.createElement('tbody');
 
       const trEmpty = document.createElement('tr');
       trEmpty.innerHTML = `</br>`;
       tableBody.appendChild(trEmpty);
-      
+
       //for starting time
       const tr = document.createElement('tr');
       tr.style.backgroundColor = 'inherit';
       tr.style.borderWidth = '0';
       const td = document.createElement('td');
       td.style.borderWidth = '0';
-      var trackStartTime = trackIndex === 0 ? 0 : this.tracksData.tracks.slice(0, trackIndex).reduce((sum, track) => sum + track.track.duration_ms, 0);
+      if (this.tracksData.trackType === TrackType.AudioLibrary) {
+        var trackStartTime = trackIndex === 0 ? 0 : this.tracksData.tracks.slice(0, trackIndex).reduce((sum, track) => sum + track.duration_ms, 0);
+      } else {
+        var trackStartTime = trackIndex === 0 ? 0 : this.tracksData.tracks.slice(0, trackIndex).reduce((sum, track) => sum + track.track.duration_ms, 0);
+      }
+
       const text = document.createTextNode(`Start : ${Constants.formatMilliseconds(trackStartTime)}`);
       td.appendChild(text);
       tr.appendChild(td);
@@ -320,10 +473,78 @@ export class TrackSummaryGraphComponent {
       tr1.style.paddingBottom = '10px';
       const td1 = document.createElement('td1');
       td.style.borderWidth = '0';
-      const text1 = document.createTextNode(`Duration : ${Constants.formatMilliseconds( track.duration_ms)}`);
+      const text1 = document.createTextNode(`Duration : ${Constants.formatMilliseconds(track.duration_ms)}`);
       td1.appendChild(text1);
       tr1.appendChild(td1);
       tableBody.appendChild(tr1);
+
+
+      //only if TempoStatistic Exists
+      if (track.tempoStatistic) {
+        var distance: number = 0;
+        var pace: string = '';
+        var speed: number = 0;
+        switch (this.selectedDate.name) {
+          case 'Average':
+            distance = track.avgDistance;
+            pace = track.tempoStatistic.avgPace;
+            speed = track.tempoStatistic.avgSpeed;
+            break;
+          case 'Min':
+            distance = track.minDistance;
+            pace = track.tempoStatistic.minPace;
+            speed = track.tempoStatistic.minSpeed;
+            break;
+          case 'Max':
+            distance = track.maxDistance;
+            pace = track.tempoStatistic.maxPace;
+            speed = track.tempoStatistic.maxSpeed;
+            break;
+          default:
+            break;
+        };
+        distance = parseFloat(distance.toFixed(2));
+        speed = parseFloat(speed.toFixed(2));
+
+        //For Distance 
+        const trDist = document.createElement('tr');
+        trDist.style.backgroundColor = 'inherit';
+        trDist.style.borderWidth = '0';
+        trDist.style.paddingBottom = '10px';
+        const tdDist = document.createElement('td');
+        td.style.borderWidth = '0';
+        const textD = document.createTextNode(`Distance : ${distance} km`);
+        tdDist.appendChild(textD);
+        trDist.appendChild(tdDist);
+        tableBody.appendChild(trDist);
+
+        //For Pace 
+        const trPace = document.createElement('tr');
+        trPace.style.backgroundColor = 'inherit';
+        trPace.style.borderWidth = '0';
+        trPace.style.paddingBottom = '10px';
+        const tdPace = document.createElement('td');
+        td.style.borderWidth = '0';
+        const textP = document.createTextNode(`Pace : ${pace} /km`);
+        tdPace.appendChild(textP);
+        trPace.appendChild(tdPace);
+        tableBody.appendChild(trPace);
+
+        //For Speed 
+        const trSpeed = document.createElement('tr');
+        trSpeed.style.backgroundColor = 'inherit';
+        trSpeed.style.borderWidth = '0';
+        trSpeed.style.paddingBottom = '10px';
+        const tdSpeed = document.createElement('td');
+        td.style.borderWidth = '0';
+        const textS = document.createTextNode(`Speed : ${speed} km/hr`);
+        tdSpeed.appendChild(textS);
+        trSpeed.appendChild(tdSpeed);
+        tableBody.appendChild(trSpeed);
+
+      };
+
+
 
       const tableFooter = document.createElement('tfooter');
       const trFooter = document.createElement('tr');
@@ -380,147 +601,6 @@ export class TrackSummaryGraphComponent {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //sum function for main chart data
-  sumOf(array: any[]) {
-    let sum: number = 0;
-    array.forEach((a) => (sum += a));
-    return sum;
-  }
-
-  onDateChangeBarChart() {
-    const documentStyle = getComputedStyle(document.documentElement);
-    // const monthlyData = {
-    //   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-    //   datasets: [
-    //     {
-    //       label: 'Orders',
-    //       data: this.orders.monthlyData.orders,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-color'),
-    //       borderRadius: 12
-    //     },
-    //     {
-    //       label: 'Units',
-    //       data: this.orders.monthlyData.orderUnits,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-light-color'),
-    //       borderRadius: 12
-    //     }
-    //   ]
-    // };
-
-    // const dailyData = {
-    //   labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
-    //   datasets: [
-    //     {
-    //       label: 'Orders',
-    //       data: this.orders.dailyData.orders,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-color'),
-    //       borderRadius: 6
-    //     },
-    //     {
-    //       label: 'Units',
-    //       data: this.orders.dailyData.orderUnits,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-light-color'),
-    //       borderRadius: 6
-    //     }
-    //   ]
-    // };
-
-    // const weeklyData = {
-    //   labels: [
-    //     'Week 1',
-    //     'Week 2',
-    //     'Week 3',
-    //     'Week 4',
-    //     'Week 5',
-    //     'Week 6',
-    //     'Week 7',
-    //     'Week 8',
-    //     'Week 9',
-    //     'Week 10',
-    //     'Week 11',
-    //     'Week 12',
-    //     'Week 13',
-    //     'Week 14',
-    //     'Week 15',
-    //     'Week 16',
-    //     'Week 17',
-    //     'Week 18',
-    //     'Week 19',
-    //     'Week 20',
-    //     'Week 21',
-    //     'Week 22',
-    //     'Week 23',
-    //     'Week 24'
-    //   ],
-    //   datasets: [
-    //     {
-    //       label: 'Orders',
-    //       data: this.orders.weeklyData.orders,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-color'),
-    //       borderRadius: 6
-    //     },
-    //     {
-    //       label: 'Units',
-    //       data: this.orders.weeklyData.orderUnits,
-    //       fill: false,
-    //       backgroundColor: documentStyle.getPropertyValue('--primary-light-color'),
-    //       borderRadius: 6
-    //     }
-    //   ]
-    // };
-
-    // let newBarData = { ...this.chartData };
-    // switch (this.selectedDate.name) {
-    //   case 'Monthly':
-    //     newBarData = monthlyData;
-    //     break;
-    //   case 'Weekly':
-    //     newBarData = weeklyData;
-    //     break;
-    //   case 'Daily':
-    //     newBarData = dailyData;
-    //     break;
-    //   default:
-    //     break;
-    // }
-
-    this.chartData = {};
-  }
 
 
 

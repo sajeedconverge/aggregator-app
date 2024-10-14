@@ -1,0 +1,5 @@
+@if(isLoading) {
+<app-progress-bar></app-progress-bar>
+}@else {
+<p-chart type="line" [data]="data" [options]="options" />
+}

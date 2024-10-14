@@ -6,7 +6,7 @@
     <p-table [value]="trackDetails" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
         [totalRecords]="trackDetails.length" [paginator]="true" paginatorPosition="top"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        [tableStyle]="{'min-width': '60rem'}" >
+        [tableStyle]="{'min-width': '60rem'}">
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <h3>Audio Details</h3>
@@ -49,23 +49,57 @@
                 <th>Omit</th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-trackDetail>
+        <ng-template pTemplate="body" let-trackDetail let-index="rowIndex">
             <tr>
                 <td>{{trackDetail.start_time | date: 'dd-MMM-yyyy hh:mm:ss a'}}</td>
                 <td>{{ trackDetail?.distance | number:'1.2-2' }} km</td>
-                <td>{{ trackDetail?.pace }} /km</td>
-                <td>{{ trackDetail?.speed | number:'1.2-2'}} km/hr</td>
+                <td>
+                    @if(index>0){
+                    @if(trackDetails[index-1].pace<trackDetails[index].pace || index===0){ <span
+                        class="material-symbols-outlined text-green-800">
+                        trending_up
+                        </span>
+                        }@else{
+                        <span class="material-symbols-outlined text-red-600">
+                            trending_down
+                        </span>
+                        }
+                        }@else {
+                        <span class="material-symbols-outlined text-green-800">
+                            trending_up
+                        </span>
+                        }
+                        {{ trackDetail?.pace }} /km
+                </td>
+                <td>
+                    @if(index>0){
+                    @if(trackDetails[index-1].speed<trackDetails[index].speed || index===0){ <span
+                        class="material-symbols-outlined text-green-800">
+                        trending_up
+                        </span>
+                        }@else{
+                        <span class="material-symbols-outlined text-red-600">
+                            trending_down
+                        </span>
+                        }
+                        }@else {
+                        <span class="material-symbols-outlined text-green-800">
+                            trending_up
+                        </span>
+                        }
+                        {{ trackDetail?.speed | number:'1.2-2'}} km/hr
+                </td>
                 <td>
                     <!-- <div class="flex flex-row justify-content-center"> -->
-                        <span class="pi pi-check" *ngIf="trackDetail.isOmitted"></span>
-                        <span class="pi pi-times" *ngIf="!trackDetail.isOmitted"></span>
+                    <span class="pi pi-check" *ngIf="trackDetail.isOmitted"></span>
+                    <span class="pi pi-times" *ngIf="!trackDetail.isOmitted"></span>
                     <!-- </div> -->
                 </td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <tr class="">
-                <td colspan="10">No history found for the current audio track.</td>
+                <td colspan="10" class="text-center">No history found for the current audio track.</td>
             </tr>
         </ng-template>
 

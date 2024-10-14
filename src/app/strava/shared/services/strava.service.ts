@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ResponseModel } from '../../../shared/shared-models';
@@ -112,7 +112,7 @@ export class StravaService {
       );
   }
 
-  getActivityDetailsByTrackId(trackId:string): Observable<any> {
+  getActivityDetailsByTrackId(trackId: string): Observable<any> {
     return this.http.get<any>(Constants.baseServerUrl + `Strava/GetActivityDetailsByTrackId?trackId=${trackId}`, { headers: this.headers })
       .pipe(
         map(response => {
@@ -129,6 +129,21 @@ export class StravaService {
   updateActivityDetail(request: PostActivityDetailRequest): Observable<any> {
     return this.http.put<any>(Constants.baseServerUrl + 'Strava/UpdateActivityDetail', request, { headers: this.headers });
   }
+
+  getTempoStatisticsByTempo(tempo: number) : Observable<any>{
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetTempoStatisticByTempo?tempo=${tempo}`, { headers: this.headers });
+  }
+
+  getTempoStatisticsByMultiTempos(tempos: number[]) : Observable<any>{
+    var tempoString = tempos.join(',');
+    return this.http.get<any>(Constants.baseServerUrl + `Strava/GetTempoStatisticsByMultiTempos?tempoString=${tempoString}`, {
+      headers: this.headers,
+    });
+  }
+
+
+
+
 
 
 

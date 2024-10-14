@@ -23,6 +23,8 @@ import { ButtonGroupModule } from 'primeng/buttongroup';
 import { RoundPipe } from '../../shared/common-pipes/round.pipe';
 import { Title } from '@angular/platform-browser';
 import { UriPipe } from "../../shared/common-pipes/uri.pipe";
+import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-summary-graph.component';
+import { TracksData, TrackType } from '../shared/models/graph-models';
 
 
 
@@ -47,8 +49,14 @@ import { UriPipe } from "../../shared/common-pipes/uri.pipe";
     TooltipModule,
     ButtonGroupModule,
     RoundPipe,
-    UriPipe
-],
+    UriPipe,
+    TrackSummaryGraphComponent,
+
+
+
+
+
+  ],
   templateUrl: './playlist-details.component.html',
   styleUrl: './playlist-details.component.css',
   providers: [
@@ -118,10 +126,14 @@ export class PlaylistDetailsComponent implements OnInit {
   pageSize: number = 10;
   offset: number = 0;
   totalItemsCount: number = 0;
-  dataMessage:string='';
+  dataMessage: string = '';
   @ViewChild('tableRef') table!: Table;
   showPreview: boolean = false;
   currentTrack: any;
+  tracksData: TracksData = {
+    trackType: TrackType.PlaylistTracks,
+    tracks: []
+  };
 
 
 
@@ -137,7 +149,6 @@ export class PlaylistDetailsComponent implements OnInit {
 
 
 
-  
 
   constructor(
     private spotifyService: SpotifyService,
@@ -210,9 +221,9 @@ export class PlaylistDetailsComponent implements OnInit {
   }
 
   getPlayListTracks(offset: number, limit: number) {
-  // debugger;
+    // debugger;
     this.isLoading = true;
-    this.dataMessage='Loading data...';
+    this.dataMessage = 'Loading data...';
     this.playlistTracks = [];
     this.spotifyAuthService.refreshSpotifyAccessToken();
     var url = sessionStorage.getItem('playlist-items-url') || '';
@@ -220,7 +231,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
     this.currentPlayListName = playlistName;
     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-    if (spotifyAccessToken.length > 0 ) {
+    if (spotifyAccessToken.length > 0) {
 
       url = url + `?offset=${offset}&limit=${limit}`;
       this.spotifyService.SpotifyCommonGetApi(url, spotifyAccessToken).subscribe((resp) => {
@@ -235,7 +246,7 @@ export class PlaylistDetailsComponent implements OnInit {
 
         if (this.playlistTracks.length > 0) {
           // To assign Audio Features to the track
-          this.playlistTracks.forEach((pltrack,index) => {
+          this.playlistTracks.forEach((pltrack, index) => {
             pltrack.color = Constants.generateRandomPrimeNGColor();
             //To get Track features from DB
             this.spotifyService.getTrackById(pltrack.track.id).subscribe((dbTrackRes) => {
@@ -246,7 +257,7 @@ export class PlaylistDetailsComponent implements OnInit {
               } else {
                 //console.log('track not found');
                 this.nonSavedTrackIds.push(pltrack.track.id);
-                
+
                 //Add track to DB after fetching it's features
                 this.spotifyService.getSpotifyAudioFeaturesUrl(pltrack.track.id).subscribe((res) => {
                   if (res.statusCode === 200) {
@@ -269,13 +280,16 @@ export class PlaylistDetailsComponent implements OnInit {
                           pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
                         };
                       });
+                    }, error => {
+                      this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                      this.isLoading = false;
                     });
                   };
                 });
 
               };
             });
-            
+
             // //To get track analysis
             // this.spotifyService.getTrackAnalysisById(pltrack.track.id).subscribe((taRes) => {
 
@@ -311,10 +325,11 @@ export class PlaylistDetailsComponent implements OnInit {
             //     });
             //   };
             // });
-          if(index==(this.playlistTracks.length-1)){
-            this.dataMessage='No tracks found in the current playlist.';
-          };
+            if (index == (this.playlistTracks.length - 1)) {
+              this.dataMessage = 'No tracks found in the current playlist.';
+            };
           });
+          this.tracksData.tracks = this.playlistTracks;
           setTimeout(() => {
             if (this.table) {
               var sortEvent: any = {
@@ -325,11 +340,14 @@ export class PlaylistDetailsComponent implements OnInit {
               this.tableSorted(sortEvent);
             };
             this.isLoading = false;
-          }, (this.playlistTracks.length>25)? 8000 :5000);
+          }, (this.playlistTracks.length > 25) ? 8000 : 5000);
         } else {
-          this.dataMessage='No tracks found in the current playlist.';
+          this.dataMessage = 'No tracks found in the current playlist.';
           this.isLoading = false;
         }
+      }, error => {
+        this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+        this.isLoading = false;
       });
     };
   }
@@ -691,16 +709,23 @@ export class PlaylistDetailsComponent implements OnInit {
   navigateToTrackDetails(trackName: string, trackId: string) {
     sessionStorage.setItem('track-name', trackName);
     sessionStorage.setItem('track-id', trackId);
-    this.router.navigate(['/spotify/audio-details']);
+    this.router.navigate(['/spotify/audio-history']);
   }
 
 
   refreshGraphs() {
-    if (this.showSummaryGraph) {
-      this.showSummaryGraphChanged(true);
-    } else if (this.showDetailedGraph) {
-      this.showGraphChanged(true);
-    }
+    // if (this.showSummaryGraph) {
+    //   this.showSummaryGraphChanged(true);
+    // } else if (this.showDetailedGraph) {
+    //   this.showGraphChanged(true);
+    // };
+
+    this.showSummaryGraph = false;
+    this.isLoading = true;
+    setTimeout(() => {
+      this.showSummaryGraph = true;
+      this.isLoading = false;
+    }, 200);
   }
 
   onPageChange(event: any) {

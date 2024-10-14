@@ -148,7 +148,7 @@ export class SpotifyAuthorizationService {
                 if (res) {
                   //console.log("refresh access token", res);
                   sessionStorage.setItem('spotify-bearer-token', res.access_token);
-    
+
                   const currentDateTime = new Date();
                   const tokenExpiryTime = new Date(currentDateTime.getTime() + 3600 * 1000);
                   //console.log(currentDateTime, tokenExpiryTime);
@@ -183,7 +183,6 @@ export class SpotifyAuthorizationService {
         };
       });
     };
-
 
   }
 

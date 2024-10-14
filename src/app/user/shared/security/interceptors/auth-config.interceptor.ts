@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { catchError, delay, from, mergeMap, of, retryWhen, switchMap, take, throwError } from 'rxjs';
+import { catchError, delay, from, mergeMap, of, retryWhen, switchMap, take, throwError, timer } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { inject } from '@angular/core';
@@ -42,24 +42,17 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
 
           spotifyAuthService.refreshSpotifyAccessToken();
           // debugger;
-          // Retry the request with the new token
 
-          //
+          console.log('spotify token expired !');
 
-          // retryWhen(errors =>
-          //   errors.pipe(
-          //     mergeMap((error, index) => {
-          //       if (index < 3 && error.status === 401) {
-          //         return throwError(error);  // If retries fail after 3 attempts, throw the error
-          //       }
-          //       return of(error); // Retry up to 3 times
-          //     }),
-          //     delay(1000),  // Wait 1 second before retrying
-          //     take(3)       // Retry at most 3 times
-          //   )
-          // );
+          timer(3000).subscribe(() => {
+            console.log('timer executed !');
+            return next(req);
+          });
 
           return next(req);
+
+
 
         } else {
           // If the error is not 401, propagate it further

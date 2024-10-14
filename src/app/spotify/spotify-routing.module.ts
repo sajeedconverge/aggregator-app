@@ -6,6 +6,7 @@ import { TrackDetailsComponent } from './track-details/track-details.component';
 import { AudioHistoryComponent } from './audio-history/audio-history.component';
 import { AudioLibraryComponent } from './audio-library/audio-library.component';
 import { LikedSongsComponent } from './liked-songs/liked-songs.component';
+import { SearchTracksComponent } from './search-tracks/search-tracks.component';
 
 const routes: Routes = [
   {
@@ -17,11 +18,11 @@ const routes: Routes = [
     component: PlaylistDetailsComponent
   },
   {
-    path: 'audio-details',
+    path: 'audio-history',
     component: TrackDetailsComponent
   },
   {
-    path: 'audio-history',
+    path: 'recently-played',
     component: AudioHistoryComponent
   },
   {
@@ -31,6 +32,11 @@ const routes: Routes = [
   {
     path: 'liked-songs',
     component: LikedSongsComponent
+  }
+  ,
+  {
+    path: 'search',
+    component: SearchTracksComponent
   }
 ];
 

@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
 import { Constants } from '../../shared/Constants';
 import { TooltipModule } from 'primeng/tooltip';
 import { Title } from '@angular/platform-browser';
+import { MessageService } from 'primeng/api';
 
 
 
@@ -168,7 +169,8 @@ export class TrackDetailsComponent implements OnInit {
   constructor(
     private spotifyService: SpotifyService,
     private router: Router,
-    private title:Title
+    private title:Title,
+    private messageService:MessageService
   ) {
     this.title.setTitle('AudioActive - Track Details')
     this.trackId = sessionStorage.getItem('track-id') || '';
@@ -318,6 +320,9 @@ export class TrackDetailsComponent implements OnInit {
                 this.data1.datasets[1].data.push(section.loudness);
               });
               //this.showFeaturesGraph = true;
+              this.isLoading = false;
+            }, error => {
+              this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
               this.isLoading = false;
             });
           };

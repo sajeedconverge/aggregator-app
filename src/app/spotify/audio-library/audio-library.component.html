@@ -10,17 +10,19 @@
         [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
         (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)" [lazy]="true"
         (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta"> -->
-    <p-table [value]="audioTracks"  [totalRecords]="audioTracks.length" sortField="name"
-        (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
+    <p-table [value]="audioTracks" [totalRecords]="audioTracks.length" sortField="name" (sortOrder)="1"
+        [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
         (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)" [lazy]="true"
-        (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+        (onLazyLoad)="loadData($event)" [multiSortMeta]="multiSortMeta" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
                 <div></div>
                 <h3>Audio Library</h3>
                 <div class="flex flex-row align-items-center">
-                    <p-dropdown [options]="rowsPerPageOptions" (onChange)="onLimitChange($event)" pTooltip="Tracks limit" tooltipPosition="bottom"></p-dropdown>
+                    <p-dropdown [options]="rowsPerPageOptions" (onChange)="onLimitChange($event)"
+                        pTooltip="Tracks limit" tooltipPosition="bottom"></p-dropdown>
                     <div>
                         <p-button [rounded]="true" severity="success" icon="pi pi-refresh"
                             [disabled]="!showSummaryGraph && !showDetailedGraph" (onClick)="refreshGraphs()"
@@ -44,11 +46,8 @@
                         </p-buttonGroup> -->
 
                         <p-button class="pr-3 btn-grp-custom" [outlined]="!showSummaryGraph" size="small"
-                            (onClick)="showSummaryGraphChanged(false)" pTooltip="Summary Graph"
-                            tooltipPosition="bottom">
-                            <span class="material-symbols-outlined">
-                                show_chart
-                            </span>
+                            (onClick)="showSummaryGraphChanged(false)" pTooltip="Summary Graph" tooltipPosition="bottom"
+                            icon="pi pi-chart-bar">
                         </p-button>
                     </div>
 
@@ -69,7 +68,13 @@
                 </div>
             </div>
             <div>
-                <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" />
+                <!-- <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" /> -->
+
+                <div *ngIf="showSummaryGraph">
+                    <app-track-summary-graph [tracksData]="tracksData"
+                        [selectedTracksList]="selectedTracksList"></app-track-summary-graph>
+                </div>
+
             </div>
             <!-- <div>
                 <p-chart type="line" [data]="data" [options]="options" *ngIf="showDetailedGraph" />
@@ -143,7 +148,8 @@
                     <p-tableCheckbox [value]="track" />
                 </td>
                 <td>
-                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true" (onClick)="showPreviewPopup(track)" />
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true"
+                        (onClick)="showPreviewPopup(track)" />
                 </td>
                 <td><img [src]="track.album?.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
@@ -161,7 +167,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <tr class="">
-                <td colspan="12">{{dataMessage}}</td>
+                <td colspan="12" class="text-center">{{dataMessage}}</td>
             </tr>
         </ng-template>
     </p-table>
@@ -232,6 +238,6 @@
     [style]="{ width: '50rem' }">
     <div class="">
         <iframe [src]="currentTrack?.uri | uri" width="600" height="230" frameborsrcder="0" allowtransparency="true"
-            allow="encrypted-media ; autoplay" sandbox="allow-scripts allow-same-origin" ></iframe>
+            allow="encrypted-media ; autoplay" sandbox="allow-scripts allow-same-origin"></iframe>
     </div>
 </p-dialog>

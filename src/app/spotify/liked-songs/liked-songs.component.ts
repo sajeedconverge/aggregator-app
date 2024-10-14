@@ -58,7 +58,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 
 
-],
+  ],
   templateUrl: './liked-songs.component.html',
   styleUrl: './liked-songs.component.css',
   providers: [
@@ -139,8 +139,6 @@ export class LikedSongsComponent implements OnInit {
   @ViewChild('tableRef') table!: Table;
   showPreview: boolean = false;
   currentTrack: any;
-  searchText:string='';
-
 
 
 
@@ -224,7 +222,7 @@ export class LikedSongsComponent implements OnInit {
         var likedSongsUrl = urlResponse.payload;
 
         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-        if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
+        if (spotifyAccessToken.length > 0 ) {
 
           this.spotifyService.SpotifyCommonGetApi(likedSongsUrl, spotifyAccessToken).subscribe((resp) => {
             // debugger;
@@ -273,6 +271,9 @@ export class LikedSongsComponent implements OnInit {
                               pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
                             };
                           });
+                        }, error => {
+                          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                          this.isLoading = false;
                         });
                       };
                     });
@@ -364,10 +365,13 @@ export class LikedSongsComponent implements OnInit {
                 this.dataMessage = 'No tracks found in liked songs.';
                 this.isLoading = false;
 
-              }, (this.likedSongs.length>25)? 8000 :5000);
+              }, (this.likedSongs.length > 25) ? 8000 : 5000);
             } else {
               this.isLoading = false;
             }
+          }, error => {
+            this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+            this.isLoading = false;
           });
         };
       } else {
@@ -714,7 +718,7 @@ export class LikedSongsComponent implements OnInit {
   navigateToTrackDetails(trackName: string, trackId: string) {
     sessionStorage.setItem('track-name', trackName);
     sessionStorage.setItem('track-id', trackId);
-    this.router.navigate(['/spotify/audio-details']);
+    this.router.navigate(['/spotify/audio-history']);
   }
 
   addTracksToExistingPlaylist() {
@@ -729,6 +733,9 @@ export class LikedSongsComponent implements OnInit {
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
           console.log(this.userPlaylists);
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
         });
         this.isLoading = false;
       };
@@ -823,6 +830,9 @@ export class LikedSongsComponent implements OnInit {
                     //console.log("track added successfully.", pltrack.track.name);
                   };
                 });
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });
@@ -857,6 +867,9 @@ export class LikedSongsComponent implements OnInit {
 
                   };
                 });
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });
@@ -866,11 +879,17 @@ export class LikedSongsComponent implements OnInit {
   }
 
   refreshGraphs() {
-    if (this.showSummaryGraph) {
-      this.showSummaryGraphChanged(true);
-    } else if (this.showDetailedGraph) {
-      this.showGraphChanged(true);
-    }
+    // if (this.showSummaryGraph) {
+    //   this.showSummaryGraphChanged(true);
+    // } else if (this.showDetailedGraph) {
+    //   this.showGraphChanged(true);
+    // };
+    this.showSummaryGraph = false;
+    this.isLoading = true;
+    setTimeout(() => {
+      this.showSummaryGraph = true;
+      this.isLoading = false;
+    }, 200);
   }
 
   onPageChange(event: any) {
@@ -891,7 +910,7 @@ export class LikedSongsComponent implements OnInit {
     this.currentTrack = track.track;
   }
 
-
+  
 
 
 

@@ -15,6 +15,11 @@
                 <h3>Recently Played</h3>
                 <div class="flex flex-row align-items-center">
                     <div class="flex flex-row align-items-center">
+                        <!-- <div *ngIf="selectedTracksList.length>0">
+                            <p-button icon="pi pi-chart-line" class="px-2" pTooltip="Projections Graph"
+                                tooltipPosition="bottom" (onClick)="showProjections()" ></p-button>
+                        </div> -->
+
                         <div>
                             <p-button [rounded]="true" severity="success" icon="pi pi-refresh"
                                 [disabled]="!showSummaryGraph && !showDetailedGraph" (onClick)="refreshGraphs()"
@@ -35,11 +40,10 @@
                             </p-button>
                         </p-buttonGroup> -->
 
-                        <p-button class="pr-3 btn-grp-custom" [outlined]="!showSummaryGraph" size="small" (onClick)="showSummaryGraphChanged(false)"
-                            pTooltip="Summary Graph" tooltipPosition="bottom">
-                            <span class="material-symbols-outlined">
-                                show_chart
-                            </span>
+                        <p-button class="pr-3 btn-grp-custom" [outlined]="!showSummaryGraph" size="small"
+                            (onClick)="showSummaryGraphChanged(false)" pTooltip="Summary Graph" tooltipPosition="bottom"
+                            icon="pi pi-chart-bar">
+
                         </p-button>
                     </div>
 
@@ -58,9 +62,10 @@
             </div>
             <div>
                 <!-- <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" /> -->
-            
-                <div  *ngIf="showSummaryGraph">
-                    <app-track-summary-graph [tracksData]="tracksData" [selectedTracksList]="selectedTracksList"></app-track-summary-graph>
+
+                <div *ngIf="showSummaryGraph">
+                    <app-track-summary-graph [tracksData]="tracksData"
+                        [selectedTracksList]="selectedTracksList"></app-track-summary-graph>
                 </div>
             </div>
             <!-- <div>
@@ -123,7 +128,8 @@
                     <p-tableCheckbox [value]="track" />
                 </td>
                 <td>
-                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true" (onClick)="showPreviewPopup(track)" />
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true"
+                        (onClick)="showPreviewPopup(track)" />
                 </td>
                 <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
@@ -142,7 +148,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <tr class="">
-                <td colspan="12">
+                <td colspan="12" class="text-center">
                     {{dataMessage}}
                 </td>
             </tr>
@@ -219,9 +225,3 @@
             allow="encrypted-media ; autoplay"></iframe>
     </div>
 </p-dialog>
-
-
-
-
-
-
