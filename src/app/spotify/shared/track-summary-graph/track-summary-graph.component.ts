@@ -11,6 +11,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TooltipModule } from 'primeng/tooltip';
 import { Message, MessageService } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
+import { error } from 'console';
 
 
 
@@ -286,10 +287,11 @@ export class TrackSummaryGraphComponent {
   getTempoStats() {
     var tempos = this.tracksData.tracks.map(track => { return track.audio_features.tempo });
     tempos = [...new Set(tempos)];
+    
     this.stravaService.getTempoStatisticsByMultiTempos(tempos).subscribe((temposRes) => {
       if (temposRes.statusCode === 200) {
         // console.log('tempo stats', temposRes.payload);
-
+        this.tempoStatCount=0;
         this.tracksData.tracks.forEach(track => {
           var duration_ms = 0;
           if (this.tracksData.trackType === TrackType.AudioLibrary) {
@@ -320,7 +322,11 @@ export class TrackSummaryGraphComponent {
 
 
         this.onDateChangeBarChart();
+      }else if(temposRes.statusCode ===404){
+        this.tempoStatCount=0;
       };
+    },error=>{
+      this.tempoStatCount=0;
     });
   }
 
