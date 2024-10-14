@@ -222,7 +222,7 @@ export class LikedSongsComponent implements OnInit {
         var likedSongsUrl = urlResponse.payload;
 
         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
-        if (spotifyAccessToken.length > 0 && Constants.spotifySettings.clientId.length > 0) {
+        if (spotifyAccessToken.length > 0 ) {
 
           this.spotifyService.SpotifyCommonGetApi(likedSongsUrl, spotifyAccessToken).subscribe((resp) => {
             // debugger;

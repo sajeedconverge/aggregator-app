@@ -62,7 +62,7 @@ export class SearchTracksComponent implements OnInit {
   ref: DynamicDialogRef | undefined;
   dataMessage: string = 'No tracks';
   totalCount: number = 0;
-
+  likedSongs: any[] = [];
 
 
 
@@ -80,10 +80,27 @@ export class SearchTracksComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.getLikedSongs();
   }
 
 
+  getLikedSongs() {
+    this.spotifyService.getLikedSongsUrl(0, 50).subscribe((urlResponse) => {
+      if (urlResponse.statusCode === 200) {
+        var likedSongsUrl = urlResponse.payload;
+        const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
+        this.spotifyService.SpotifyCommonGetApi(likedSongsUrl, spotifyAccessToken).subscribe((resp) => {
+          this.likedSongs = resp.items;
+          // console.log('likedSongs', this.likedSongs);
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
+        });
+
+      }
+    });
+
+  }
 
 
   searchSpotify() {
@@ -96,6 +113,10 @@ export class SearchTracksComponent implements OnInit {
       this.searchedTracks = response.tracks.items;
       console.log(this.searchedTracks);
 
+      // to check if song is liked
+      // this.searchedTracks.forEach(track => {
+      //   track.isLiked = this.likedSongs.some(likedSong => likedSong.track.id === track.id);
+      // });
 
       this.searchedTracks.forEach((track) => {
         // audio features
