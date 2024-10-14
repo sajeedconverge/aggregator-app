@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { catchError, delay, from, mergeMap, of, retryWhen, switchMap, take, throwError } from 'rxjs';
+import { catchError, delay, from, mergeMap, of, retryWhen, switchMap, take, throwError, timer } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { inject } from '@angular/core';
@@ -44,6 +44,11 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
           // debugger;
 
           console.log('spotify token expired !');
+
+          timer(3000).subscribe(() => {
+            console.log('timer executed !');
+            return next(req);
+          });
 
           return next(req);
 

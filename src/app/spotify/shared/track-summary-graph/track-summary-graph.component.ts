@@ -9,6 +9,8 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TooltipModule } from 'primeng/tooltip';
+import { Message, MessageService } from 'primeng/api';
+import { MessagesModule } from 'primeng/messages';
 
 
 
@@ -28,13 +30,17 @@ import { TooltipModule } from 'primeng/tooltip';
     ButtonModule,
     OverlayPanelModule,
     TooltipModule,
+    MessagesModule,
+
+
 
 
 
 
   ],
   templateUrl: './track-summary-graph.component.html',
-  styleUrl: './track-summary-graph.component.css'
+  styleUrl: './track-summary-graph.component.css',
+  providers: [MessageService]
 })
 export class TrackSummaryGraphComponent {
   documentStyle = getComputedStyle(document.documentElement);
@@ -61,8 +67,10 @@ export class TrackSummaryGraphComponent {
   paceText: string = '';
   aggregatePace: string = '00:00:00';
   dynamicMessage: string = '';
-
-
+  tempoStatCount:number=-1;
+  messages: Message[] = [
+    { severity: 'warn', detail: 'Audio Active has not collected sufficient data to project statistics.' },
+  ];
 
 
 
@@ -307,7 +315,8 @@ export class TrackSummaryGraphComponent {
         // console.log('modified tracks', this.tracksData.tracks);
         var tempostatTrackCount = (this.tracksData.tracks.filter(track => track.tempoStatistic !== undefined)).length;
         var count = (tempostatTrackCount > this.selectedTracksList.length && (this.selectedTracksList.length != 0)) ? this.selectedTracksList.length : tempostatTrackCount;
-        this.dynamicMessage = `The average Information corresponds to ${count} tracks.`;
+        this.tempoStatCount=count;
+        this.dynamicMessage = `The Total Distance and avg. Pace corresponds to ${count} track(s).`;
 
 
         this.onDateChangeBarChart();
@@ -365,8 +374,8 @@ export class TrackSummaryGraphComponent {
       tooltipEl.style.position = 'absolute';
       tooltipEl.style.transform = 'translate(-50%, 0)';
       tooltipEl.style.transition = 'all .2s ease';
-      tooltipEl.style.maxWidth='200px';
-      tooltipEl.style.width='200px';
+      tooltipEl.style.maxWidth = '200px';
+      tooltipEl.style.width = '200px';
 
       const table = document.createElement('table');
       table.style.margin = '0px';
@@ -408,12 +417,26 @@ export class TrackSummaryGraphComponent {
         th.innerText = context.tooltip.dataPoints[0].dataset.tracks[trackIndex].name;
         track = context.tooltip.dataPoints[0].dataset.tracks[trackIndex];
 
-        //const text = document.createTextNode(title);
 
-        //th.appendChild(text);
+        if (track.tempoStatistic?.isProjected) {
+          // Create a span for the "Projected" tag
+          const projectedTag = document.createElement('span');
+          projectedTag.innerText = "Projected";
+          projectedTag.style.backgroundColor = "green";  // Green background
+          projectedTag.style.color = "white";            // White text
+          projectedTag.style.padding = "2px 5px";        // Padding for the tag
+          projectedTag.style.borderRadius = "3px";       // Rounded corners
+          projectedTag.style.marginLeft = "10px";        // Space between name and tag
+
+          // Append the tag to the th element
+          th.appendChild(projectedTag);
+        };
+
         tr.appendChild(th);
         tableHead.appendChild(tr);
       });
+
+
       const tableBody = document.createElement('tbody');
 
       const trEmpty = document.createElement('tr');

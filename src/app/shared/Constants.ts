@@ -4,8 +4,8 @@ import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "..
 
 export class Constants {
 
-    // public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
-    public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
+    public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
+    // public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     public static spotifySettings: SpotifySettings = {
         clientId: "",
@@ -433,9 +433,9 @@ export class Constants {
         return this.formatMilliseconds(totalMilliseconds);
     }
 
-public static spotifySearchUrl(text:string,limit:number) {
-    return `https://api.spotify.com/v1/search?q=${text}&type=track&limit=${limit}`
-}
+    public static spotifySearchUrl(text: string, limit: number) {
+        return `https://api.spotify.com/v1/search?q=${text}&type=track&limit=${limit}`
+    }
 
 
 

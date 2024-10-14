@@ -12,10 +12,16 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { RoundPipe } from "../../shared/common-pipes/round.pipe";
 import { Router } from '@angular/router';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { UriPipe } from "../../shared/common-pipes/uri.pipe";
 import { DialogModule } from 'primeng/dialog';
+import { SpotifyAuthorizationService } from '../shared/services/spotify-authorization.service';
+import { ToastModule } from 'primeng/toast';
+
+
+
+
 
 @Component({
   selector: 'app-search-tracks',
@@ -32,7 +38,7 @@ import { DialogModule } from 'primeng/dialog';
     InputTextModule,
     UriPipe,
     DialogModule,
-
+    ToastModule,
 
 
 
@@ -66,7 +72,9 @@ export class SearchTracksComponent implements OnInit {
   constructor(
     private title: Title,
     private spotifyService: SpotifyService,
-    private router: Router
+    private router: Router,
+    private spotifyAuthService: SpotifyAuthorizationService,
+    private messageService: MessageService,
   ) {
     this.title.setTitle('AudioActive - Search')
   }
@@ -80,6 +88,7 @@ export class SearchTracksComponent implements OnInit {
 
   searchSpotify() {
     this.isLoading = true;
+    this.spotifyAuthService.refreshSpotifyAccessToken();
     var searchUrl = Constants.spotifySearchUrl(this.searchText, this.limit);
     const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
     this.spotifyService.SpotifyCommonGetApi(searchUrl, spotifyAccessToken).subscribe((response) => {
@@ -122,6 +131,9 @@ export class SearchTracksComponent implements OnInit {
         this.isLoading = false;
       }, 5000);
 
+    }, error => {
+      this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+      this.isLoading = false;
     });
   }
 
@@ -149,6 +161,20 @@ export class SearchTracksComponent implements OnInit {
     this.limit = event.rows;
 
   }
+
+  clearSearch() {
+    this.searchedTracks = [];
+  }
+
+
+
+
+
+
+
+
+
+
 
 
 

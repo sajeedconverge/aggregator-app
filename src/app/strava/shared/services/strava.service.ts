@@ -130,11 +130,11 @@ export class StravaService {
     return this.http.put<any>(Constants.baseServerUrl + 'Strava/UpdateActivityDetail', request, { headers: this.headers });
   }
 
-  getTempoStatisticsByTempo(tempo: number) {
+  getTempoStatisticsByTempo(tempo: number) : Observable<any>{
     return this.http.get<any>(Constants.baseServerUrl + `Strava/GetTempoStatisticByTempo?tempo=${tempo}`, { headers: this.headers });
   }
 
-  getTempoStatisticsByMultiTempos(tempos: number[]) {
+  getTempoStatisticsByMultiTempos(tempos: number[]) : Observable<any>{
     var tempoString = tempos.join(',');
     return this.http.get<any>(Constants.baseServerUrl + `Strava/GetTempoStatisticsByMultiTempos?tempoString=${tempoString}`, {
       headers: this.headers,

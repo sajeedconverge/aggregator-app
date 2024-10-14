@@ -2,6 +2,7 @@
 <app-progress-bar></app-progress-bar>
 }
 <p-confirmDialog />
+<p-toast></p-toast> 
 
 <div class="palylist_table">
     <p-table [value]="searchedTracks" [rows]="limit" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
@@ -10,39 +11,22 @@
         (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" #tableRef>
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-center">
-
+                <!-- <div></div> -->
 
                 <div class="flex flex-row align-items-center track_search">
-                    <input type="text" placeholder="Search Tracks" pInputText [(ngModel)]="searchText" />
+                    <input type="text" placeholder="Search Tracks" pInputText [(ngModel)]="searchText"
+                        (keydown.enter)="searchSpotify()" />
                     <p-button icon="pi pi-search" severity="primary" (onClick)="searchSpotify()"
                         [disabled]="!(searchText.length>2)" />
-                    <!-- <p-overlayPanel #op>
-                            <div class="flex flex-column gap-3 w-25rem">
-                                <div>
-                                    <span class="font-medium text-900 block mb-2">Searched Tracks</span>
-                                    <ul class="list-none p-0 m-0 flex flex-column gap-3" style="overflow-y:auto;">
-                                        <li *ngFor="let track of searchedTracks" class="flex align-items-center gap-2">
-                                            <img [src]="track.album.images[0].url"
-                                                style="width: 32px;border-radius: 50%;" />
-                                            <div>
-                                                <span class="font-medium">{{ track.name }}</span>
-                                                <div class="text-sm text-color-secondary">{{ track.artists[0].name }}
-                                                </div>
-                                            </div>
-                                            <div
-                                                class="flex align-items-center gap-2 text-color-secondary ml-auto text-sm">
-                                                <p-button icon="pi pi-plus" [rounded]="true" severity="success"
-                                                    pTooltip="Add to Liked Songs" tooltipPosition="bottom" />
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </p-overlayPanel> -->
                 </div>
 
+                <!-- <div>
+                    <p-button class="pr-2" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clearSearch()"
+                            pTooltip="Clear search results" tooltipPosition="bottom" />
+                </div> -->
             </div>
 
+            
         </ng-template>
 
         <ng-template pTemplate="header">
