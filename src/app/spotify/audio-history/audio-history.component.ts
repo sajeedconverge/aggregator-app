@@ -207,6 +207,9 @@ export class AudioHistoryComponent implements OnInit {
                       pltrack.audio_features.loudness = Math.round(pltrack.audio_features.loudness * (-10));
                       pltrack.audio_features.energy = Math.round(pltrack.audio_features.energy * (100));
                       pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
+                    }, error => {
+                      this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                      this.isLoading = false;
                     });
                   };
                 });
@@ -253,6 +256,9 @@ export class AudioHistoryComponent implements OnInit {
             };
             this.isLoading = false;
           }, (this.hisotryTracks.length > 25) ? 8000 : 5000);
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
         })
       } else {
         this.dataMessage = 'No tracks found in audio history.';
@@ -641,6 +647,9 @@ export class AudioHistoryComponent implements OnInit {
                     //console.log("track added successfully.", pltrack.track.name);
                   };
                 });
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });
@@ -675,6 +684,9 @@ export class AudioHistoryComponent implements OnInit {
                     pltrack.audioAnalysis = Constants.typeCastTrackAnalysisJson(pltrack.audioAnalysis);
                   };
                 });
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });
@@ -695,6 +707,9 @@ export class AudioHistoryComponent implements OnInit {
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
           console.log(this.userPlaylists);
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
         });
         this.isLoading = false;
       };

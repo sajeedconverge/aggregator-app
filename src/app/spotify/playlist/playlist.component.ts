@@ -5,7 +5,7 @@ import { SpotifyService } from '../shared/services/spotify.service';
 import { Constants } from '../../shared/Constants';
 import { HttpHeaders } from '@angular/common/http';
 import { MessagesModule } from 'primeng/messages';
-import { Message } from 'primeng/api';
+import { Message, MessageService } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
@@ -61,7 +61,8 @@ export class PlaylistComponent implements OnInit {
     private spotifyService: SpotifyService,
     private spotifyAuthService: SpotifyAuthorizationService,
     private router: Router,
-    private title: Title
+    private title: Title,
+    private messageService:MessageService
   ) {
     this.title.setTitle('AudioActive - Playlists')
     this.spotifyAuthService.checkExpiryAndRefreshToken();
@@ -126,6 +127,9 @@ export class PlaylistComponent implements OnInit {
           // console.log(this.userPlaylists);
           // to assign other properties
           this.assignPlaylistProperties();
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
         });
         this.isLoading = false;
       }
@@ -172,11 +176,17 @@ export class PlaylistComponent implements OnInit {
                 playlist.maxTempo = Math.max(...tempos);
 
 
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });
         }
 
+      }, error => {
+        this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+        this.isLoading = false;
       });
     })
   }

@@ -639,6 +639,9 @@ export class AudioLibraryComponent implements OnInit {
                     //console.log("track added successfully.", pltrack.name);
                   };
                 });
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });
@@ -693,6 +696,9 @@ export class AudioLibraryComponent implements OnInit {
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
           console.log(this.userPlaylists);
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
         });
         this.isLoading = false;
       }

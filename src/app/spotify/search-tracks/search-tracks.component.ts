@@ -117,6 +117,9 @@ export class SearchTracksComponent implements OnInit {
                   track.audio_features.loudness = Math.round(track.audio_features.loudness * (-10));
                   track.audio_features.energy = Math.round(track.audio_features.energy * (100));
                   track.audio_features.danceability = Math.round(track.audio_features.danceability * (100));
+                }, error => {
+                  this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                  this.isLoading = false;
                 });
               };
             });

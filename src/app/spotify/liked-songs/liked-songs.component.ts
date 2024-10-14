@@ -271,6 +271,9 @@ export class LikedSongsComponent implements OnInit {
                               pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
                             };
                           });
+                        }, error => {
+                          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                          this.isLoading = false;
                         });
                       };
                     });
@@ -366,6 +369,9 @@ export class LikedSongsComponent implements OnInit {
             } else {
               this.isLoading = false;
             }
+          }, error => {
+            this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+            this.isLoading = false;
           });
         };
       } else {
@@ -727,6 +733,9 @@ export class LikedSongsComponent implements OnInit {
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
           console.log(this.userPlaylists);
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
         });
         this.isLoading = false;
       };
@@ -821,6 +830,9 @@ export class LikedSongsComponent implements OnInit {
                     //console.log("track added successfully.", pltrack.track.name);
                   };
                 });
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });
@@ -855,6 +867,9 @@ export class LikedSongsComponent implements OnInit {
 
                   };
                 });
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });

@@ -280,6 +280,9 @@ export class PlaylistDetailsComponent implements OnInit {
                           pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
                         };
                       });
+                    }, error => {
+                      this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                      this.isLoading = false;
                     });
                   };
                 });
@@ -342,6 +345,9 @@ export class PlaylistDetailsComponent implements OnInit {
           this.dataMessage = 'No tracks found in the current playlist.';
           this.isLoading = false;
         }
+      }, error => {
+        this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+        this.isLoading = false;
       });
     };
   }

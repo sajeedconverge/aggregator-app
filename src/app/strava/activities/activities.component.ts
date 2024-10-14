@@ -180,6 +180,9 @@ export class ActivitiesComponent implements OnInit {
                   });
                   this.athleteActivities.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
                 };
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           })
@@ -238,6 +241,9 @@ export class ActivitiesComponent implements OnInit {
                 //to filter out the activities with no tracks
                 this.athleteActivities = unfilteredActivites;
                 //this.athleteActivities = unfilteredActivites.filter(activity => activity.end_date >= this.recentAudio[(this.recentAudio.length) - 1].start_time);
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
 

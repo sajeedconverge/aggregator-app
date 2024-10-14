@@ -240,6 +240,9 @@ export class ActivityDetailsComponent implements OnInit {
             });
           };
 
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
         });
 
       };
@@ -294,6 +297,9 @@ export class ActivityDetailsComponent implements OnInit {
             });
             this.isLoading = false;
           };
+        }, error => {
+          this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+          this.isLoading = false;
         });
 
       };
@@ -376,6 +382,9 @@ export class ActivityDetailsComponent implements OnInit {
                 track.audio_features = audioFeature;
                 track.duration_mins = Constants.formatDuration(track.track.duration_ms);
 
+              }, error => {
+                this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.isLoading = false;
               });
             };
           });
@@ -489,6 +498,9 @@ export class ActivityDetailsComponent implements OnInit {
 
             this.audioFeatures.push(audioFeature);
             this.showAudioFeatures = true;
+          }, error => {
+            this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+            this.isLoading = false;
           });
         };
       });
