@@ -30,6 +30,14 @@
                         <p-inputSwitch [(ngModel)]="showPaceGraph" class="mr-2" pTooltip="Pace History"
                             tooltipPosition="bottom" />
                     </div>
+                    <div>
+                        <p-button (click)="redirectBack()" class="mr-2" pTooltip="Back" tooltipPosition="bottom"
+                        size="small" pTooltip="Back" tooltipPosition="bottom">
+                        <span class="material-symbols-outlined">
+                            undo
+                        </span>
+                    </p-button>
+                    </div>
                     <!-- <p-button (click)="backToTracks()">Back</p-button> -->
                 </div>
             </div>

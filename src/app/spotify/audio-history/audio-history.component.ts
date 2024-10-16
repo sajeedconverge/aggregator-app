@@ -209,6 +209,7 @@ export class AudioHistoryComponent implements OnInit {
                       pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
                     }, error => {
                       this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                     this.getRecentAudio();
                       this.isLoading = false;
                     });
                   };

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -170,7 +170,8 @@ export class TrackDetailsComponent implements OnInit {
     private spotifyService: SpotifyService,
     private router: Router,
     private title:Title,
-    private messageService:MessageService
+    private messageService:MessageService,
+    private location: Location
   ) {
     this.title.setTitle('AudioActive - Track Details')
     this.trackId = sessionStorage.getItem('track-id') || '';
@@ -332,7 +333,9 @@ export class TrackDetailsComponent implements OnInit {
 
   }
 
-
+  redirectBack(): void {
+    this.location.back();
+  }
 
 
 
