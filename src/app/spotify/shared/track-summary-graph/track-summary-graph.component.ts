@@ -68,7 +68,7 @@ export class TrackSummaryGraphComponent {
   paceText: string = '';
   aggregatePace: string = '00:00:00';
   dynamicMessage: string = '';
-  tempoStatCount:number=-1;
+  tempoStatCount: number = -1;
   messages: Message[] = [
     { severity: 'warn', detail: 'Audio Active has not collected sufficient data to project statistics.' },
   ];
@@ -100,6 +100,9 @@ export class TrackSummaryGraphComponent {
         break;
       case TrackType.RecentlyPlayed:
         this.chartTitle = 'Recently Played';
+        // this.tracksData.tracks.forEach(track => {
+        //   track.audio_features = track.track.audio_features;
+        // });
         break;
 
       default:
@@ -287,11 +290,11 @@ export class TrackSummaryGraphComponent {
   getTempoStats() {
     var tempos = this.tracksData.tracks.map(track => { return track.audio_features.tempo });
     tempos = [...new Set(tempos)];
-    
+
     this.stravaService.getTempoStatisticsByMultiTempos(tempos).subscribe((temposRes) => {
       if (temposRes.statusCode === 200) {
         // console.log('tempo stats', temposRes.payload);
-        this.tempoStatCount=0;
+        this.tempoStatCount = 0;
         this.tracksData.tracks.forEach(track => {
           var duration_ms = 0;
           if (this.tracksData.trackType === TrackType.AudioLibrary) {
@@ -317,16 +320,16 @@ export class TrackSummaryGraphComponent {
         // console.log('modified tracks', this.tracksData.tracks);
         var tempostatTrackCount = (this.tracksData.tracks.filter(track => track.tempoStatistic !== undefined)).length;
         var count = (tempostatTrackCount > this.selectedTracksList.length && (this.selectedTracksList.length != 0)) ? this.selectedTracksList.length : tempostatTrackCount;
-        this.tempoStatCount=count;
-        this.dynamicMessage = `The Total Distance and avg. Pace corresponds to ${count} track(s).`;
+        this.tempoStatCount = count;
+        this.dynamicMessage = `The Total Distance and ${this.selectedDate.name} Pace corresponds to ${count} track(s).`;
 
 
         this.onDateChangeBarChart();
-      }else if(temposRes.statusCode ===404){
-        this.tempoStatCount=0;
+      } else if (temposRes.statusCode === 404) {
+        this.tempoStatCount = 0;
       };
-    },error=>{
-      this.tempoStatCount=0;
+    }, error => {
+      this.tempoStatCount = 0;
     });
   }
 
@@ -365,6 +368,7 @@ export class TrackSummaryGraphComponent {
       default:
         break;
     };
+    this.dynamicMessage = `The Total Distance and ${this.selectedDate.name} Pace corresponds to ${this.tempoStatCount} track(s).`;
   }
 
   getOrCreateTooltip = (chart: any) => {

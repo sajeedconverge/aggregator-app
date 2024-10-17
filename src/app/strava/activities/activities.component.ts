@@ -162,7 +162,7 @@ export class ActivitiesComponent implements OnInit {
                     };
 
                   });
-                  console.log('athlete activities', this.athleteActivities);
+                  // console.log('athlete activities', this.athleteActivities);
                   this.isLoading = false;
                   //Code to store these activities into the DB
                   this.athleteActivities.forEach((activity) => {
@@ -174,7 +174,7 @@ export class ActivitiesComponent implements OnInit {
                     };
                     this.stravaService.postActivity(activityRequest).subscribe((response) => {
                       if (response.statusCode === 200) {
-                        console.log("activity stored in db");
+                        // console.log("activity stored in db");
                       };
                     });
                   });

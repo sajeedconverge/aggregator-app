@@ -51,8 +51,8 @@ export class ActivityDetailChartComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    console.log("chart activityDetails", this.activityDetails);
-    console.log("chart pairedTracks", this.pairedTracks);
+    // console.log("chart activityDetails", this.activityDetails);
+    // console.log("chart pairedTracks", this.pairedTracks);
 
     this.chartTitle = this.activityDetails.name;
     this.totalTime = Constants.formatDuration(this.activityDetails.elapsed_time * 1000);

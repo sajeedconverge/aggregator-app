@@ -188,7 +188,7 @@ export class TrackDetailsComponent implements OnInit {
 
     this.spotifyService.getTrackMetricsByTrackId(this.trackId).subscribe(historyResponse => {
       if (historyResponse.statusCode === 200) {
-        console.log('track metrics :', historyResponse.payload);
+        // console.log('track metrics :', historyResponse.payload);
         //sort data a/c to date in ascending order
         historyResponse.payload = historyResponse.payload.sort((a:any, b:any) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 

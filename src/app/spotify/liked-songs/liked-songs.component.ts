@@ -503,7 +503,7 @@ export class LikedSongsComponent implements OnInit {
           this.data2.datasets[3].tracks.push(pltrack.track.name);
           // this.data2.datasets[3].colors.push(pltrack.color);
         });
-        console.log('this.data2', this.data2);
+        // console.log('this.data2', this.data2);
         this.isLoading = false;
       } else {
         var durationSum = 0;
@@ -732,7 +732,7 @@ export class LikedSongsComponent implements OnInit {
         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
-          console.log(this.userPlaylists);
+          // console.log(this.userPlaylists);
         }, error => {
           this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
           this.isLoading = false;
@@ -762,7 +762,7 @@ export class LikedSongsComponent implements OnInit {
   }
 
   updatePlaylist() {
-    console.log('selectedPlaylist', this.selectedPlaylist);
+    // console.log('selectedPlaylist', this.selectedPlaylist);
     if (this.selectedPlaylist != null) {
       this.spotifyService.getPlaylistOpsUrl(this.selectedPlaylist.id).subscribe((res) => {
         if (res.statusCode === 200) {

@@ -26,6 +26,7 @@ import { TracksData, TrackType } from '../shared/models/graph-models';
 import { UriPipe } from "../../shared/common-pipes/uri.pipe";
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ProjectionsGraphComponent } from '../shared/projections-graph/projections-graph.component';
+import { timer } from 'rxjs';
 
 
 
@@ -182,7 +183,7 @@ export class AudioHistoryComponent implements OnInit {
         this.spotifyService.SpotifyCommonGetApi(recentAudioUrl, spotifyAccessToken).subscribe((audioResponse) => {
 
           this.hisotryTracks = audioResponse.items;
-          console.log('hisotryTracks', this.hisotryTracks);
+          // console.log('hisotryTracks', this.hisotryTracks);
 
 
           this.hisotryTracks.forEach((pltrack, index) => {
@@ -209,7 +210,7 @@ export class AudioHistoryComponent implements OnInit {
                       pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
                     }, error => {
                       this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
-                     this.getRecentAudio();
+                      this.getRecentAudio();
                       this.isLoading = false;
                     });
                   };
@@ -239,12 +240,16 @@ export class AudioHistoryComponent implements OnInit {
             //   };
             // });
             if (index == (this.hisotryTracks.length - 1)) {
-              this.dataMessage = 'No tracks found in the audio history.'
+              this.dataMessage = 'No tracks found in the audio history.';
+              this.isLoading = false;
+            } else {
+              this.isLoading = true;
             };
 
           });
           this.tracksData.tracks = this.hisotryTracks;
 
+          this.isLoading = true;
           setTimeout(() => {
             // debugger;
             if (this.table) {
@@ -255,8 +260,17 @@ export class AudioHistoryComponent implements OnInit {
               };
               this.tableSorted(sortEvent);
             };
-            this.isLoading = false;
+            if (this.hisotryTracks.length > 25) {
+              timer(4000).subscribe(() => {
+                this.isLoading = false;
+              });
+            }else{
+              this.isLoading = false;
+            }
+            
           }, (this.hisotryTracks.length > 25) ? 8000 : 5000);
+
+
         }, error => {
           this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
           this.isLoading = false;
@@ -363,7 +377,7 @@ export class AudioHistoryComponent implements OnInit {
         // this.selectedTrackIds = Array.from(new Set(this.selectedTrackIds));
         var selectedTracks = this.hisotryTracks?.filter(ht => this.selectedTracksList.some((selectedTrack: any) => ((selectedTrack.track.id === ht.track.id) && (selectedTrack.played_at === ht.played_at))));
         selectedTracks = selectedTracks.reduce((acc, current) => {
-          const x = acc.find((item: any) => ((item.track.id === current.track.id)&& (item.played_at === current.played_at)));
+          const x = acc.find((item: any) => ((item.track.id === current.track.id) && (item.played_at === current.played_at)));
           if (!x) {
             acc.push(current);
           }
@@ -707,7 +721,7 @@ export class AudioHistoryComponent implements OnInit {
         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
-          console.log(this.userPlaylists);
+          // console.log(this.userPlaylists);
         }, error => {
           this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
           this.isLoading = false;
@@ -737,7 +751,7 @@ export class AudioHistoryComponent implements OnInit {
   }
 
   updatePlaylist() {
-    console.log('selectedPlaylist', this.selectedPlaylist);
+    // console.log('selectedPlaylist', this.selectedPlaylist);
     if (this.selectedPlaylist != null) {
       this.spotifyService.getPlaylistOpsUrl(this.selectedPlaylist.id).subscribe((res) => {
         if (res.statusCode === 200) {
