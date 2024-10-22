@@ -8,7 +8,7 @@
         [rowsPerPageOptions]="[10,25,50]" [totalRecords]="totalLikedSongsCount" [paginator]="true" sortField="added_at"
         (sortOrder)="1" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         paginatorPosition="top" [(selection)]="selectedTracksList" [tableStyle]="{'min-width': '60rem'}"
-        (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)" #tableRef>
+        (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)"  #tableRef>
     
     
         <!-- <p-table [value]="likedSongs" [lazy]="true" (onLazyLoad)="onPageChange($event)" [rows]="pageSize"

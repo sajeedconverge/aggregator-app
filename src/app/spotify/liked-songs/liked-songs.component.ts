@@ -304,8 +304,10 @@ export class LikedSongsComponent implements OnInit {
                     pltrack.audio_features.danceability = Math.round(pltrack.audio_features.danceability * (100));
                   };
                 });
+                
               }, error => {
                 this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
+                this.dataMessage = 'No tracks found in liked songs.';
                 this.isLoading = false;
               });
             };
@@ -315,6 +317,7 @@ export class LikedSongsComponent implements OnInit {
           setTimeout(() => {
             this.isLoading = false;
             this.onPageChange({ first: this.offset, rows: this.pageSize });
+            this.dataMessage = 'No tracks found in liked songs.';
           }, 3000);
         };
       });
@@ -786,15 +789,21 @@ export class LikedSongsComponent implements OnInit {
               var newPlaylistId = npResponse.id;
               //to push the existing items to the new playlist
               this.spotifyService.getPlaylistOpsUrl(newPlaylistId).subscribe(ploResponse => {
+                debugger;
                 if (ploResponse.statusCode === 200) {
                   let plOpsUrl = ploResponse.payload;
                   let plOpsBody: any = {
                     uris: [],
                     position: 0
                   };
-                  if (this.reOrderedTracks.length != 0) {
-                    this.reOrderedTracks.forEach(trackId => {
-                      plOpsBody.uris.push(`spotify:track:${trackId}`)
+                  // if (this.reOrderedTracks.length != 0) {
+                  //   this.reOrderedTracks.forEach(trackId => {
+                  //     plOpsBody.uris.push(`spotify:track:${trackId}`)
+                  //   });
+                  // } else 
+                  if (this.selectedTracksList.length != 0) {
+                    this.selectedTracksList.forEach(selectedTrack => {
+                      plOpsBody.uris.push(`spotify:track:${selectedTrack.track.id}`)
                     });
                   } else {
                     this.originalTracks.forEach(trackId => {

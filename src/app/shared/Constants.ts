@@ -4,8 +4,8 @@ import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "..
 
 export class Constants {
 
-     public static baseServerUrl: string = 'https://localhost:44354/api/v1/'; 
-    // public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
+    // public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
+    public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     public static spotifySettings: SpotifySettings = {
         clientId: "",
@@ -312,6 +312,9 @@ export class Constants {
     public static typeCastPairedTrackJson(pairedTrack: any): PairedTrackJsonObject {
         var audioFeatures = (pairedTrack.audio_features) ?
             pairedTrack.audio_features.tempo : pairedTrack.track.audio_features.tempo
+        if (Number.isNaN(audioFeatures)) {
+            audioFeatures = 0;
+        };
 
         var PairedTrackJson: PairedTrackJsonObject = {
             distance: pairedTrack.distance,

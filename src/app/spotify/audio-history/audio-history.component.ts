@@ -66,7 +66,7 @@ export class AudioHistoryComponent implements OnInit {
   playlistName: string = '';
   selectedTracksList: any[] = [];
   hisotryTracks: any[] = [];
-  limit: number = 10;
+  limit: number = 50;
   showSummaryGraph: boolean = false;
   showDetailedGraph: boolean = false;
   documentStyle = getComputedStyle(document.documentElement);
@@ -240,7 +240,7 @@ export class AudioHistoryComponent implements OnInit {
             //   };
             // });
             if (index == (this.hisotryTracks.length - 1)) {
-              this.dataMessage = 'No tracks found in the audio history.';
+              this.dataMessage = 'No tracks found.';
               this.isLoading = false;
             } else {
               this.isLoading = true;
@@ -276,7 +276,7 @@ export class AudioHistoryComponent implements OnInit {
           this.isLoading = false;
         })
       } else {
-        this.dataMessage = 'No tracks found in audio history.';
+        this.dataMessage = 'No tracks found.';
       };
     })
   }
@@ -815,7 +815,9 @@ export class AudioHistoryComponent implements OnInit {
     });
   }
 
-
+  clear(table: Table) {
+    table.clear();
+  }
 
 
 
