@@ -70,7 +70,7 @@ export class TrackSummaryGraphComponent {
   dynamicMessage: string = '';
   tempoStatCount: number = -1;
   messages: Message[] = [
-    { severity: 'warn', detail: 'Audio Active has not collected sufficient data to project statistics.' },
+    { severity: 'warn', detail: 'Audioactive has not collected sufficient data to estimate performance.' },
   ];
 
 

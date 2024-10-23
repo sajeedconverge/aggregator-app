@@ -18,13 +18,13 @@
 
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
+                <h2>Audio Library</h2>
                 <div></div>
-                <h3>Audio Library</h3>
                 <div class="flex flex-row align-items-center">
                     <p-dropdown [options]="rowsPerPageOptions" (onChange)="onLimitChange($event)"
                         pTooltip="Tracks limit" tooltipPosition="bottom"></p-dropdown>
                     <div>
-                        <p-button [rounded]="true" severity="success" icon="pi pi-refresh"
+                        <p-button severity="success" icon="pi pi-refresh"
                             [disabled]="!showSummaryGraph && !showDetailedGraph" (onClick)="refreshGraphs()"
                             pTooltip="Refresh Graph" tooltipPosition="bottom" class="px-2"></p-button>
                     </div>
@@ -33,21 +33,24 @@
                             <p-button [outlined]="!showSummaryGraph" size="small"
                                 (onClick)="showSummaryGraphChanged(false)" pTooltip="Summary Graph"
                                 tooltipPosition="bottom">
-                                <span class="material-symbols-outlined">
+                                <span class="material-icons">
                                     show_chart
                                 </span>
                             </p-button>
                             <p-button [outlined]="!showDetailedGraph" size="small" (onClick)="showGraphChanged(false)"
                                 pTooltip="Detailed Graph" tooltipPosition="bottom">
-                                <span class="material-symbols-outlined">
+                                <span class="material-icons">
                                     monitoring
                                 </span>
                             </p-button>
                         </p-buttonGroup> -->
 
-                        <p-button class="pr-3 btn-grp-custom" [outlined]="!showSummaryGraph" size="small"
+                        <p-button class="pr-2 btn-grp-custom" [outlined]="!showSummaryGraph" size="small"
                             (onClick)="showSummaryGraphChanged(false)" pTooltip="Summary Graph" tooltipPosition="bottom"
-                            icon="pi pi-chart-bar">
+                            icon="material-icons">
+                            <span class="material-icons">
+                                show_chart
+                            </span>
                         </p-button>
                     </div>
 
@@ -57,8 +60,8 @@
 
                     <p-button class="mr-2" severity="success" size="small" pTooltip="Save tracks as a new playlist"
                         tooltipPosition="bottom" (onClick)="plNameVisible=true"
-                        [disabled]="selectedTracksList.length===0">
-                        <span class="material-symbols-outlined">
+                        [disabled]="selectedTracksList.length===0" icon="material-icons">
+                        <span class="material-icons">
                             playlist_add
                         </span>
                     </p-button>

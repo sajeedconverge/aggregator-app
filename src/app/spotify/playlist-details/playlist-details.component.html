@@ -8,56 +8,59 @@
         [totalRecords]="playlistTracks.length" [paginator]="true" sortField="added_at" (sortOrder)="1"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)"> -->
-        
-        <p-table [value]="playlistTracks" [lazy]="true" (onLazyLoad)="onPageChange($event)" [rows]="pageSize"
+
+    <p-table [value]="playlistTracks" [lazy]="true" (onLazyLoad)="onPageChange($event)" [rows]="pageSize"
         [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]" [totalRecords]="totalItemsCount"
         [paginator]="true" sortField="added_at" (sortOrder)="1" #tableRef
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" paginatorPosition="top"
-         [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered($event)"
-        (onSort)="tableSorted($event)">
-        
+        [tableStyle]="{'min-width': '60rem'}" (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)">
+
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
-                <h3>Tracks</h3>
-                <h3>{{currentPlayListName}}</h3>
+                <h2>Tracks</h2>
+                <h3 class="pt-1">{{currentPlayListName}}</h3>
                 <div class="flex flex-row align-items-center">
                     <div class="flex flex-row align-items-center" *ngIf="playlistTracks.length > 0">
                         <div>
-                            <p-button [rounded]="true" severity="success" icon="pi pi-refresh" 
-                            [disabled]="!showSummaryGraph && !showDetailedGraph" (onClick)="refreshGraphs()"
-                            pTooltip="Refresh Graph" tooltipPosition="bottom" class="px-2" ></p-button>
+                            <p-button  severity="success" icon="pi pi-refresh"
+                                [disabled]="!showSummaryGraph && !showDetailedGraph" (onClick)="refreshGraphs()"
+                                pTooltip="Refresh Graph" tooltipPosition="bottom" class="px-2"></p-button>
                         </div>
-                        <div class="pr-3 ">
+                        <div class="pr-2 ">
                             <!-- <p-buttonGroup class="btn-grp-custom">
                                 <p-button [outlined]="!showSummaryGraph" (onClick)="showSummaryGraphChanged(false)"
                                     size="small" pTooltip="Summary Graph" tooltipPosition="bottom">
-                                    <span class="material-symbols-outlined">
+                                    <span class="material-icons">
                                         show_chart
                                     </span>
                                 </p-button>
                                 <p-button [outlined]="!showDetailedGraph" size="small" (onClick)="showGraphChanged(false)"
                                     pTooltip="Detailed Graph" tooltipPosition="bottom">
-                                    <span class="material-symbols-outlined">
+                                    <span class="material-icons">
                                         monitoring
                                     </span>
                                 </p-button>
                             </p-buttonGroup> -->
-                            <p-button class=" btn-grp-custom" [outlined]="!showSummaryGraph" size="small" (onClick)="showSummaryGraphChanged(false)"
-                            pTooltip="Summary Graph" tooltipPosition="bottom" icon="pi pi-chart-bar">
-                        </p-button>
+                            <p-button class=" btn-grp-custom" [outlined]="!showSummaryGraph" size="small"
+                                (onClick)="showSummaryGraphChanged(false)" pTooltip="Summary Graph"
+                                tooltipPosition="bottom" icon="material-icons">
+                                <span class="material-icons">
+                                    show_chart
+                                </span>
+                            </p-button>
                         </div>
                         <p-button class="mr-2" severity="warning" (click)="confirmUpdatePlaylist()" icon="pi pi-save"
                             pTooltip="Save changes" tooltipPosition="bottom" iconPos="right"></p-button>
 
                         <p-button class="mr-2" severity="success" size="small" pTooltip="Save as new"
-                            tooltipPosition="bottom" (onClick)="plNameVisible=true">
-                            <span class="material-symbols-outlined">
+                            tooltipPosition="bottom" (onClick)="plNameVisible=true" icon="material-icons">
+                            <span class="material-icons">
                                 playlist_add
                             </span>
                         </p-button>
                     </div>
-                    <p-button (click)="backToPlaylists()" pTooltip="Back" tooltipPosition="bottom" size="small">
-                        <span class="material-symbols-outlined">
+                    <p-button (click)="backToPlaylists()" pTooltip="Back" tooltipPosition="bottom" size="small" icon="material-icons">
+                        <span class="material-icons">
                             undo
                         </span>
                     </p-button>
@@ -65,7 +68,7 @@
             </div>
             <div>
                 <!-- <p-chart type="line" [data]="data2" [options]="options" *ngIf="showSummaryGraph" /> -->
-           
+
                 <div *ngIf="showSummaryGraph">
                     <app-track-summary-graph [tracksData]="tracksData"
                         [selectedTracksList]="[]"></app-track-summary-graph>
@@ -121,7 +124,8 @@
                     <span class="pi pi-bars" pReorderableRowHandle></span>
                 </td>
                 <td>
-                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true" (onClick)="showPreviewPopup(track)" />
+                    <p-button icon="pi pi-play-circle" [rounded]="true" severity="primary" [outlined]="true"
+                        (onClick)="showPreviewPopup(track)" />
                 </td>
                 <td><img [src]="track.track.album.images[0].url" style="width:60px;height: 60px;border-radius: 50%;">
                 </td>
@@ -179,24 +183,3 @@
             allow="encrypted-media ; autoplay"></iframe>
     </div>
 </p-dialog>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

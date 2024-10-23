@@ -519,9 +519,9 @@ export class ActivityDetailsComponent implements OnInit {
     this.router.navigate(['/strava/activities']);
   }
 
-  changeOmissionStatus(event: any, trackId: string) {
+  changeOmissionStatus(event: any, trackId: string,played_at:string) {
     this.pairedTracks.forEach(pt => {
-      if (pt.track.id === trackId) {
+      if (pt.track.id === trackId && pt.played_at===played_at) {
         pt.isOmitted = event.checked;
       };
     });
@@ -583,7 +583,10 @@ export class ActivityDetailsComponent implements OnInit {
 
   }
 
-
+  isAM(date: string | Date): boolean {
+    const hours = new Date(date).getHours();
+    return hours < 12;
+  }
 
 
 

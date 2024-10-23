@@ -173,7 +173,7 @@ export class TrackDetailsComponent implements OnInit {
     private messageService:MessageService,
     private location: Location
   ) {
-    this.title.setTitle('AudioActive - Track Details')
+    this.title.setTitle('AudioActive - Audio History')
     this.trackId = sessionStorage.getItem('track-id') || '';
     this.trackName = sessionStorage.getItem('track-name') || '';
   }
