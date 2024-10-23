@@ -102,6 +102,21 @@
                     Duration
                     <p-sortIcon field="track.duration_ms" />
                     <p-columnFilter type="text" field="duration" display="menu" [showOperator]="false" />
+                
+                    <!-- <p-columnFilter field="track.duration_ms" display="menu" [showOperator]="false">
+                       <ng-template pTemplate="filter" let-filter>
+                            <p-calendar 
+                                inputId="calendar-timeonly" 
+                                [(ngModel)]="filterTime" 
+                                [timeOnly]="true" 
+                                hourFormat="24"
+                                (onSelect)="onTimeFilter($event)" 
+                                showSeconds="true" 
+                                placeholder="hh:mm:ss">
+                            </p-calendar>
+                        </ng-template>
+                    </p-columnFilter>  -->
+
                 </th>
                 <th pSortableColumn="audio_features.tempo">
                     Tempo

@@ -4,8 +4,8 @@ import { ActivityDetailJsonObject, ActivityJsonObject, StravaSettings } from "..
 
 export class Constants {
 
-    // public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
-    public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
+    public static baseServerUrl: string = 'https://localhost:44354/api/v1/';
+    // public static baseServerUrl: string = 'https://aggregatorwebapi.azurewebsites.net/api/v1/';
 
     public static spotifySettings: SpotifySettings = {
         clientId: "",
@@ -395,10 +395,10 @@ export class Constants {
         navigator.requestMediaKeySystemAccess('com.widevine.alpha', config)
             .then(keySystemAccess => {
                 // Proceed with DRM operations
-                console.log('MediaKeySystemAccess granted:', keySystemAccess);
+                //console.log('MediaKeySystemAccess granted:', keySystemAccess);
             })
             .catch(error => {
-                console.error('MediaKeySystemAccess request failed:', error);
+                //console.error('MediaKeySystemAccess request failed:', error);
             });
     }
 

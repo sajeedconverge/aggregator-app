@@ -27,7 +27,7 @@ import { TrackSummaryGraphComponent } from '../shared/track-summary-graph/track-
 import { TracksData, TrackType } from '../shared/models/graph-models';
 import { UriPipe } from "../../shared/common-pipes/uri.pipe";
 import { OverlayPanelModule } from 'primeng/overlaypanel';
-
+import { CalendarModule } from 'primeng/calendar';
 
 
 @Component({
@@ -51,8 +51,8 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
     PaginatorModule,
     TrackSummaryGraphComponent,
     UriPipe,
-    OverlayPanelModule
-
+    OverlayPanelModule,
+    CalendarModule,
 
 
 
@@ -140,6 +140,10 @@ export class LikedSongsComponent implements OnInit {
   showPreview: boolean = false;
   currentTrack: any;
   allLikedSongs: any[] = [];
+  filterTime!: Date ;
+
+
+
 
 
 
@@ -1040,7 +1044,35 @@ export class LikedSongsComponent implements OnInit {
 
 
 
+  // Method to handle filtering
+  onTimeFilter(event: Date) {
+    if (event) {
+      const filterTimeMs = this.timeToMs(event); // Convert time to milliseconds
+      this.table.filter(filterTimeMs, 'track.duration_ms', 'custom');
+    } else {
+      this.table.filter(null, 'track.duration_ms', 'custom'); // Clear filter
+    }
+  }
 
+  // Custom filter function to compare the time
+  customTimeFilter(value: any, filter: any): boolean {
+    if (!filter) {
+      return true; // Show all if no filter
+    }
+    
+    const itemTimeMs = value; // track.duration_ms is already in milliseconds
+    return itemTimeMs === filter;
+  }
+
+  // Helper function to convert time (Date) to milliseconds
+  timeToMs(time: Date): number {
+    const hours = time.getHours();
+    const minutes = time.getMinutes();
+    const seconds = time.getSeconds();
+    
+    // Convert the time to milliseconds
+    return (hours * 3600000) + (minutes * 60000) + (seconds * 1000);
+  }
 
 
 
