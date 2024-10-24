@@ -22,7 +22,7 @@
                 <div class="flex flex-row align-items-center">
                     <div class="flex flex-row align-items-center" *ngIf="playlistTracks.length > 0">
                         <div>
-                            <p-button  severity="success" icon="pi pi-refresh"
+                            <p-button severity="success" icon="pi pi-refresh"
                                 [disabled]="!showSummaryGraph && !showDetailedGraph" (onClick)="refreshGraphs()"
                                 pTooltip="Refresh Graph" tooltipPosition="bottom" class="px-2"></p-button>
                         </div>
@@ -41,7 +41,7 @@
                                     </span>
                                 </p-button>
                             </p-buttonGroup> -->
-                            <p-button class=" btn-grp-custom" [outlined]="!showSummaryGraph" size="small"
+                            <p-button class=" btn-grp-custom" [outlined]="!showSummaryGraph"
                                 (onClick)="showSummaryGraphChanged(false)" pTooltip="Summary Graph"
                                 tooltipPosition="bottom" icon="material-icons">
                                 <span class="material-icons">
@@ -52,14 +52,15 @@
                         <p-button class="mr-2" severity="warning" (click)="confirmUpdatePlaylist()" icon="pi pi-save"
                             pTooltip="Save changes" tooltipPosition="bottom" iconPos="right"></p-button>
 
-                        <p-button class="mr-2" severity="success" size="small" pTooltip="Save as new"
-                            tooltipPosition="bottom" (onClick)="plNameVisible=true" icon="material-icons">
+                        <p-button class="mr-2" severity="success" pTooltip="Save as new" tooltipPosition="bottom"
+                            (onClick)="plNameVisible=true" icon="material-icons">
                             <span class="material-icons">
                                 playlist_add
                             </span>
                         </p-button>
                     </div>
-                    <p-button (click)="backToPlaylists()" pTooltip="Back" tooltipPosition="bottom" size="small" icon="material-icons">
+                    <p-button (click)="backToPlaylists()" pTooltip="Back" tooltipPosition="bottom"
+                        icon="material-icons">
                         <span class="material-icons">
                             undo
                         </span>

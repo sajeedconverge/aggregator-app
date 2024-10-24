@@ -29,7 +29,7 @@
                         <h3 class="mb-2">{{ activityDetails[0]?.name}} </h3>
                     </div>
                     <div class="row flex justify-content-center align-items-center activity_timing">
-                        
+
                         <i [class]="icon"></i>
                         <h4>{{activityDetails[0]?.start_date | date:'MM/dd/yyyy hh:mm:ss a'}} </h4>
                     </div>
@@ -45,22 +45,23 @@
                         </p-button>
                     </div>
 
-                    <p-button class="pr-2 btn-grp-custom" [outlined]="!showActivityGraph" size="small"
-                        (onClick)="showActivityGraphChanged()" pTooltip="Activity Detail Graph" tooltipPosition="bottom"
-                        icon="material-icons">
-                        <span class="material-icons">
-                            show_chart
-                        </span>
-                    </p-button>
-                    <p-button pTooltip="Save" tooltipPosition="bottom" severity="success" [disabled]="isADSaved"
-                        (click)="saveActivityDetails()" icon="pi pi-save" iconPos="right" />
-
-                    <p-button (click)="navigateToActivities()" class="ml-2" pTooltip="Back" tooltipPosition="bottom"
-                        pTooltip="Back" tooltipPosition="bottom" icon="material-icons">
-                        <span class="material-icons">
-                            undo
-                        </span>
-                    </p-button>
+                    <div>
+                        <p-button class="pr-2 btn-grp-custom" [outlined]="!showActivityGraph"
+                            (onClick)="showActivityGraphChanged()" pTooltip="Activity Detail Graph"
+                            tooltipPosition="bottom" icon="material-icons">
+                            <span class="material-icons">
+                                show_chart
+                            </span>
+                        </p-button>
+                        <p-button pTooltip="Save" tooltipPosition="bottom" severity="success" [disabled]="isADSaved"
+                            (click)="saveActivityDetails()" icon="pi pi-save" />
+                        <p-button (click)="navigateToActivities()" class="ml-2" pTooltip="Back" tooltipPosition="bottom"
+                            pTooltip="Back" tooltipPosition="bottom" icon="material-icons">
+                            <span class="material-icons">
+                                undo
+                            </span>
+                        </p-button>
+                    </div>
                 </div>
             </div>
 
