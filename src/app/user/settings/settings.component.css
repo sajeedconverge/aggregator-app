@@ -1,0 +1,21 @@
+.playlist_pagetitle_section{
+    position: relative;
+}
+
+.settings-card{
+    height: 150px;
+}
+::ng-deep .app_setting_col .p-card {
+    height: 100%;
+}
+.app_setting_inside{
+    padding:10px 15px;
+}
+.app_setting_inside h2{
+    width:calc(100% - 50px);
+    display: inline-block;
+}
+.app_setting_inside p-inputswitch{
+    width:50px;
+    display: inline-block;
+}

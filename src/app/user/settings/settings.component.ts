@@ -12,6 +12,11 @@ import { StravaService } from '../../strava/shared/services/strava.service';
 import { SpotifyService } from '../../spotify/shared/services/spotify.service';
 import { AuthService } from '../shared/services/auth.service';
 import { Title } from '@angular/platform-browser';
+import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
+import { InputNumberModule } from 'primeng/inputnumber';
+
 
 @Component({
   selector: 'app-settings',
@@ -20,6 +25,17 @@ import { Title } from '@angular/platform-browser';
     CommonModule,
     FormsModule,
     InputSwitchModule,
+    ProgressBarComponent,
+    CardModule,
+    ButtonModule,
+    InputSwitchModule,
+    InputNumberModule,
+
+    
+
+
+
+
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
@@ -28,7 +44,7 @@ export class SettingsComponent implements OnInit {
   stravaLinked: boolean = false;
   spotifyLinked: boolean = false;
   isUserLoggedIn = false;
-
+  isLoading: boolean = false;
 
   constructor(
     private stravaAuthService: StravaAuthorizationService,
@@ -37,11 +53,11 @@ export class SettingsComponent implements OnInit {
     private stravaService: StravaService,
     private spotifyService: SpotifyService,
     private authService: AuthService,
-    private title:Title
+    private title: Title
   ) {
     this.title.setTitle('AudioActive - Settings')
     this.fetchThirdPartyDetails();
-   }
+  }
 
   ngOnInit(): void {
     this.isUserLoggedIn = this.authService.isLoggedIn();

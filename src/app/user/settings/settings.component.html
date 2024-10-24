@@ -1,4 +1,7 @@
-<p>settings works!</p>
+@if(isLoading) {
+<app-progress-bar></app-progress-bar>
+}
+
 
 <!-- <div class="m-2 flex flex-row justify-content-between">
     <div></div>
@@ -14,3 +17,58 @@
     </div>
     <div></div>
 </div> -->
+
+<section class="playlist_pagetitle_section">
+    <div class="flex flex-row align-items-center">
+        <div class="flex flex-1 playlist_pagetitle justify-content-start m-2 px-5 py-2">
+            <h2>Settings</h2>
+        </div>
+        <!-- <div class="m-2 btn_grp_short"> -->
+        <div class="m-2 ">
+
+        </div>
+        <div>
+
+        </div>
+    </div>
+</section>
+
+<div class="grid p-3 app_setting_grid">
+    <p-card class="col-4 app_setting_col">
+        <div class="app_setting_inside">
+            <div class="app_setting_title flex flex-row justify-content-between">
+                <i class="bi bi-spotify mr-2"></i>
+                <h2 class="my-0">Link Spotify</h2>
+                <p-inputSwitch [(ngModel)]="spotifyLinked" (onChange)="manageSpotifyAuth(spotifyLinked)" />
+            </div>
+            <p class="mb-0">Spotify consent required. </p>
+        </div>
+    </p-card>
+    <p-card class="col-4 app_setting_col">
+        <div class="app_setting_inside">
+            <div class="app_setting_title flex flex-row justify-content-between">
+                <i class="bi bi-strava mr-2"></i>
+                <h2 class="my-0">Link Strava</h2>
+                <p-inputSwitch [(ngModel)]="stravaLinked" (onChange)="manageStravaAuth(stravaLinked)" />
+            </div>
+            <p class="mb-0">Strava consent required. </p>
+        </div>
+    </p-card>
+    <p-card class="col-4 app_setting_col">
+        <div class="app_setting_inside">
+            <div class="app_setting_title">
+                <h2 class="my-0">eBPM</h2>
+                <p-inputSwitch />
+            </div>
+            <div>
+                <label>Enter eBPM value </label>
+                <p-inputNumber [min]="0" [max]="300"
+                [showButtons]="true"></p-inputNumber>
+            </div>
+            <div>
+                <p-button>Save</p-button>
+            </div>
+        </div>
+    </p-card>
+
+</div>
