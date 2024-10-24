@@ -74,7 +74,7 @@ export class ActivityDetailsComponent implements OnInit {
   recentAudio: any[] = [];
   activityStreams: any;
   toBeUpdated: boolean = false;
-
+  icon: string = ''
 
 
 
@@ -149,6 +149,7 @@ export class ActivityDetailsComponent implements OnInit {
             this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
               response.end_date = Constants.getActivityEndTime(response.start_date, response.elapsed_time);
               this.activityDetails.push(response);
+              this.isAM(this.activityDetails[0]?.start_date);
               this.getActivityStreams(response.id, stravaAccessToken);
               // console.log('Activity Details', this.activityDetails);
               this.pairItems(this.activityDetails, this.recentAudio);
@@ -156,7 +157,8 @@ export class ActivityDetailsComponent implements OnInit {
           };
         };
       });
-    }
+    };
+
   }
 
   getSavedADAndPairAudio(activityId: number, activityTime: any) {
@@ -165,6 +167,7 @@ export class ActivityDetailsComponent implements OnInit {
     this.stravaService.getActivityDetailById(activityId).subscribe((dbResponse) => {
       if (dbResponse.statusCode === 200) {
         this.activityDetails.push(dbResponse.payload.jsonData);
+        this.isAM(this.activityDetails[0]?.start_date);
         // console.log("db fetched activityDetails", this.activityDetails);
 
         //preceeding code
@@ -234,6 +237,7 @@ export class ActivityDetailsComponent implements OnInit {
             this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
               response.end_date = Constants.getActivityEndTime(response.start_date, response.elapsed_time);
               this.activityDetails.push(response);
+              this.isAM(this.activityDetails[0]?.start_date);
               this.getActivityStreams(response.id, stravaAccessToken);
               // console.log('Activity Details', this.activityDetails);
               this.pairItems(this.activityDetails, this.recentAudio);
@@ -391,7 +395,7 @@ export class ActivityDetailsComponent implements OnInit {
         };
         //code to remove tracks whose start time lies before previous track's end time
         // if (index > 0) {
-          
+
         //   if (new Date(result[0].tracks[index].start_time) < new Date(result[0].tracks[index - 1].played_at)) {
         //     console.log('erronous track', result[0].tracks[index]);
         //     result[0].tracks.splice(index , 1);
@@ -519,9 +523,9 @@ export class ActivityDetailsComponent implements OnInit {
     this.router.navigate(['/strava/activities']);
   }
 
-  changeOmissionStatus(event: any, trackId: string,played_at:string) {
+  changeOmissionStatus(event: any, trackId: string, played_at: string) {
     this.pairedTracks.forEach(pt => {
-      if (pt.track.id === trackId && pt.played_at===played_at) {
+      if (pt.track.id === trackId && pt.played_at === played_at) {
         pt.isOmitted = event.checked;
       };
     });
@@ -583,9 +587,15 @@ export class ActivityDetailsComponent implements OnInit {
 
   }
 
-  isAM(date: string | Date): boolean {
+  isAM(date: string | Date) {
     const hours = new Date(date).getHours();
-    return hours < 12;
+    const isDaytime = hours >= 6 && hours < 18;
+    if (isDaytime) {
+      this.icon = 'bi bi-cloud-sun-fill';
+    } else {
+      this.icon = 'bi bi-cloud-moon-fill'
+    };
+    //return isDaytime;
   }
 
 

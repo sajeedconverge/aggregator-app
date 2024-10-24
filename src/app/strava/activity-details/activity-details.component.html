@@ -29,14 +29,9 @@
                         <h3 class="mb-2">{{ activityDetails[0]?.name}} </h3>
                     </div>
                     <div class="row flex justify-content-center align-items-center activity_timing">
-                        <!-- Conditionally display sun or moon icon based on isAM method -->
-                        <ng-container *ngIf="isAM(activityDetails[0]?.start_date); else showMoonIcon">
-                            <i class="bi bi-cloud-sun-fill"></i>
-                        </ng-container>
-                        <ng-template #showMoonIcon>
-                            <i class="bi bi-cloud-moon-fill"></i>
-                        </ng-template>
-                        <h4>{{activityDetails[0]?.start_date | date:'mm/dd/yyyy hh:mm:ss a'}} </h4>
+                        
+                        <i [class]="icon"></i>
+                        <h4>{{activityDetails[0]?.start_date | date:'MM/dd/yyyy hh:mm:ss a'}} </h4>
                     </div>
                 </div>
 
@@ -51,8 +46,8 @@
                     </div>
 
                     <p-button class="pr-2 btn-grp-custom" [outlined]="!showActivityGraph" size="small"
-                        (onClick)="showActivityGraphChanged()" pTooltip="Activity Detail Graph"
-                        tooltipPosition="bottom" icon="material-icons">
+                        (onClick)="showActivityGraphChanged()" pTooltip="Activity Detail Graph" tooltipPosition="bottom"
+                        icon="material-icons">
                         <span class="material-icons">
                             show_chart
                         </span>
@@ -61,7 +56,7 @@
                         (click)="saveActivityDetails()" icon="pi pi-save" iconPos="right" />
 
                     <p-button (click)="navigateToActivities()" class="ml-2" pTooltip="Back" tooltipPosition="bottom"
-                         pTooltip="Back" tooltipPosition="bottom" icon="material-icons">
+                        pTooltip="Back" tooltipPosition="bottom" icon="material-icons">
                         <span class="material-icons">
                             undo
                         </span>
@@ -143,7 +138,8 @@
 
             <div class="flex flex-row justify-content-between">
                 <h2>Audio Features</h2>
-                <p-button (click)="showAudioFeatures=false" pTooltip="Back" tooltipPosition="bottom"  icon="material-icons">
+                <p-button (click)="showAudioFeatures=false" pTooltip="Back" tooltipPosition="bottom"
+                    icon="material-icons">
                     <span class="material-icons">
                         undo
                     </span></p-button>
