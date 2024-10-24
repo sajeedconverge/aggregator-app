@@ -204,7 +204,7 @@ export class AudioLibraryComponent implements OnInit {
             pltrack.jsonData.duration = Constants.formatMilliseconds(pltrack.jsonData.duration_ms);
             return pltrack.jsonData;
           });
-          console.log('this.audioTracks', this.audioTracks);
+          // console.log('this.audioTracks', this.audioTracks);
           this.tracksData.tracks = this.audioTracks;
 
 
@@ -695,7 +695,7 @@ export class AudioLibraryComponent implements OnInit {
         const spotifyAccessToken = sessionStorage.getItem('spotify-bearer-token') || '';
         this.spotifyService.SpotifyCommonGetApi(playlistsUrl, spotifyAccessToken).subscribe((playlistResponse) => {
           this.userPlaylists = playlistResponse.items;
-          console.log(this.userPlaylists);
+          // console.log(this.userPlaylists);
         }, error => {
           this.messageService.add({ severity: 'warn', summary: 'Request Failed !', detail: 'Please try again.' });
           this.isLoading = false;
@@ -728,7 +728,7 @@ export class AudioLibraryComponent implements OnInit {
   }
 
   updatePlaylist() {
-    console.log('selectedPlaylist', this.selectedPlaylist);
+    // console.log('selectedPlaylist', this.selectedPlaylist);
     if (this.selectedPlaylist != null) {
       this.spotifyService.getPlaylistOpsUrl(this.selectedPlaylist.id).subscribe((res) => {
         if (res.statusCode === 200) {
@@ -760,7 +760,7 @@ export class AudioLibraryComponent implements OnInit {
 
   clear(table: Table) {
     table.clear();
-    console.log('clear method called :')
+    // console.log('clear method called :')
     this.filterRequest.sortField = 'name';
     this.filterRequest.sortOrder = 1;
     this.filterRequest.pageSize = this.pageSize;

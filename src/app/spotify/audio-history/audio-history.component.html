@@ -4,46 +4,46 @@
 <p-confirmDialog />
 
 <div class="palylist_table">
-    <p-table [value]="hisotryTracks" [rows]="limit" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+    <!-- <p-table [value]="hisotryTracks" [rows]="limit" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
         (onPage)="onPageChange($event)" [totalRecords]="hisotryTracks.length" [paginator]="true" paginatorPosition="top"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" sortField="added_at"
         (sortOrder)="1" [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
+        (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)"> -->
+    <p-table [value]="hisotryTracks" [rows]="limit" sortField="added_at" (sortOrder)="1"
+        [tableStyle]="{'min-width': '60rem'}" [(selection)]="selectedTracksList" #tableRef
         (onRowReorder)="tableReordered($event)" (onSort)="tableSorted($event)">
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
-                <div></div>
-                <h3>Recently Played</h3>
+                <h2>Recently Played</h2>
                 <div class="flex flex-row align-items-center">
                     <div class="flex flex-row align-items-center">
-                        <!-- <div *ngIf="selectedTracksList.length>0">
-                            <p-button icon="pi pi-chart-line" class="px-2" pTooltip="Projections Graph"
-                                tooltipPosition="bottom" (onClick)="showProjections()" ></p-button>
-                        </div> -->
 
                         <div>
-                            <p-button [rounded]="true" severity="success" icon="pi pi-refresh"
+                            <p-button  severity="success" icon="pi pi-refresh"
                                 [disabled]="!showSummaryGraph && !showDetailedGraph" (onClick)="refreshGraphs()"
                                 pTooltip="Refresh Graph" tooltipPosition="bottom" class="px-2"></p-button>
                         </div>
                         <!-- <p-buttonGroup class="pr-3 btn-grp-custom">
                             <p-button [outlined]="!showSummaryGraph" size="small" (onClick)="showSummaryGraphChanged(false)"
                                 pTooltip="Summary Graph" tooltipPosition="bottom">
-                                <span class="material-symbols-outlined">
+                                <span class="material-icons">
                                     show_chart
                                 </span>
                             </p-button>
                             <p-button [outlined]="!showDetailedGraph" size="small" (onClick)="showGraphChanged(false)"
                                 pTooltip="Detailed Graph" tooltipPosition="bottom">
-                                <span class="material-symbols-outlined">
+                                <span class="material-icons">
                                     monitoring
                                 </span>
                             </p-button>
                         </p-buttonGroup> -->
 
-                        <p-button class="pr-3 btn-grp-custom" [outlined]="!showSummaryGraph" size="small"
-                            (onClick)="showSummaryGraphChanged(false)" pTooltip="Summary Graph" tooltipPosition="bottom"
-                            icon="pi pi-chart-bar">
-
+                        <p-button class="pr-2 btn-grp-custom" [outlined]="!showSummaryGraph" 
+                            (onClick)="showSummaryGraphChanged(false)" pTooltip="Summary Graph"
+                            tooltipPosition="bottom" icon="material-icons">
+                            <span class="material-icons">
+                                show_chart
+                            </span>
                         </p-button>
                     </div>
 
@@ -51,13 +51,16 @@
                         [disabled]="selectedTracksList.length===0" icon="pi pi-save" iconPos="right"
                         pTooltip="Add tracks to existing playlist" tooltipPosition="bottom"></p-button>
 
-                    <p-button class="mr-2" severity="success" size="small" pTooltip="Save tracks as a new playlist"
+                    <p-button class="mr-2" severity="success"  pTooltip="Save tracks as a new playlist"
                         tooltipPosition="bottom" (onClick)="plNameVisible=true"
-                        [disabled]="selectedTracksList.length===0">
-                        <span class="material-symbols-outlined">
+                        [disabled]="selectedTracksList.length===0" icon="material-icons">
+                        <span class="material-icons">
                             playlist_add
                         </span>
                     </p-button>
+
+                    <p-button class="pr-2" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear(tableRef)"
+                        pTooltip="Clear filter(s)" tooltipPosition="bottom" />
                 </div>
             </div>
             <div>
@@ -88,34 +91,45 @@
                 <th pSortableColumn="track.name">
                     Title
                     <p-sortIcon field="track.name" />
+                    <p-columnFilter type="text" field="track.name" display="menu" [showOperator]="false" />
                 </th>
                 <th pSortableColumn="artist">
                     Artist
                     <p-sortIcon field="artist" />
+                    <p-columnFilter type="text" field="artist" display="menu" [showOperator]="false" />
                 </th>
                 <th pSortableColumn="played_at">
                     Played At
                     <p-sortIcon field="played_at" />
+                    <p-columnFilter type="text" field="played_at" display="menu" [showOperator]="false" />
                 </th>
                 <th pSortableColumn="track.duration_ms">
                     Duration
                     <p-sortIcon field="track.duration_ms" />
+                    <p-columnFilter type="text" field="duration" display="menu" [showOperator]="false" />
                 </th>
                 <th pSortableColumn="audio_features.tempo">
                     Tempo
                     <p-sortIcon field="audio_features.tempo" />
+                    <p-columnFilter type="numeric" field="audio_features.tempo" display="menu" [showOperator]="false" />
                 </th>
                 <th pSortableColumn="audio_features.danceability">
                     Danceability
                     <p-sortIcon field="audio_features.danceability" />
+                    <p-columnFilter type="numeric" field="audio_features.danceability" display="menu"
+                        [showOperator]="false" />
                 </th>
                 <th pSortableColumn="audio_features.energy">
                     Energy
                     <p-sortIcon field="audio_features.energy" />
+                    <p-columnFilter type="numeric" field="audio_features.energy" display="menu"
+                        [showOperator]="false" />
                 </th>
                 <th pSortableColumn="audio_features.loudness">
                     Loudness
                     <p-sortIcon field="audio_features.loudness" />
+                    <p-columnFilter type="numeric" field="audio_features.loudness" display="menu"
+                        [showOperator]="false" />
                 </th>
             </tr>
         </ng-template>

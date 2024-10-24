@@ -1,0 +1,14 @@
+.activity_timing i{
+    font-size: 28px;
+    margin-right: 10px;
+}
+.activity_timing i.bi-cloud-moon-fill{
+    color: #2051a1;
+}
+.activity_timing i.bi-cloud-sun-fill{
+    color: #dda33a;
+}
+.activity_timing h4{
+    margin-bottom: 0px;
+    margin-top: 6px;
+}

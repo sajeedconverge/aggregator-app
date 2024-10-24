@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -170,9 +170,10 @@ export class TrackDetailsComponent implements OnInit {
     private spotifyService: SpotifyService,
     private router: Router,
     private title:Title,
-    private messageService:MessageService
+    private messageService:MessageService,
+    private location: Location
   ) {
-    this.title.setTitle('AudioActive - Track Details')
+    this.title.setTitle('AudioActive - Audio History')
     this.trackId = sessionStorage.getItem('track-id') || '';
     this.trackName = sessionStorage.getItem('track-name') || '';
   }
@@ -187,7 +188,7 @@ export class TrackDetailsComponent implements OnInit {
 
     this.spotifyService.getTrackMetricsByTrackId(this.trackId).subscribe(historyResponse => {
       if (historyResponse.statusCode === 200) {
-        console.log('track metrics :', historyResponse.payload);
+        // console.log('track metrics :', historyResponse.payload);
         //sort data a/c to date in ascending order
         historyResponse.payload = historyResponse.payload.sort((a:any, b:any) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
@@ -332,7 +333,9 @@ export class TrackDetailsComponent implements OnInit {
 
   }
 
-
+  redirectBack(): void {
+    this.location.back();
+  }
 
 
 

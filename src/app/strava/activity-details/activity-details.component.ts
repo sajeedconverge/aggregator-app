@@ -74,7 +74,7 @@ export class ActivityDetailsComponent implements OnInit {
   recentAudio: any[] = [];
   activityStreams: any;
   toBeUpdated: boolean = false;
-
+  icon: string = ''
 
 
 
@@ -149,14 +149,16 @@ export class ActivityDetailsComponent implements OnInit {
             this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
               response.end_date = Constants.getActivityEndTime(response.start_date, response.elapsed_time);
               this.activityDetails.push(response);
+              this.isAM(this.activityDetails[0]?.start_date);
               this.getActivityStreams(response.id, stravaAccessToken);
-              console.log('Activity Details', this.activityDetails);
+              // console.log('Activity Details', this.activityDetails);
               this.pairItems(this.activityDetails, this.recentAudio);
             });
           };
         };
       });
-    }
+    };
+
   }
 
   getSavedADAndPairAudio(activityId: number, activityTime: any) {
@@ -165,7 +167,8 @@ export class ActivityDetailsComponent implements OnInit {
     this.stravaService.getActivityDetailById(activityId).subscribe((dbResponse) => {
       if (dbResponse.statusCode === 200) {
         this.activityDetails.push(dbResponse.payload.jsonData);
-        console.log("db fetched activityDetails", this.activityDetails);
+        this.isAM(this.activityDetails[0]?.start_date);
+        // console.log("db fetched activityDetails", this.activityDetails);
 
         //preceeding code
         this.pairedTracks = this.activityDetails[0].audio;
@@ -197,7 +200,7 @@ export class ActivityDetailsComponent implements OnInit {
           this.isADSaved = true;
         });
 
-        console.log("this.pairedTracks", this.pairedTracks);
+        // console.log("this.pairedTracks", this.pairedTracks);
 
         this.isLoading = false;
       } else if (dbResponse.statusCode === 404) {
@@ -226,7 +229,7 @@ export class ActivityDetailsComponent implements OnInit {
             track.start_time = Constants.getTrackStartTime(track.played_at, track.track.duration_ms);
             //track.end_time = Constants.getTrackEndTime(track.played_at, track.track.duration_ms);
           });
-          console.log("this.recentAudio", this.recentAudio);
+          // console.log("this.recentAudio", this.recentAudio);
           //to filter out the activities with no tracks
 
           //to pair the activity and song
@@ -234,8 +237,9 @@ export class ActivityDetailsComponent implements OnInit {
             this.stravaService.StravaCommonGetApi(activityUrl, stravaAccessToken).subscribe((response) => {
               response.end_date = Constants.getActivityEndTime(response.start_date, response.elapsed_time);
               this.activityDetails.push(response);
+              this.isAM(this.activityDetails[0]?.start_date);
               this.getActivityStreams(response.id, stravaAccessToken);
-              console.log('Activity Details', this.activityDetails);
+              // console.log('Activity Details', this.activityDetails);
               this.pairItems(this.activityDetails, this.recentAudio);
             });
           };
@@ -391,7 +395,7 @@ export class ActivityDetailsComponent implements OnInit {
         };
         //code to remove tracks whose start time lies before previous track's end time
         // if (index > 0) {
-          
+
         //   if (new Date(result[0].tracks[index].start_time) < new Date(result[0].tracks[index - 1].played_at)) {
         //     console.log('erronous track', result[0].tracks[index]);
         //     result[0].tracks.splice(index , 1);
@@ -400,7 +404,7 @@ export class ActivityDetailsComponent implements OnInit {
       });
     };
     this.pairedResult = result;
-    console.log("pairedItems", result);
+    // console.log("pairedItems", result);
     this.isLoading = false;
     return result;
   }
@@ -423,7 +427,7 @@ export class ActivityDetailsComponent implements OnInit {
         };
         this.spotifyService.postTrack(PostTrackRequest).subscribe((postTrackResponse) => {
           if (postTrackResponse.statusCode === 200) {
-            console.log("track added successfully.");
+            // console.log("track added successfully.");
 
           }
         });
@@ -449,7 +453,7 @@ export class ActivityDetailsComponent implements OnInit {
 
       this.spotifyService.postTrackMetric(trackMetric).subscribe((postMetricResponse) => {
         if (postMetricResponse.statusCode === 200) {
-          console.log('metric posted successfully.');
+          // console.log('metric posted successfully.');
 
         };
       });
@@ -464,7 +468,7 @@ export class ActivityDetailsComponent implements OnInit {
       this.isLoading = true;
       if (adResponse.statusCode === 200) {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Activity details saved successfully.' });
-        console.log("actvity detail added successfully.");
+        // console.log("actvity detail added successfully.");
 
         this.isADSaved = true;
         this.isLoading = false;
@@ -519,9 +523,9 @@ export class ActivityDetailsComponent implements OnInit {
     this.router.navigate(['/strava/activities']);
   }
 
-  changeOmissionStatus(event: any, trackId: string) {
+  changeOmissionStatus(event: any, trackId: string, played_at: string) {
     this.pairedTracks.forEach(pt => {
-      if (pt.track.id === trackId) {
+      if (pt.track.id === trackId && pt.played_at === played_at) {
         pt.isOmitted = event.checked;
       };
     });
@@ -529,7 +533,7 @@ export class ActivityDetailsComponent implements OnInit {
 
 
   updateActivityDetail() {
-    console.log("updated activityDetails", this.activityDetails);
+    // console.log("updated activityDetails", this.activityDetails);
 
     this.isLoading = true;
     //to store activity detail and track json
@@ -558,7 +562,7 @@ export class ActivityDetailsComponent implements OnInit {
 
       this.spotifyService.updateTrackMetric(trackMetric).subscribe((postMetricResponse) => {
         if (postMetricResponse.statusCode === 200) {
-          console.log('metric posted successfully.');
+          // console.log('metric posted successfully.');
 
         };
       });
@@ -573,7 +577,7 @@ export class ActivityDetailsComponent implements OnInit {
       this.isLoading = true;
       if (adResponse.statusCode === 200) {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Activity details saved successfully.' });
-        console.log("actvity detail added successfully.");
+        // console.log("actvity detail added successfully.");
 
         this.isADSaved = true;
         this.isLoading = false;
@@ -583,7 +587,16 @@ export class ActivityDetailsComponent implements OnInit {
 
   }
 
-
+  isAM(date: string | Date) {
+    const hours = new Date(date).getHours();
+    const isDaytime = hours >= 6 && hours < 18;
+    if (isDaytime) {
+      this.icon = 'bi bi-cloud-sun-fill';
+    } else {
+      this.icon = 'bi bi-cloud-moon-fill'
+    };
+    //return isDaytime;
+  }
 
 
 

@@ -80,7 +80,7 @@ export class ProjectionsGraphComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.tracks);
+    // console.log(this.tracks);
     this.options = {
       maintainAspectRatio: false,
       aspectRatio: 0.6,
@@ -175,7 +175,7 @@ export class ProjectionsGraphComponent implements OnInit {
       })
     });
 
-    console.log('data', this.data);
+    // console.log('data', this.data);
   }
 
 

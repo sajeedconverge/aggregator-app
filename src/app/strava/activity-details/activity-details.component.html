@@ -19,33 +19,49 @@
         <ng-template pTemplate="caption">
 
             <div class="flex flex-row justify-content-between">
-                <h3>Activity Details</h3>
+                <div>
+                    <h2>Activity Details</h2>
+                </div>
+
+
+                <div class="col text-center">
+                    <div class="row">
+                        <h3 class="mb-2">{{ activityDetails[0]?.name}} </h3>
+                    </div>
+                    <div class="row flex justify-content-center align-items-center activity_timing">
+
+                        <i [class]="icon"></i>
+                        <h4>{{activityDetails[0]?.start_date | date:'MM/dd/yyyy hh:mm:ss a'}} </h4>
+                    </div>
+                </div>
+
                 <div class="flex">
                     <div *ngIf="isADSaved">
-                        <p-button class="pr-2" icon="pi pi-minus-circle" pTooltip="Omit Tracks"
-                            tooltipPosition="bottom" (onClick)="toBeUpdated=true"  >
+                        <p-button class="pr-2" icon="pi pi-minus-circle" pTooltip="Omit Tracks" tooltipPosition="bottom"
+                            (onClick)="toBeUpdated=true">
                         </p-button>
                         <p-button severity="warning" class="pr-2" icon="pi pi-pencil" pTooltip="Update Changes"
                             tooltipPosition="bottom" [disabled]="!toBeUpdated" (onClick)="updateActivityDetail()">
                         </p-button>
                     </div>
 
-                    <p-button class="pr-3 btn-grp-custom" [outlined]="!showActivityGraph" size="small"
-                        (onClick)="showActivityGraphChanged()" pTooltip="Activity Detail Graph"
-                        tooltipPosition="bottom">
-                        <span class="material-symbols-outlined">
-                            show_chart
-                        </span>
-                    </p-button>
-                    <p-button pTooltip="Save" tooltipPosition="bottom" severity="success" [disabled]="isADSaved"
-                        (click)="saveActivityDetails()" icon="pi pi-save" iconPos="right" />
-
-                    <p-button (click)="navigateToActivities()" class="ml-2" pTooltip="Back" tooltipPosition="bottom"
-                        size="small" pTooltip="Back" tooltipPosition="bottom">
-                        <span class="material-symbols-outlined">
-                            undo
-                        </span>
-                    </p-button>
+                    <div>
+                        <p-button class="pr-2 btn-grp-custom" [outlined]="!showActivityGraph"
+                            (onClick)="showActivityGraphChanged()" pTooltip="Activity Detail Graph"
+                            tooltipPosition="bottom" icon="material-icons">
+                            <span class="material-icons">
+                                show_chart
+                            </span>
+                        </p-button>
+                        <p-button pTooltip="Save" tooltipPosition="bottom" severity="success" [disabled]="isADSaved"
+                            (click)="saveActivityDetails()" icon="pi pi-save" />
+                        <p-button (click)="navigateToActivities()" class="ml-2" pTooltip="Back" tooltipPosition="bottom"
+                            pTooltip="Back" tooltipPosition="bottom" icon="material-icons">
+                            <span class="material-icons">
+                                undo
+                            </span>
+                        </p-button>
+                    </div>
                 </div>
             </div>
 
@@ -103,7 +119,8 @@
                 }
                 @if(!isADSaved || toBeUpdated){
                 <td>
-                    <p-inputSwitch [(ngModel)]="track.isOmitted"  (onChange)="changeOmissionStatus($event,track.track.id)" />
+                    <p-inputSwitch [(ngModel)]="track.isOmitted"
+                        (onChange)="changeOmissionStatus($event,track.track.id,track.played_at)" />
                 </td>
                 }
 
@@ -121,9 +138,10 @@
         <ng-template pTemplate="caption">
 
             <div class="flex flex-row justify-content-between">
-                <h3>Audio Features</h3>
-                <p-button (click)="showAudioFeatures=false" pTooltip="Back" tooltipPosition="bottom" size="small">
-                    <span class="material-symbols-outlined">
+                <h2>Audio Features</h2>
+                <p-button (click)="showAudioFeatures=false" pTooltip="Back" tooltipPosition="bottom"
+                    icon="material-icons">
+                    <span class="material-icons">
                         undo
                     </span></p-button>
             </div>

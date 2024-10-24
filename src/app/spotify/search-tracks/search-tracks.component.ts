@@ -111,7 +111,7 @@ export class SearchTracksComponent implements OnInit {
     this.spotifyService.SpotifyCommonGetApi(searchUrl, spotifyAccessToken).subscribe((response) => {
       this.totalCount = response.tracks.total;
       this.searchedTracks = response.tracks.items;
-      console.log(this.searchedTracks);
+      // console.log(this.searchedTracks);
 
       // to check if song is liked
       // this.searchedTracks.forEach(track => {

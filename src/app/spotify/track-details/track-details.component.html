@@ -9,8 +9,8 @@
         [tableStyle]="{'min-width': '60rem'}">
         <ng-template pTemplate="caption">
             <div class="flex flex-row justify-content-between">
-                <h3>Audio Details</h3>
-                <h3>{{trackName}}</h3>
+                <h2>Audio History</h2>
+                <h3 class="pt-1">{{trackName}}</h3>
                 <div class="flex flex-row align-items-center">
                     <div>
                         <label class="mx-2">
@@ -29,6 +29,14 @@
                         </label>
                         <p-inputSwitch [(ngModel)]="showPaceGraph" class="mr-2" pTooltip="Pace History"
                             tooltipPosition="bottom" />
+                    </div>
+                    <div>
+                        <p-button (click)="redirectBack()" class="mr-2" pTooltip="Back" tooltipPosition="bottom"
+                         pTooltip="Back" tooltipPosition="bottom" icon="material-icons">
+                        <span class="material-icons">
+                            undo
+                        </span>
+                    </p-button>
                     </div>
                     <!-- <p-button (click)="backToTracks()">Back</p-button> -->
                 </div>
@@ -56,16 +64,16 @@
                 <td>
                     @if(index>0){
                     @if(trackDetails[index-1].pace<trackDetails[index].pace || index===0){ <span
-                        class="material-symbols-outlined text-green-800">
+                        class="material-icons text-green-800">
                         trending_up
                         </span>
                         }@else{
-                        <span class="material-symbols-outlined text-red-600">
+                        <span class="material-icons text-red-600">
                             trending_down
                         </span>
                         }
                         }@else {
-                        <span class="material-symbols-outlined text-green-800">
+                        <span class="material-icons text-green-800">
                             trending_up
                         </span>
                         }
@@ -74,16 +82,16 @@
                 <td>
                     @if(index>0){
                     @if(trackDetails[index-1].speed<trackDetails[index].speed || index===0){ <span
-                        class="material-symbols-outlined text-green-800">
+                        class="material-icons text-green-800">
                         trending_up
                         </span>
                         }@else{
-                        <span class="material-symbols-outlined text-red-600">
+                        <span class="material-icons text-red-600">
                             trending_down
                         </span>
                         }
                         }@else {
-                        <span class="material-symbols-outlined text-green-800">
+                        <span class="material-icons text-green-800">
                             trending_up
                         </span>
                         }

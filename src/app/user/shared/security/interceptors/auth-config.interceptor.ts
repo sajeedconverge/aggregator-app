@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { catchError, delay, from, mergeMap, of, retryWhen, switchMap, take, throwError, timer } from 'rxjs';
+import { catchError, tap, throwError, timer } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { inject } from '@angular/core';
@@ -9,11 +9,12 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
   const spotifyAuthService = inject(SpotifyAuthorizationService);
   //spotifyAuthService.checkExpiryAndRefreshToken();
   const url: string = req.url;
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
   //for not spotify api calls
   if (!(url.includes('accounts.spotify.com') || url.includes('api.spotify.com') || url.includes('www.strava.com/api'))) {
-    const authService = inject(AuthService);
-    const router = inject(Router);
+
 
     // Check if user is logged in but not authorized and redirect if needed
     if (authService.isLoggedIn() && !authService.isUserAuthorized()) {
@@ -35,32 +36,53 @@ export const authConfigInterceptor: HttpInterceptorFn = (req, next) => {
   if ((url.includes('accounts.spotify.com')) || (url.includes('api.spotify.com'))) {
     //console.log('spotify api called !');
 
+    // return next(req).pipe(
+    //   catchError((error: HttpErrorResponse) => {
+    //     // Handle 401 errors specifically
+    //     if (error.status === 401) {
+
+    //       spotifyAuthService.refreshSpotifyAccessToken();
+    //       // debugger;
+
+    //       console.log('spotify token expired !');
+
+    //       // if (authService.isSpotifyLinked()) {
+    //       //   timer(2000).subscribe(() => {
+    //       //     console.log('timer executed !');
+    //       //     return next(req);
+    //       //   });
+    //       // } else {
+    //       //   timer(2000).subscribe(() => {
+    //       //     console.log('timer executed !');
+    //       //     return next(req);
+    //       //   });
+    //       // };
+
+    //       return next(req);
+    //     } else {
+    //       // If the error is not 401, propagate it further
+    //       return throwError(error);
+    //     }
+    //   })
+    // );
+
     return next(req).pipe(
-      catchError((error: HttpErrorResponse) => {
-        // Handle 401 errors specifically
-        if (error.status === 401) {
+      tap({
+        error: (error: HttpErrorResponse) => {
+          if (error.status === 401) {
+            spotifyAuthService.refreshSpotifyAccessToken();
+            console.log('spotify token expired !');
 
-          spotifyAuthService.refreshSpotifyAccessToken();
-          // debugger;
-
-          console.log('spotify token expired !');
-
-          timer(3000).subscribe(() => {
-            console.log('timer executed !');
-            return next(req);
-          });
-
-          return next(req);
-
-
-
-        } else {
-          // If the error is not 401, propagate it further
-          return throwError(error);
+            timer(2000).subscribe(() => {
+              console.log('timer executed !');
+              return next(req);
+            });
+          };
         }
-      })
+      }),
+      // You may still need to propagate the error further
+      catchError((error: HttpErrorResponse) => throwError(error))
     );
-
 
   }
 

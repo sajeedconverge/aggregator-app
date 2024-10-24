@@ -14,15 +14,20 @@
 }@else {
 
 <section class="playlist_pagetitle_section" *ngIf="!showTracks && !showAudioFeatures">
-    <div class="flex">
-        <div class="flex flex-1 playlist_pagetitle justify-content-center m-2 px-5 py-3">
+    <div class="flex flex-row align-items-center">
+        <div class="flex flex-1 playlist_pagetitle justify-content-start m-2 px-5 py-2">
             <h2>Playlists</h2>
         </div>
-        <div class="m-3 btn_grp_short">
+        <!-- <div class="m-2 btn_grp_short"> -->
+        <div class="m-2 ">
             <p-buttonGroup class="btn-grp-custom">
                 <p-button icon="pi pi-th-large" (onClick)="changeGridView(true)" [outlined]="!isGrid" />
                 <p-button icon="pi pi-list" (onClick)="changeGridView(false)" [outlined]="isGrid" />
             </p-buttonGroup>
+        </div>
+        <div>
+            <p-button class="pr-2" [outlined]="true" icon="pi pi-filter-slash" (onClick)="clear()"
+                pTooltip="Clear filter(s)" tooltipPosition="bottom" />
         </div>
     </div>
 </section>
@@ -52,15 +57,35 @@
 
 <!-- All Playlist LIST section starts -->
 <section class="allplaylist" *ngIf="!isGrid">
-    <p-table [value]="userPlaylists" [tableStyle]="{ 'min-width': '50rem' }">
+    <p-table [value]="userPlaylists" [tableStyle]="{ 'min-width': '50rem' }" #tableRef>
         <ng-template pTemplate="header">
             <tr>
                 <th> </th>
-                <th>Playlist Name</th>
-                <th>Min Tempo</th>
-                <th>Max Tempo</th>
-                <th>Tracks</th>
-                <th>Total Duration</th>
+                <th pSortableColumn="name">
+                    Playlist Name
+                    <p-sortIcon field="name" />
+                    <p-columnFilter type="text" field="name" display="menu" [showOperator]="false" />
+                </th>
+                <th pSortableColumn="minTempo">
+                    Min Tempo
+                    <p-sortIcon field="minTempo" />
+                    <p-columnFilter type="numeric" field="minTempo" display="menu" [showOperator]="false" />
+                </th>
+                <th pSortableColumn="maxTempo">
+                    Max Tempo
+                    <p-sortIcon field="maxTempo" />
+                    <p-columnFilter type="numeric" field="maxTempo" display="menu" [showOperator]="false" />
+                </th>
+                <th pSortableColumn="tracks.total">
+                    Tracks
+                    <p-sortIcon field="tracks.total" />
+                    <p-columnFilter type="numeric" field="tracks.total" display="menu" [showOperator]="false" />
+                </th>
+                <th pSortableColumn="duration_ms">
+                    Total Duration
+                    <p-sortIcon field="duration_ms" />
+                    <p-columnFilter type="text" field="duration_ms" display="menu" [showOperator]="false" />
+                </th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-playlist>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { SpotifyAuthorizationService } from '../shared/services/spotify-authorization.service';
 import { SpotifyService } from '../shared/services/spotify.service';
@@ -6,7 +6,7 @@ import { Constants } from '../../shared/Constants';
 import { HttpHeaders } from '@angular/common/http';
 import { MessagesModule } from 'primeng/messages';
 import { Message, MessageService } from 'primeng/api';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { PlaylistDetailsComponent } from '../playlist-details/playlist-details.component';
@@ -53,7 +53,7 @@ export class PlaylistComponent implements OnInit {
   audioFeatures: any[] = [];
   currentTrackName: string = '';
   isGrid: boolean = true;
-
+  @ViewChild('tableRef') table!: Table;
 
 
 
@@ -209,5 +209,33 @@ export class PlaylistComponent implements OnInit {
     };
   }
 
+  clear() {
+    this.table.clear();
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
 }
